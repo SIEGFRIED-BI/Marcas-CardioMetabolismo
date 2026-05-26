@@ -348,20 +348,23 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 
   <!-- ══ 01 VENTA INTERNA ══════════════════════════════════════════════ -->
   <div class="sec" id="s-bud">
-    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Estimado de Ventas</h2></div>
-    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs estimado de ventas · % cumplimiento por producto</p>
+    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Presupuesto</h2></div>
+    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs presupuesto planificado · 2025 cierre · 2026 vigente</p>
     <div class="card">
       <div class="ctrl-row">
-        <div class="pill-group" id="bud-pills" style="display:none;"></div>
+        <div class="pill-group" id="bud-pills"></div><div id="bud-totals" style="margin-left:16px;display:flex;gap:14px;flex-wrap:wrap;font-family:IBM Plex Mono,monospace;font-size:11px;color:#4b5563;align-items:center;"></div>
         <div style="margin-left:auto;"><div class="yr-ctrl" id="bud-yr"></div></div>
       </div>
-      <div id="bud-table-wrap" style="overflow-x:hidden;margin-top:8px;width:100%;">
-        <table id="bud-table" style="width:100%;table-layout:fixed;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:10.5px;">
-          <colgroup id="bud-table-cols"></colgroup>
-          <thead id="bud-table-head"></thead>
-          <tbody id="bud-table-body"></tbody>
-          <tfoot id="bud-table-foot"></tfoot>
-        </table>
+      <div class="g2">
+        <div><div class="chart-h280"><canvas id="budChart"></canvas></div><div id="bud-iqvia-note" style="display:none;font-size:9px;color:#d97706;margin-top:4px;text-align:center;">⚠ Real derivado de IQVIA PM · dato SAP no disponible</div><div class="bud-cap" style="margin-top:10px;padding:8px 12px;background:#fffaeb;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#78350f;line-height:1.5;"><div style="display:flex;flex-wrap:wrap;gap:14px;font-family:IBM Plex Mono,monospace;font-size:10px;color:#4b5563;margin-bottom:6px;"><span><span style="display:inline-block;width:11px;height:11px;background:rgba(107,114,128,.25);border:1px solid rgba(55,65,81,.5);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Budget original (lo planificado para el mes)</span><span><span style="display:inline-block;width:11px;height:11px;background:rgba(245,158,11,.55);border:1px solid rgba(217,119,6,.85);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Redistribuido (extra agregado por shortfall acumulado)</span><span><span style="display:inline-block;width:11px;height:11px;background:#b01e1e;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Real PM (vendido)</span></div><div>El segmento <b style="color:#92400e">ámbar</b> en los <b>próximos 3 meses</b> indica la <b>parte redistribuida</b>: el déficit acumulado en meses pasados se reparte en el siguiente trimestre. Eso significa que para cerrar el año en plan, en cada uno de esos 3 meses hay que vender lo planificado <b>más</b> la porción ámbar. El total anual de Budget se mantiene constante.</div></div></div>
+        <div class="card-sm">
+          <p style="font-size:9px;font-weight:700;color:#4b5563;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">% Cumplimiento mensual</p>
+          <div id="bud-meter"></div>
+          <div class="bm-legend">
+            <span><span class="bm-sq" style="background:#fecaca;border:1px solid #b01e1e;"></span>Budget</span>
+            <span><span class="bm-sq" style="background:rgba(245,158,11,.55);border:1px solid rgba(217,119,6,.85);"></span>Redistribuido</span><span><span class="bm-sq" style="background:#b01e1e"></span>Real PM</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -933,167 +936,158 @@ let bChart=null, bProd='VALIUM', bYear='2026';
 const BUD_PRODS = Object.keys(D.budget);
 
 function renderBudPills(){
-  var el = document.getElementById('bud-pills');
-  if(el) el.innerHTML = '';
+  const totalPill = `<button class="pill ${'__TOTAL__'===bProd?'on':''}" onclick="setBP('__TOTAL__')"
+      style="${'__TOTAL__'===bProd?'color:#111827;border-color:#111827;font-weight:700;':'font-weight:700;'}">
+      <span class="dot" style="background:#111827"></span>TOTAL LÍNEA
+    </button>`;
+  document.getElementById('bud-pills').innerHTML = totalPill + BUD_PRODS.map(p=>`
+    <button class="pill ${p===bProd?'on':''}" onclick="setBP('${p}')"
+      style="${p===bProd?`color:${COLORS[p]||'#38bdf8'};border-color:${COLORS[p]||'#38bdf8'}`:''}">
+      <span class="dot" style="background:${COLORS[p]||'#555'}"></span>${p}
+    </button>`).join('');
 }
 function renderBudYr(){
   document.getElementById('bud-yr').innerHTML = ['2025','2026'].map(y=>`
     <button class="yr-btn ${y===bYear?'on':''}" onclick="setBY('${y}')">${y}</button>`).join('');
 }
-function setBP(p){ /* deprecated: tabla muestra todos los productos */ renderBudget(); }
+function setBP(p){bProd=p;renderBudPills();renderBudget();if(!_filterLock&&PROD_MAP[p])setGlobalFilter(p);}
 function setBY(y){bYear=y;renderBudYr();renderBudget();}
 
 function renderBudget(){
-  var BUD_PRODS_LOCAL = Object.keys(D.budget||{});
-  var MESES_L = (typeof MESES!=='undefined' && MESES.length===12) ? MESES : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  // Compact format: 1234 -> 1.2k, 1234567 -> 1.2M. Default to '—' for null.
-  var fmtU = function(n){
-    if(n==null) return '—';
-    var x = Math.abs(+n||0);
-    if(x===0) return '0';
-    if(x>=1e6) return (n/1e6).toFixed(x>=1e7?1:2).replace(/\.?0+$/,'')+'M';
-    if(x>=1e3) return (n/1e3).toFixed(x>=1e4?0:1).replace(/\.0$/,'')+'k';
-    return Math.round(n).toString();
-  };
-  var pctColor = function(p){
-    if(p == null) return '#9ca3af';
-    if(p >= 100) return '#16a34a';
-    if(p >= 85)  return '#d97706';
-    return '#b01e1e';
-  };
-  var pctBg = function(p){
-    if(p == null) return 'transparent';
-    if(p >= 100) return 'rgba(22,163,74,.08)';
-    if(p >= 85)  return 'rgba(217,119,6,.08)';
-    return 'rgba(176,30,30,.08)';
-  };
-  var rows = [];
-  var totalsReal = new Array(12).fill(0);
-  var totalsBud  = new Array(12).fill(0);
-  var hasReal = new Array(12).fill(false);
-  var hasBud  = new Array(12).fill(false);
-  BUD_PRODS_LOCAL.forEach(function(prod){
-    var yo = (D.budget[prod]||{})[bYear] || {};
-    var real = (yo.real || []).slice();
-    var bud  = (yo.budget || []).slice();
-    if(bYear==='2026' && (typeof getIQVIAReal2026==='function') && !real.some(function(v){return v!=null;})){
-      var iqv = getIQVIAReal2026(prod);
-      if(iqv) real = iqv;
-    }
-    while(real.length < 12) real.push(null);
-    while(bud.length  < 12) bud.push(null);
-    var totR = 0, totB = 0;
-    for(var i=0;i<12;i++){
-      var rv = real[i], bv = bud[i];
-      if(rv != null){ totR += +rv || 0; totalsReal[i] += +rv || 0; hasReal[i] = true; }
-      if(bv != null && +bv > 0){ totB += +bv || 0; totalsBud[i] += +bv || 0; hasBud[i] = true; }
-    }
-    rows.push({prod: prod, real: real, bud: bud, totR: totR, totB: totB});
-  });
-  // Colgroup: distribuye anchos para responsive sin scroll horizontal
-  var cg = document.getElementById('bud-table-cols');
-  if(cg){
-    var cgh = '<col style="width:11%">';      // Producto
-    cgh    += '<col style="width:5%">';       // Metrica label
-    for(var ci=0;ci<12;ci++) cgh += '<col style="width:6.5%">';  // 12 meses
-    cgh    += '<col style="width:6%">';       // Total
-    cg.innerHTML = cgh;
-  }
-  // Header (1 fila): PRODUCTO | METRICA | Ene .. Dic | TOTAL
-  var head = document.getElementById('bud-table-head');
-  if(head){
-    var hh = '<tr style="border-bottom:1px solid #e5e7eb;">';
-    hh += '<th style="text-align:left;padding:5px 6px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;">Producto</th>';
-    hh += '<th style="text-align:left;padding:5px 2px;font-size:8px;font-weight:600;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;"></th>';
-    MESES_L.forEach(function(m){
-      hh += '<th style="text-align:right;padding:5px 4px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.04em;text-transform:uppercase;">'+m+'</th>';
-    });
-    hh += '<th style="text-align:right;padding:5px 6px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
-    hh += '</tr>';
-    head.innerHTML = hh;
-  }
-  // Body: 3 filas por producto
-  var body = document.getElementById('bud-table-body');
-  if(body){
-    var html = '';
-    rows.forEach(function(r, idx){
-      var rowBorderTop = idx===0 ? '' : 'border-top:1px solid #e5e7eb;';
-      // Row 1: Venta
-      html += '<tr style="'+rowBorderTop+'">';
-      html += '<td rowspan="3" title="'+r.prod+'" style="padding:5px 6px;font-weight:700;font-size:10px;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.prod+'</td>';
-      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#b01e1e;letter-spacing:.03em;text-transform:uppercase;">Venta</td>';
-      r.real.forEach(function(v){
-        html += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(v))+'</td>';
-      });
-      html += '<td style="padding:2px 5px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(r.totR)+'</td>';
-      html += '</tr>';
-      // Row 2: Estim.
-      html += '<tr>';
-      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#1f4ba6;letter-spacing:.03em;text-transform:uppercase;">Estim.</td>';
-      r.bud.forEach(function(v){
-        var disp = (v==null || +v<=0) ? '—' : fmtU(v);
-        html += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
-      });
-      var totBStr = r.totB>0 ? fmtU(r.totB) : '—';
-      html += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:700;border-left:2px solid #fde2e2;">'+totBStr+'</td>';
-      html += '</tr>';
-      // Row 3: % Cumpl (mes a mes)
-      html += '<tr style="border-bottom:1px solid #f3f4f6;">';
-      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#6b7280;letter-spacing:.03em;text-transform:uppercase;">% Cumpl</td>';
-      for(var i=0;i<12;i++){
-        var rv = r.real[i], bv = r.bud[i];
-        var pct = (bv && +bv>0 && rv!=null) ? (+rv / +bv * 100) : null;
-        var pctStr = pct==null ? '—' : pct.toFixed(0)+'%';
-        html += '<td style="padding:2px 3px;text-align:right;font-weight:700;color:'+pctColor(pct)+';background:'+pctBg(pct)+';">'+pctStr+'</td>';
+  // TOTAL LINEA: aggregate across all families
+  let src, budget, real;
+  if(bProd==='__TOTAL__'){
+    budget = new Array(12).fill(0);
+    real = new Array(12).fill(null);
+    let hasReal = new Array(12).fill(false);
+    Object.keys(D.budget||{}).forEach(fam=>{
+      const fy = (D.budget[fam]||{})[bYear];
+      if(!fy) return;
+      const fb = fy.budget||[];
+      const fr = fy.real||[];
+      for(let i=0;i<12;i++){
+        budget[i] += (+fb[i]||0);
+        const v = fr[i];
+        if(v!=null){
+          if(real[i]==null) real[i] = 0;
+          real[i] += (+v||0);
+          hasReal[i] = true;
+        }
       }
-      var totPct = (r.totB>0 && r.totR>0) ? (r.totR/r.totB*100) : null;
-      var totPctStr = totPct==null ? '—' : totPct.toFixed(0)+'%';
-      html += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(totPct)+';background:'+pctBg(totPct)+';border-left:2px solid #fde2e2;">'+totPctStr+'</td>';
-      html += '</tr>';
     });
-    body.innerHTML = html;
+    // Cleanup: if no fam had real for that month, keep null
+    for(let i=0;i<12;i++){ if(!hasReal[i]) real[i] = null; }
+    src = { budget, real };
+  } else {
+    src = D.budget[bProd]?.[bYear]||{};
+    budget = src.budget||[];
+    real   = src.real||[];
   }
-  // Footer: TOTAL LINEA (3 filas)
-  var foot = document.getElementById('bud-table-foot');
-  if(foot){
-    var grandReal = totalsReal.reduce(function(a,b){return a+b;},0);
-    var grandBud  = totalsBud.reduce(function(a,b){return a+b;},0);
-    var grandPct  = (grandBud > 0 && grandReal > 0) ? (grandReal/grandBud*100) : null;
-    var fhtml = '';
-    // Row 1: TOTAL LINEA - Venta
-    fhtml += '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
-    fhtml += '<td rowspan="3" style="padding:5px 6px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:9px;font-weight:800;vertical-align:top;border-right:1px solid #fecaca;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">TOTAL</td>';
-    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#b01e1e;letter-spacing:.03em;text-transform:uppercase;">Venta</td>';
-    for(var j=0;j<12;j++){
-      var tv = hasReal[j] ? fmtU(totalsReal[j]) : '—';
-      fhtml += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+tv+'</td>';
-    }
-    fhtml += '<td style="padding:2px 5px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(grandReal)+'</td>';
-    fhtml += '</tr>';
-    // Row 2: TOTAL LINEA - Estim.
-    fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
-    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#1f4ba6;letter-spacing:.03em;text-transform:uppercase;">Estim.</td>';
-    for(var k=0;k<12;k++){
-      var tb = hasBud[k] ? fmtU(totalsBud[k]) : '—';
-      fhtml += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+tb+'</td>';
-    }
-    var gbStr = grandBud>0 ? fmtU(grandBud) : '—';
-    fhtml += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:800;border-left:2px solid #fde2e2;">'+gbStr+'</td>';
-    fhtml += '</tr>';
-    // Row 3: TOTAL LINEA - % Cumpl
-    fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
-    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#6b7280;letter-spacing:.03em;text-transform:uppercase;">% Cumpl</td>';
-    for(var n=0;n<12;n++){
-      var rr = totalsReal[n], bb = totalsBud[n];
-      var mpct = (bb>0 && rr>0) ? (rr/bb*100) : null;
-      var mpctStr = mpct==null ? '—' : mpct.toFixed(0)+'%';
-      fhtml += '<td style="padding:2px 3px;text-align:right;font-weight:800;color:'+pctColor(mpct)+';background:'+pctBg(mpct)+';">'+mpctStr+'</td>';
-    }
-    var gpctStr = grandPct == null ? '—' : grandPct.toFixed(0)+'%';
-    fhtml += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';background:'+pctBg(grandPct)+';border-left:2px solid #fde2e2;">'+gpctStr+'</td>';
-    fhtml += '</tr>';
-    foot.innerHTML = fhtml;
+  // 2026: if real is all-null, derive from IQVIA mol_perf
+  if(bYear==='2026' && !real.some(v=>v!=null)){
+    const iqvArr = getIQVIAReal2026(bProd);
+    if(iqvArr) real = iqvArr;
   }
+  // ── Redistribución trimestral: shortfall se redistribuye en los proximos 3 meses ──
+  const __origBudgetArr = budget.slice();
+  let __sfReal = 0, __sfBudget = 0, __sfShortPast = 0, __firstPending = -1;
+  for(let i=0;i<12;i++){
+    const b = +budget[i]||0, r = real[i];
+    __sfBudget += b;
+    if(r!=null){
+      __sfReal += +r||0;
+      if(b>0) __sfShortPast += Math.max(0, b - (+r||0));
+    } else if(__firstPending<0 && b>0){
+      __firstPending = i;
+    }
+  }
+  // Targets de redistribucion: proximos 3 meses con budget desde firstPending
+  const __sfTriIdx = [];
+  if(__firstPending>=0){
+    for(let i=__firstPending;i<12 && __sfTriIdx.length<3;i++){
+      if((+budget[i]||0)>0) __sfTriIdx.push(i);
+    }
+  }
+  let __adjBudget = budget.slice();
+  let __sfExtra = 0;
+  if(__sfTriIdx.length>0 && __sfShortPast>0){
+    __sfExtra = __sfShortPast / __sfTriIdx.length;
+    for(const i of __sfTriIdx){ __adjBudget[i] = (+budget[i]||0) + __sfExtra; }
+  }
+  const __sfPct = __sfBudget>0 ? Math.round(__sfReal/__sfBudget*100) : null;
+  const __sfPend = Math.max(0, __sfBudget - __sfReal);
+  const __sfTotalsEl = document.getElementById('bud-totals');
+  const __sfMESES = (typeof MESES!=='undefined' && MESES.length===12) ? MESES : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  if(__sfTotalsEl){
+    const fmtU = n=>Number(n||0).toLocaleString('es-AR');
+    const pctCls = __sfPct==null?'color:#4b5563':__sfPct>=100?'color:#15803d':__sfPct>=85?'color:#ca8a04':'color:#b01e1e';
+    let __triHtml = '';
+    if(__sfTriIdx.length>0 && __sfExtra>0){
+      const i0 = __sfTriIdx[0];
+      const nxtMes = __sfMESES[i0];
+      const nxtNew = +__adjBudget[i0]||0;
+      __triHtml = '<span style="color:#92400e">Próximo (' + nxtMes + '): <b>+' + fmtU(Math.round(__sfExtra)) + '</b> u. redistribuidas → target <b>' + fmtU(Math.round(nxtNew)) + '</b> u.</span>';
+    }
+    __sfTotalsEl.innerHTML =
+      '<span><b style="color:#111827">Año ' + bYear + '</b></span>'
+      + '<span>Budget <b style="color:#111827">' + fmtU(__sfBudget) + '</b> u.</span>'
+      + '<span>Real <b style="color:#111827">' + fmtU(__sfReal) + '</b> u.</span>'
+      + '<span style="' + pctCls + '">Cumpl. <b>' + (__sfPct==null?'—':__sfPct+'%') + '</b></span>'
+      + (__sfPend>0?'<span>Pendiente <b style="color:#b01e1e">' + fmtU(__sfPend) + '</b> u.</span>':'')
+      + __triHtml;
+  }
+  window.__sfBudgetTotals = {budget:__sfBudget, real:__sfReal, pct:__sfPct, pending:__sfPend, adjusted:__adjBudget, triExtra:__sfExtra, triIdx:__sfTriIdx};
+  const isIQVIADerived = bYear==='2026' && !(src.real||[]).some(v=>v!=null) && real.some(v=>v!=null);
+  const color  = (COLORS[bProd] && COLORS[bProd]!=='#38bdf8') ? COLORS[bProd] : '#b01e1e';
+  const maxVal = Math.max(...[...budget,...real].filter(Boolean), 1);
+
+  if(bChart) bChart.destroy();
+  const ctx = document.getElementById('budChart').getContext('2d');
+  bChart = new Chart(ctx,{
+    type:'bar',
+    data:{labels:MESES,datasets:[
+      {label:'Budget',data:budget,
+       backgroundColor:'rgba(107,114,128,.15)',borderColor:'rgba(55,65,81,.5)',
+       borderWidth:1,borderRadius:0,order:3,stack:'budget'},
+      {label:'Redistribuido',data:__adjBudget.map((v,i)=>Math.max(0,(+v||0)-(+budget[i]||0))),
+       backgroundColor:'rgba(245,158,11,.55)',borderColor:'rgba(217,119,6,.85)',
+       borderWidth:1,borderRadius:3,order:2,stack:'budget'},
+      {label:'Real PM',stack:'real',data:real,
+       backgroundColor:MESES.map((_,i)=>real[i]==null?'rgba(0,0,0,0)':(color==='#38bdf8'?'#b01e1e':hex2rgba(color,.9))),
+       borderColor:MESES.map((_,i)=>real[i]==null?'transparent':(color==='#38bdf8'?'#8f1515':color)),
+       borderWidth:1,borderRadius:3,order:1},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:'#ffffff',borderColor:'rgba(0,0,0,.12)',borderWidth:1,titleColor:'#111827',bodyColor:'#111827',
+          callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.parsed.y)} u.`,
+            afterLabel:c=>{if(c.datasetIndex!==1)return '';
+              const b=budget[c.dataIndex],r=real[c.dataIndex];
+              return (b&&r)?`Cumpl.: ${Math.round(r/b*100)}%`:'';}}}},
+      scales:{
+        x:{stacked:true,ticks:{color:'#566c82',font:{size:10,family:'IBM Plex Mono'}},grid:{color:'rgba(255,255,255,.03)'}},
+        y:{stacked:true,ticks:{color:'#566c82',font:{size:10},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v},
+           grid:{color:'rgba(0,0,0,.18)'},beginAtZero:true}
+      }}
+  });
+
+  const maxB = Math.max(...budget.filter(Boolean),1);
+  const noteEl=document.getElementById('bud-iqvia-note');
+  if(noteEl) noteEl.style.display=isIQVIADerived?'block':'none';
+  document.getElementById('bud-meter').innerHTML = MESES.map((m,i)=>{
+    const b=budget[i],r=real[i];
+    const pct=(b&&r)?Math.round(r/b*100):null;
+    const bW=b?Math.min(Math.round(b/maxB*100),100):0;
+    const rW=(r&&b)?Math.min(Math.round(r/maxB*100),100):0;
+    const barCol=pct===null?'rgba(100,116,139,.4)':pct>=110?'#22c55e':pct>=100?'#38bdf8':pct>=85?'#eab308':'#ef4444';
+    const pctStyle=pct===null?'color:#4b5563':pct>=100?'color:var(--green)':pct>=85?'color:var(--yellow)':'color:var(--red)';
+    return `<div class="bm-row">
+      <span class="bm-lbl">${m}</span>
+      <div class="bm-outer"><div class="bm-bud" style="width:${bW}%"></div>
+        <div class="bm-real" style="width:${rW}%;background:${barCol}"></div></div>
+      <span class="bm-pct" style="${pctStyle}">${pct===null?'—':pct+'%'}</span>
+    </div>`;
+  }).join('');
 }
 
 // ── PERFORMANCE (MS% + UNITS only) ────────────────────────────────────

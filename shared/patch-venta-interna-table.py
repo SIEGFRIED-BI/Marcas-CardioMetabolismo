@@ -25,7 +25,10 @@ FILES = [
     'OTC/index.html',
     'respiratorio/index.html',
     'mujer/index.html',
-    'SNC/index.html',
+    # SNC EXCLUIDO a pedido del usuario: en SNC se mantiene el chart original
+    # de Venta Interna (budChart + bud-meter + bud-totals + redistribución
+    # trimestral). Ver shared/_restore-snc-budget-chart.py.
+    # 'SNC/index.html',
     'dermatologia/dermato_dashboard.html',
 ]
 
