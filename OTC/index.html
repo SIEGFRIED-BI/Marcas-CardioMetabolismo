@@ -869,29 +869,37 @@ function renderBudget(){
   var BUD_PRODS_LOCAL = Object.keys(D.budget||{});
   var MESES_L = (typeof MESES!=='undefined' && MESES.length===12) ? MESES : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   var fmtU = function(n){ return Number(n||0).toLocaleString('es-AR'); };
-  // Build rows: producto + 12 monthly real + total
+  var pctColor = function(p){
+    if(p == null) return '#9ca3af';
+    if(p >= 100) return '#16a34a';
+    if(p >= 85)  return '#d97706';
+    return '#b01e1e';
+  };
+  // Build rows: producto + 12 monthly real + venta total + presup total + %cumpl
   var rows = [];
-  var totals = new Array(12).fill(0);
-  var hasAny = new Array(12).fill(false);
+  var totalsReal = new Array(12).fill(0);
+  var totalsBud  = new Array(12).fill(0);
+  var hasReal = new Array(12).fill(false);
+  var hasBud  = new Array(12).fill(false);
   BUD_PRODS_LOCAL.forEach(function(prod){
     var yo = (D.budget[prod]||{})[bYear] || {};
     var real = (yo.real || []).slice();
-    // 2026: si todo null, derivar de IQVIA mol_perf si esta disponible
+    var bud  = (yo.budget || []).slice();
+    // 2026: si todo null en real, derivar de IQVIA mol_perf si esta disponible
     if(bYear==='2026' && (typeof getIQVIAReal2026==='function') && !real.some(function(v){return v!=null;})){
       var iqv = getIQVIAReal2026(prod);
       if(iqv) real = iqv;
     }
     while(real.length < 12) real.push(null);
-    var tot = 0;
+    while(bud.length  < 12) bud.push(null);
+    var totR = 0, totB = 0;
     for(var i=0;i<12;i++){
-      var v = real[i];
-      if(v!=null){
-        tot += (+v || 0);
-        totals[i] += (+v || 0);
-        hasAny[i] = true;
-      }
+      var rv = real[i], bv = bud[i];
+      if(rv != null){ totR += +rv || 0; totalsReal[i] += +rv || 0; hasReal[i] = true; }
+      if(bv != null && +bv > 0){ totB += +bv || 0; totalsBud[i] += +bv || 0; hasBud[i] = true; }
     }
-    rows.push({prod: prod, real: real, total: tot});
+    var pct = (totB > 0 && totR > 0) ? (totR / totB * 100) : null;
+    rows.push({prod: prod, real: real, totR: totR, totB: totB, pct: pct});
   });
   // Header
   var head = document.getElementById('bud-table-head');
@@ -901,7 +909,9 @@ function renderBudget(){
     MESES_L.forEach(function(m){
       hh += '<th style="text-align:right;padding:8px 8px;font-size:10px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;">'+m+'</th>';
     });
-    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#b01e1e;letter-spacing:.06em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
+    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#b01e1e;letter-spacing:.06em;text-transform:uppercase;border-left:2px solid #fde2e2;">Venta</th>';
+    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#1f4ba6;letter-spacing:.06em;text-transform:uppercase;">Presup</th>';
+    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;">% Cumpl</th>';
     hh += '</tr>';
     head.innerHTML = hh;
   }
@@ -912,24 +922,32 @@ function renderBudget(){
       var cells = r.real.map(function(v){
         return '<td style="padding:6px 8px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(Math.round(v)))+'</td>';
       }).join('');
+      var pctStr = r.pct == null ? '—' : r.pct.toFixed(1)+'%';
       return '<tr style="border-bottom:1px solid #f3f4f6;">'+
         '<td style="padding:6px 10px;font-weight:600;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;">'+r.prod+'</td>'+
         cells +
-        '<td style="padding:6px 10px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(Math.round(r.total))+'</td>'+
+        '<td style="padding:6px 10px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(Math.round(r.totR))+'</td>'+
+        '<td style="padding:6px 10px;text-align:right;color:#1f4ba6;">'+(r.totB>0?fmtU(Math.round(r.totB)):'—')+'</td>'+
+        '<td style="padding:6px 10px;text-align:right;font-weight:700;color:'+pctColor(r.pct)+';">'+pctStr+'</td>'+
       '</tr>';
     }).join('');
   }
   // Footer: TOTAL LINEA
   var foot = document.getElementById('bud-table-foot');
   if(foot){
-    var grandTotal = totals.reduce(function(a,b){return a+b;},0);
+    var grandReal = totalsReal.reduce(function(a,b){return a+b;},0);
+    var grandBud  = totalsBud.reduce(function(a,b){return a+b;},0);
+    var grandPct  = (grandBud > 0 && grandReal > 0) ? (grandReal/grandBud*100) : null;
     var fr = '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
     fr += '<td style="padding:8px 10px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:11px;">TOTAL LÍNEA</td>';
     for(var j=0;j<12;j++){
-      var tv = hasAny[j] ? fmtU(Math.round(totals[j])) : '—';
+      var tv = hasReal[j] ? fmtU(Math.round(totalsReal[j])) : '—';
       fr += '<td style="padding:8px 8px;text-align:right;color:#111827;">'+tv+'</td>';
     }
-    fr += '<td style="padding:8px 10px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(Math.round(grandTotal))+'</td>';
+    fr += '<td style="padding:8px 10px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(Math.round(grandReal))+'</td>';
+    fr += '<td style="padding:8px 10px;text-align:right;color:#1f4ba6;font-weight:800;">'+(grandBud>0?fmtU(Math.round(grandBud)):'—')+'</td>';
+    var gpctStr = grandPct == null ? '—' : grandPct.toFixed(1)+'%';
+    fr += '<td style="padding:8px 10px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';">'+gpctStr+'</td>';
     fr += '</tr>';
     foot.innerHTML = fr;
   }
