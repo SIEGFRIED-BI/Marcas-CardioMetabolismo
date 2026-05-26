@@ -926,97 +926,107 @@ function renderBudget(){
     }
     rows.push({prod: prod, real: real, bud: bud, totR: totR, totB: totB});
   });
-  // Colgroup: 1 col Producto + 36 sub-cols (12 meses × 3) + 3 sub-cols Total
+  // Colgroup: distribuye anchos para responsive sin scroll horizontal
   var cg = document.getElementById('bud-table-cols');
   if(cg){
-    var cgh = '<col style="width:9%">';                 // Producto
-    for(var ci=0;ci<12;ci++){
-      cgh += '<col style="width:2.4%">';                // V del mes
-      cgh += '<col style="width:2.4%">';                // E del mes
-      cgh += '<col style="width:2.4%">';                // % del mes
-    }
-    cgh += '<col style="width:2.5%">';                  // V Total
-    cgh += '<col style="width:2.5%">';                  // E Total
-    cgh += '<col style="width:2.5%">';                  // % Total
+    var cgh = '<col style="width:11%">';      // Producto
+    cgh    += '<col style="width:5%">';       // Metrica label
+    for(var ci=0;ci<12;ci++) cgh += '<col style="width:6.5%">';  // 12 meses
+    cgh    += '<col style="width:6%">';       // Total
     cg.innerHTML = cgh;
   }
-  // Header (2 filas): row 1 = MESES con colspan=3, row 2 = sub-labels V/E/%
+  // Header (1 fila): PRODUCTO | METRICA | Ene .. Dic | TOTAL
   var head = document.getElementById('bud-table-head');
   if(head){
     var hh = '<tr style="border-bottom:1px solid #e5e7eb;">';
-    hh += '<th rowspan="2" style="text-align:left;padding:6px 6px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;vertical-align:bottom;border-right:1px solid #e5e7eb;">Producto</th>';
-    MESES_L.forEach(function(m, mi){
-      var sep = (mi%2===0) ? 'background:#fafbfc;' : '';
-      hh += '<th colspan="3" style="text-align:center;padding:4px 2px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid #f3f4f6;'+sep+'">'+m+'</th>';
+    hh += '<th style="text-align:left;padding:5px 6px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;">Producto</th>';
+    hh += '<th style="text-align:left;padding:5px 2px;font-size:8px;font-weight:600;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;"></th>';
+    MESES_L.forEach(function(m){
+      hh += '<th style="text-align:right;padding:5px 4px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.04em;text-transform:uppercase;">'+m+'</th>';
     });
-    hh += '<th colspan="3" style="text-align:center;padding:4px 2px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #fde2e2;background:#fef2f2;">Total</th>';
-    hh += '</tr>';
-    // Row 2: V / E / % sub-headers (12 meses + Total)
-    hh += '<tr style="border-bottom:1px solid #e5e7eb;">';
-    for(var ji=0;ji<12;ji++){
-      var sep = (ji%2===0) ? 'background:#fafbfc;' : '';
-      hh += '<th style="text-align:right;padding:3px 2px;font-size:7.5px;font-weight:700;color:#b01e1e;letter-spacing:.02em;text-transform:uppercase;'+sep+'">V</th>';
-      hh += '<th style="text-align:right;padding:3px 2px;font-size:7.5px;font-weight:700;color:#1f4ba6;letter-spacing:.02em;text-transform:uppercase;'+sep+'">E</th>';
-      hh += '<th style="text-align:right;padding:3px 2px;font-size:7.5px;font-weight:700;color:#6b7280;letter-spacing:.02em;text-transform:uppercase;'+sep+'">%</th>';
-    }
-    hh += '<th style="text-align:right;padding:3px 2px;font-size:7.5px;font-weight:700;color:#b01e1e;letter-spacing:.02em;text-transform:uppercase;border-left:2px solid #fde2e2;background:#fef2f2;">V</th>';
-    hh += '<th style="text-align:right;padding:3px 2px;font-size:7.5px;font-weight:700;color:#1f4ba6;letter-spacing:.02em;text-transform:uppercase;background:#fef2f2;">E</th>';
-    hh += '<th style="text-align:right;padding:3px 2px;font-size:7.5px;font-weight:700;color:#6b7280;letter-spacing:.02em;text-transform:uppercase;background:#fef2f2;">%</th>';
+    hh += '<th style="text-align:right;padding:5px 6px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
     hh += '</tr>';
     head.innerHTML = hh;
   }
-  // Body: 1 fila por producto, cada mes = 3 celdas (V/E/%)
+  // Body: 3 filas por producto
   var body = document.getElementById('bud-table-body');
   if(body){
     var html = '';
-    rows.forEach(function(r){
+    rows.forEach(function(r, idx){
+      var rowBorderTop = idx===0 ? '' : 'border-top:1px solid #e5e7eb;';
+      // Row 1: Venta
+      html += '<tr style="'+rowBorderTop+'">';
+      html += '<td rowspan="3" title="'+r.prod+'" style="padding:5px 6px;font-weight:700;font-size:10px;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.prod+'</td>';
+      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#b01e1e;letter-spacing:.03em;text-transform:uppercase;">Venta</td>';
+      r.real.forEach(function(v){
+        html += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(v))+'</td>';
+      });
+      html += '<td style="padding:2px 5px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(r.totR)+'</td>';
+      html += '</tr>';
+      // Row 2: Estim.
+      html += '<tr>';
+      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#1f4ba6;letter-spacing:.03em;text-transform:uppercase;">Estim.</td>';
+      r.bud.forEach(function(v){
+        var disp = (v==null || +v<=0) ? '—' : fmtU(v);
+        html += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
+      });
+      var totBStr = r.totB>0 ? fmtU(r.totB) : '—';
+      html += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:700;border-left:2px solid #fde2e2;">'+totBStr+'</td>';
+      html += '</tr>';
+      // Row 3: % Cumpl (mes a mes)
       html += '<tr style="border-bottom:1px solid #f3f4f6;">';
-      html += '<td title="'+r.prod+'" style="padding:4px 6px;font-weight:700;font-size:10px;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;background:#fafbfc;border-right:1px solid #e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.prod+'</td>';
+      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#6b7280;letter-spacing:.03em;text-transform:uppercase;">% Cumpl</td>';
       for(var i=0;i<12;i++){
         var rv = r.real[i], bv = r.bud[i];
         var pct = (bv && +bv>0 && rv!=null) ? (+rv / +bv * 100) : null;
         var pctStr = pct==null ? '—' : pct.toFixed(0)+'%';
-        var monthBg = (i%2===0) ? 'background:#fafbfc;' : '';
-        var pctCellBg = pctBg(pct);
-        var bgFinal = pctCellBg !== 'transparent' ? pctCellBg : monthBg.replace('background:','') || 'transparent';
-        html += '<td style="padding:3px 2px;text-align:right;color:#111827;font-size:9.5px;'+monthBg+'">'+(rv==null?'—':fmtU(rv))+'</td>';
-        html += '<td style="padding:3px 2px;text-align:right;color:#1f4ba6;font-size:9.5px;'+monthBg+'">'+(bv==null||+bv<=0?'—':fmtU(bv))+'</td>';
-        html += '<td style="padding:3px 2px;text-align:right;font-weight:700;font-size:9.5px;color:'+pctColor(pct)+';background:'+(pctCellBg!=='transparent'?pctCellBg:(i%2===0?'#fafbfc':'transparent'))+';">'+pctStr+'</td>';
+        html += '<td style="padding:2px 3px;text-align:right;font-weight:700;color:'+pctColor(pct)+';background:'+pctBg(pct)+';">'+pctStr+'</td>';
       }
-      // Total: 3 sub-cols
       var totPct = (r.totB>0 && r.totR>0) ? (r.totR/r.totB*100) : null;
       var totPctStr = totPct==null ? '—' : totPct.toFixed(0)+'%';
-      var totBStr = r.totB>0 ? fmtU(r.totB) : '—';
-      html += '<td style="padding:3px 2px;text-align:right;font-weight:700;color:#b01e1e;font-size:9.5px;border-left:2px solid #fde2e2;background:#fef2f2;">'+fmtU(r.totR)+'</td>';
-      html += '<td style="padding:3px 2px;text-align:right;color:#1f4ba6;font-weight:700;font-size:9.5px;background:#fef2f2;">'+totBStr+'</td>';
-      html += '<td style="padding:3px 2px;text-align:right;font-weight:800;font-size:9.5px;color:'+pctColor(totPct)+';background:'+(pctBg(totPct)!=='transparent'?pctBg(totPct):'#fef2f2')+';">'+totPctStr+'</td>';
+      html += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(totPct)+';background:'+pctBg(totPct)+';border-left:2px solid #fde2e2;">'+totPctStr+'</td>';
       html += '</tr>';
     });
     body.innerHTML = html;
   }
-  // Footer: TOTAL LINEA (1 fila, mismo formato que producto)
+  // Footer: TOTAL LINEA (3 filas)
   var foot = document.getElementById('bud-table-foot');
   if(foot){
     var grandReal = totalsReal.reduce(function(a,b){return a+b;},0);
     var grandBud  = totalsBud.reduce(function(a,b){return a+b;},0);
     var grandPct  = (grandBud > 0 && grandReal > 0) ? (grandReal/grandBud*100) : null;
-    var fhtml = '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
-    fhtml += '<td style="padding:5px 6px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:9px;font-weight:800;border-right:1px solid #fecaca;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">TOTAL LÍNEA</td>';
-    for(var fj=0;fj<12;fj++){
-      var rr = totalsReal[fj], bb = totalsBud[fj];
+    var fhtml = '';
+    // Row 1: TOTAL LINEA - Venta
+    fhtml += '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
+    fhtml += '<td rowspan="3" style="padding:5px 6px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:9px;font-weight:800;vertical-align:top;border-right:1px solid #fecaca;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">TOTAL</td>';
+    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#b01e1e;letter-spacing:.03em;text-transform:uppercase;">Venta</td>';
+    for(var j=0;j<12;j++){
+      var tv = hasReal[j] ? fmtU(totalsReal[j]) : '—';
+      fhtml += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+tv+'</td>';
+    }
+    fhtml += '<td style="padding:2px 5px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(grandReal)+'</td>';
+    fhtml += '</tr>';
+    // Row 2: TOTAL LINEA - Estim.
+    fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
+    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#1f4ba6;letter-spacing:.03em;text-transform:uppercase;">Estim.</td>';
+    for(var k=0;k<12;k++){
+      var tb = hasBud[k] ? fmtU(totalsBud[k]) : '—';
+      fhtml += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+tb+'</td>';
+    }
+    var gbStr = grandBud>0 ? fmtU(grandBud) : '—';
+    fhtml += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:800;border-left:2px solid #fde2e2;">'+gbStr+'</td>';
+    fhtml += '</tr>';
+    // Row 3: TOTAL LINEA - % Cumpl
+    fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
+    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#6b7280;letter-spacing:.03em;text-transform:uppercase;">% Cumpl</td>';
+    for(var n=0;n<12;n++){
+      var rr = totalsReal[n], bb = totalsBud[n];
       var mpct = (bb>0 && rr>0) ? (rr/bb*100) : null;
       var mpctStr = mpct==null ? '—' : mpct.toFixed(0)+'%';
-      var tv = hasReal[fj] ? fmtU(rr) : '—';
-      var tb = hasBud[fj]  ? fmtU(bb) : '—';
-      fhtml += '<td style="padding:4px 2px;text-align:right;color:#111827;font-size:9.5px;font-weight:700;">'+tv+'</td>';
-      fhtml += '<td style="padding:4px 2px;text-align:right;color:#1f4ba6;font-size:9.5px;font-weight:700;">'+tb+'</td>';
-      fhtml += '<td style="padding:4px 2px;text-align:right;font-weight:800;font-size:9.5px;color:'+pctColor(mpct)+';background:'+pctBg(mpct)+';">'+mpctStr+'</td>';
+      fhtml += '<td style="padding:2px 3px;text-align:right;font-weight:800;color:'+pctColor(mpct)+';background:'+pctBg(mpct)+';">'+mpctStr+'</td>';
     }
     var gpctStr = grandPct == null ? '—' : grandPct.toFixed(0)+'%';
-    var gbStr   = grandBud>0 ? fmtU(grandBud) : '—';
-    fhtml += '<td style="padding:4px 2px;text-align:right;color:#b01e1e;font-weight:800;font-size:9.5px;border-left:2px solid #fde2e2;">'+fmtU(grandReal)+'</td>';
-    fhtml += '<td style="padding:4px 2px;text-align:right;color:#1f4ba6;font-weight:800;font-size:9.5px;">'+gbStr+'</td>';
-    fhtml += '<td style="padding:4px 2px;text-align:right;font-weight:800;font-size:9.5px;color:'+pctColor(grandPct)+';background:'+pctBg(grandPct)+';">'+gpctStr+'</td>';
+    fhtml += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';background:'+pctBg(grandPct)+';border-left:2px solid #fde2e2;">'+gpctStr+'</td>';
     fhtml += '</tr>';
     foot.innerHTML = fhtml;
   }
