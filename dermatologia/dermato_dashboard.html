@@ -264,6 +264,7 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 <link rel="stylesheet" href="../shared/microinteractions.css">
 <link rel="stylesheet" href="../shared/responsive.css">
 <script src="../shared/ux-shared.js" defer></script>
+  <link rel="stylesheet" href="../shared/multi-period-table.css">
 </head>
 <body>
 
@@ -401,6 +402,10 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
         </div>
       </div>
     </div>
+      <div class="card mp-summary-card" style="margin-top:14px;">
+      <p style="font-size:9px;font-weight:700;color:#4b5563;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Comparativa multi-periodo &middot; Mercado IQVIA</p>
+      <div id="mp-iqvia-wrap"></div>
+    </div>
   </div>
 
   <!-- ══ 03 RECETAS ══════════════════════════════════════════════════ -->
@@ -439,6 +444,10 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
         </div>
         <div id="rec-comp-table"></div>
       </div>
+    </div>
+      <div class="card mp-summary-card" style="margin-top:14px;">
+      <p style="font-size:9px;font-weight:700;color:#4b5563;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Comparativa multi-periodo &middot; Recetas (CloseUp)</p>
+      <div id="mp-rec-wrap"></div>
     </div>
   </div>
 
@@ -2147,6 +2156,27 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
   });
 })();
 
+</script>
+<script src="../shared/multi-period-table.js"></script>
+<script>
+// Multi-period summary tables (added by patch-multi-period-sections.py).
+// Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.
+(function(){
+  function getData(){
+    try { if (typeof OTC_DASHBOARD !== "undefined") return OTC_DASHBOARD; } catch(e){}
+    try { if (typeof D !== "undefined") return D; } catch(e){}
+    return null;
+  }
+  function init(){
+    if (typeof window.renderMultiPeriodTable !== "function") return;
+    var data = getData();
+    if (!data) return;
+    try { window.renderMultiPeriodTable("mp-iqvia-wrap", { source: "iqvia", data: data }); } catch(e){ console.error("[mp-iqvia]", e); }
+    try { window.renderMultiPeriodTable("mp-rec-wrap",   { source: "recetas", data: data }); } catch(e){ console.error("[mp-rec]", e); }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else setTimeout(init, 50);
+})();
 </script>
 </body></html>
 

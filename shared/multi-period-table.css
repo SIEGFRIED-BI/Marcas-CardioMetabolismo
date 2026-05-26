@@ -1,0 +1,115 @@
+/* shared/multi-period-table.css
+ * Estilos para la tabla multi-período (MAT/YTD/MES/TRIM × 6 métricas).
+ * Mismo lenguaje visual que kpis.html → vista 'Por Marca'.
+ * Responsive: sin scrollbar horizontal en ningún breakpoint.
+ */
+.mp-wrap {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+.mp-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+}
+.mp-table th, .mp-table td {
+  padding: 4px 4px;
+  text-align: right;
+  border-bottom: 1px solid #f3f4f6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mp-table thead tr.mp-group-row th {
+  padding: 6px 6px;
+  text-align: center;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(0,0,0,.1);
+}
+.mp-table thead tr.mp-group-row th.mp-g-mat  { background: #1f4ba6; }
+.mp-table thead tr.mp-group-row th.mp-g-ytd  { background: #ea580c; }
+.mp-table thead tr.mp-group-row th.mp-g-mes  { background: #15803d; }
+.mp-table thead tr.mp-group-row th.mp-g-trim { background: #7c3aed; }
+.mp-table thead tr.mp-group-row th.mp-fam-th {
+  background: #f3f4f6; color: #374151;
+  text-align: left;
+  padding-left: 8px;
+  border-right: 1px solid #e5e7eb;
+}
+.mp-table thead tr.mp-group-row th .mp-lbl {
+  display: block;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: .03em;
+  text-transform: none;
+  opacity: .9;
+  margin-top: 1px;
+}
+.mp-table thead tr.mp-sub-row th.mp-sh {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+  padding: 4px 3px;
+  border-bottom: 1px solid #e5e7eb;
+}
+.mp-table thead tr.mp-sub-row th.mp-sh-mat  { background: #e6edf8; color: #1f4ba6; }
+.mp-table thead tr.mp-sub-row th.mp-sh-ytd  { background: #fef3eb; color: #ea580c; }
+.mp-table thead tr.mp-sub-row th.mp-sh-mes  { background: #e8f5ee; color: #15803d; }
+.mp-table thead tr.mp-sub-row th.mp-sh-trim { background: #f1ebfb; color: #7c3aed; }
+.mp-table .mp-sep { border-right: 2px solid #e5e7eb; }
+.mp-table tbody td.mp-fam {
+  text-align: left;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  color: #111827;
+  background: #fafbfc;
+  border-right: 1px solid #e5e7eb;
+  padding-left: 8px;
+}
+.mp-table tbody tr:hover td { background: rgba(243,244,246,.4); }
+.mp-table tbody tr:hover td.mp-fam { background: #f3f4f6; }
+.mp-table td.mp-num { color: #111827; }
+.mp-table td.mp-ie { font-weight: 700; }
+.mp-table td.mp-ie-good { background: rgba(22,128,61,.10); color: #15803d; }
+.mp-table td.mp-ie-warn { background: rgba(217,119,6,.10); color: #d97706; }
+.mp-table td.mp-ie-bad  { background: rgba(176,30,30,.10); color: #b01e1e; }
+.mp-table td.mp-ie-flat { background: rgba(31,75,166,.06); color: #1f4ba6; }
+.mp-table td.mp-varpp-good { color: #15803d; font-weight: 700; }
+.mp-table td.mp-varpp-bad  { color: #b01e1e; font-weight: 700; }
+.mp-table td.mp-varpp-flat { color: #6b7280; }
+.mp-table .mp-arrow { font-size: 8px; opacity: .65; margin-right: 2px; }
+.mp-table .mp-arrow.up { color: #15803d; }
+.mp-table .mp-arrow.down { color: #b01e1e; }
+
+/* Breakpoints: progressively more compact */
+@media (max-width: 1280px) {
+  .mp-table { font-size: 9.5px; }
+  .mp-table th, .mp-table td { padding: 3px 3px; }
+  .mp-table thead tr.mp-group-row th .mp-lbl { font-size: 7px; }
+}
+@media (max-width: 1024px) {
+  .mp-table { font-size: 8.5px; }
+  .mp-table thead tr.mp-group-row th { font-size: 9px; padding: 4px 3px; }
+  .mp-table thead tr.mp-sub-row th.mp-sh { font-size: 7.5px; padding: 3px 2px; }
+  .mp-table tbody td.mp-fam { font-size: 9px; }
+}
+@media (max-width: 768px) {
+  .mp-table { font-size: 8px; }
+  .mp-table th, .mp-table td { padding: 2px 2px; }
+  .mp-table thead tr.mp-group-row th { font-size: 8px; }
+  .mp-table thead tr.mp-group-row th .mp-lbl { display: none; }
+  .mp-table thead tr.mp-sub-row th.mp-sh { font-size: 7px; }
+}
