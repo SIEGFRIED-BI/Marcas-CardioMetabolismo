@@ -134,6 +134,31 @@
     };
   }
 
+  // Metrica para un competidor individual: units = sus propias unidades,
+  // MS% = sus unidades / market total. IE = su growth / market growth.
+  function computeBrand(brandMonthly, marketMonthly, windowKeys) {
+    var brand_curr  = sumWindow(brandMonthly, windowKeys.curr);
+    var brand_prev  = sumWindow(brandMonthly, windowKeys.prev);
+    var market_curr = sumWindow(marketMonthly, windowKeys.curr);
+    var market_prev = sumWindow(marketMonthly, windowKeys.prev);
+    var ms_curr = (market_curr > 0) ? +(brand_curr / market_curr * 100).toFixed(2) : null;
+    var ms_prev = (market_prev > 0) ? +(brand_prev / market_prev * 100).toFixed(2) : null;
+    var ie = null;
+    if (brand_prev > 0 && market_prev > 0 && market_curr > 0) {
+      var bg = brand_curr / brand_prev;
+      var mg = market_curr / market_prev;
+      if (mg > 0) ie = Math.round(bg / mg * 100);
+    }
+    var var_pp = null;
+    if (ms_curr != null && ms_prev != null) var_pp = +(ms_curr - ms_prev).toFixed(2);
+    return {
+      market_curr: Math.round(brand_curr),   // shown as 'Units' for the brand row
+      market_prev: Math.round(brand_prev),
+      ms_curr: ms_curr, ms_prev: ms_prev,
+      ie: ie, var_pp: var_pp,
+    };
+  }
+
   // Build family list for IQVIA from D.mol_perf
   function buildIqviaFamilies(D) {
     var mp = D && D.mol_perf;
@@ -168,7 +193,26 @@
       if (!hasSie) continue;
       var periods = {};
       for (var pk in windows) periods[pk] = computeFamily(mktMonthly, sieMonthly, windows[pk]);
-      families.push({ family: fam, periods: periods });
+      // Build competitors list (each product is one row in expanded view)
+      var competitors = [];
+      for (var cp = 0; cp < prods2.length; cp++) {
+        var prod = prods2[cp];
+        var brandMonthly = prod.monthly_vals || {};
+        var brandPeriods = {};
+        for (var pk2 in windows) brandPeriods[pk2] = computeBrand(brandMonthly, mktMonthly, windows[pk2]);
+        competitors.push({
+          brand: prod.prod || '(sin nombre)',
+          is_sie: !!prod.is_sie,
+          periods: brandPeriods,
+        });
+      }
+      competitors.sort(function(a,b){
+        // SIE first, then by MAT units desc
+        if (a.is_sie && !b.is_sie) return -1;
+        if (!a.is_sie && b.is_sie) return 1;
+        return (b.periods.mat.market_curr||0) - (a.periods.mat.market_curr||0);
+      });
+      families.push({ family: fam, periods: periods, competitors: competitors });
     }
     families.sort(function(a,b){ return (b.periods.mat.market_curr||0) - (a.periods.mat.market_curr||0); });
     var ml = MES_SHORT[latest.m];
@@ -198,7 +242,12 @@
     if (!latest) return null;
     var windows = windowsFor(latest.y, latest.m);
 
+    var rc = (D && D.rec_comp) || {};
     var families = [];
+    function isSieBrand(name) {
+      var s = (name||'').toString().toUpperCase();
+      return /\bSIE\b/.test(s) || s.endsWith(' SIE') || s.endsWith('-SIE');
+    }
     for (var fam in rm) {
       var sieMonthly = (rm[fam] && rm[fam].sie) || {};
       var mktMonthly = (rm[fam] && rm[fam].mkt) || {};
@@ -208,7 +257,25 @@
       if (!hasAnySie) continue;
       var periods = {};
       for (var pk in windows) periods[pk] = computeFamily(mktMonthly, sieMonthly, windows[pk]);
-      families.push({ family: fam, periods: periods });
+      // Build competitors from rec_comp[fam]
+      var competitors = [];
+      var famComps = rc[fam] || {};
+      for (var brandName in famComps) {
+        var brandMonthly = famComps[brandName] || {};
+        var brandPeriods = {};
+        for (var pk2 in windows) brandPeriods[pk2] = computeBrand(brandMonthly, mktMonthly, windows[pk2]);
+        competitors.push({
+          brand: brandName,
+          is_sie: isSieBrand(brandName),
+          periods: brandPeriods,
+        });
+      }
+      competitors.sort(function(a,b){
+        if (a.is_sie && !b.is_sie) return -1;
+        if (!a.is_sie && b.is_sie) return 1;
+        return (b.periods.mat.market_curr||0) - (a.periods.mat.market_curr||0);
+      });
+      families.push({ family: fam, periods: periods, competitors: competitors });
     }
     families.sort(function(a,b){ return (b.periods.mat.market_curr||0) - (a.periods.mat.market_curr||0); });
     var ml = MES_SHORT[latest.m];
@@ -245,9 +312,19 @@
         + '<td class="' + varppClass(p.var_pp) + sep + '">' + vpStr + '</td>';
     }
 
-    var rows = data.families.map(function(f){
-      return '<tr>'
-        + '<td class="mp-fam" title="' + f.family + '">' + f.family + '</td>'
+    function escapeHtml(s){
+      return (s||'').toString()
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+    }
+
+    var rows = data.families.map(function(f, idx){
+      var hasComps = f.competitors && f.competitors.length > 0;
+      var caret = hasComps ? '<span class="mp-caret">▶</span>' : '<span class="mp-caret mp-caret-empty"></span>';
+      var clickAttr = hasComps ? ' data-fam-idx="'+idx+'" role="button" tabindex="0"' : '';
+      var trClass = hasComps ? 'mp-fam-row mp-expandable' : 'mp-fam-row';
+      return '<tr class="' + trClass + '"' + clickAttr + '>'
+        + '<td class="mp-fam" title="' + escapeHtml(f.family) + '">' + caret + escapeHtml(f.family) + '</td>'
         + periodCells(f.periods.mat,       false)
         + periodCells(f.periods.ytd,       false)
         + periodCells(f.periods.mes,       false)
@@ -285,6 +362,57 @@
       + '<tbody>' + rows + '</tbody>'
       + '</table>'
       + '</div>';
+
+    // Wire up expand/collapse on family rows
+    function buildCompRows(family) {
+      var comps = family.competitors || [];
+      return comps.map(function(c){
+        var sieCls = c.is_sie ? ' mp-comp-sie' : '';
+        return '<tr class="mp-comp-row' + sieCls + '">'
+          + '<td class="mp-fam mp-comp-fam" title="' + escapeHtml(c.brand) + '">'
+            + '<span class="mp-comp-indent"></span>'
+            + escapeHtml(c.brand)
+            + (c.is_sie ? '<span class="mp-sie-tag">SIE</span>' : '')
+          + '</td>'
+          + periodCells(c.periods.mat,       false)
+          + periodCells(c.periods.ytd,       false)
+          + periodCells(c.periods.mes,       false)
+          + periodCells(c.periods.trimestre, true)
+          + '</tr>';
+      }).join('');
+    }
+
+    function toggleExpand(famTr) {
+      var idx = parseInt(famTr.getAttribute('data-fam-idx'), 10);
+      if (isNaN(idx)) return;
+      var family = data.families[idx];
+      if (!family || !family.competitors || !family.competitors.length) return;
+      var expanded = famTr.classList.contains('mp-expanded');
+      if (expanded) {
+        // Remove competitor rows that follow
+        var next = famTr.nextElementSibling;
+        while (next && next.classList.contains('mp-comp-row')) {
+          var toRemove = next;
+          next = next.nextElementSibling;
+          toRemove.remove();
+        }
+        famTr.classList.remove('mp-expanded');
+        var caret = famTr.querySelector('.mp-caret');
+        if (caret) caret.textContent = '▶';
+      } else {
+        famTr.insertAdjacentHTML('afterend', buildCompRows(family));
+        famTr.classList.add('mp-expanded');
+        var caret2 = famTr.querySelector('.mp-caret');
+        if (caret2) caret2.textContent = '▼';
+      }
+    }
+
+    container.querySelectorAll('tr.mp-expandable').forEach(function(tr){
+      tr.addEventListener('click', function(){ toggleExpand(tr); });
+      tr.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(tr); }
+      });
+    });
   }
 
   function renderMultiPeriodTable(containerId, opts) {
