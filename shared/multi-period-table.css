@@ -149,6 +149,19 @@
   border-radius: 3px;
   vertical-align: middle;
 }
+.mp-rank {
+  display: inline-block;
+  min-width: 22px;
+  padding: 0 4px;
+  margin-right: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 8.5px;
+  font-weight: 700;
+  color: #6b7280;
+  text-align: right;
+  vertical-align: middle;
+}
+.mp-comp-sie .mp-rank { color: #b01e1e; }
 .mp-table td.mp-num { color: #111827; }
 .mp-table td.mp-ie { font-weight: 700; }
 .mp-table td.mp-ie-good { background: rgba(22,128,61,.10); color: #15803d; }

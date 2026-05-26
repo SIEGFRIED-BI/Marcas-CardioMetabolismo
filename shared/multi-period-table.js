@@ -207,9 +207,7 @@
         });
       }
       competitors.sort(function(a,b){
-        // SIE first, then by MAT units desc
-        if (a.is_sie && !b.is_sie) return -1;
-        if (!a.is_sie && b.is_sie) return 1;
+        // Ranking por MAT units desc (SIE en su posicion natural, no forzado primero)
         return (b.periods.mat.market_curr||0) - (a.periods.mat.market_curr||0);
       });
       families.push({ family: fam, periods: periods, competitors: competitors });
@@ -366,11 +364,13 @@
     // Wire up expand/collapse on family rows
     function buildCompRows(family) {
       var comps = family.competitors || [];
-      return comps.map(function(c){
+      return comps.map(function(c, i){
         var sieCls = c.is_sie ? ' mp-comp-sie' : '';
+        var rank = '#' + (i + 1);
         return '<tr class="mp-comp-row' + sieCls + '">'
           + '<td class="mp-fam mp-comp-fam" title="' + escapeHtml(c.brand) + '">'
             + '<span class="mp-comp-indent"></span>'
+            + '<span class="mp-rank">' + rank + '</span>'
             + escapeHtml(c.brand)
             + (c.is_sie ? '<span class="mp-sie-tag">SIE</span>' : '')
           + '</td>'
