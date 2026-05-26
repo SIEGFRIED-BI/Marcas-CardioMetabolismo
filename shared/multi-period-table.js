@@ -256,10 +256,24 @@
       var periods = {};
       for (var pk in windows) periods[pk] = computeFamily(mktMonthly, sieMonthly, windows[pk]);
       // Build competitors from rec_comp[fam]
+      // rec_comp[fam][brand] tiene shape { monthly: {month: N}, quarterly: {...}, total: N }
+      // (fallback a flat dict si la shape es directa)
       var competitors = [];
       var famComps = rc[fam] || {};
       for (var brandName in famComps) {
-        var brandMonthly = famComps[brandName] || {};
+        var brandData = famComps[brandName];
+        var brandMonthly = {};
+        if (brandData && typeof brandData === 'object') {
+          if (brandData.monthly && typeof brandData.monthly === 'object') {
+            brandMonthly = brandData.monthly;
+          } else {
+            // Fallback: detectar si las keys son meses directos (shape flat)
+            var sampleKey = Object.keys(brandData)[0];
+            if (sampleKey && /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/.test(sampleKey)) {
+              brandMonthly = brandData;
+            }
+          }
+        }
         var brandPeriods = {};
         for (var pk2 in windows) brandPeriods[pk2] = computeBrand(brandMonthly, mktMonthly, windows[pk2]);
         competitors.push({
