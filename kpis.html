@@ -356,6 +356,102 @@ table.products tbody tr:hover td:nth-child(3) { background: var(--gray-50); }
 .delta.flat { color: var(--gray-400); }
 .delta.na   { color: var(--gray-300); }
 
+/* MARCAS TABLE (multi-period) */
+.marcas-table-wrap {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  overflow: auto;
+  max-height: 80vh;
+}
+table.marcas-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  font-family: 'IBM Plex Mono', monospace;
+}
+table.marcas-table th, table.marcas-table td {
+  padding: 6px 8px; text-align: right; font-size: 11px;
+  border-bottom: 1px solid var(--gray-100);
+  white-space: nowrap;
+}
+table.marcas-table thead th {
+  position: sticky; top: 0; z-index: 4;
+  background: var(--gray-50);
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--gray-700);
+  border-bottom: 1px solid var(--gray-200);
+  cursor: pointer; user-select: none;
+}
+table.marcas-table thead tr.mt-group-row th {
+  font-size: 11px;
+  padding: 8px 10px;
+  text-align: center;
+  color: var(--white);
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  cursor: default;
+  z-index: 5;
+}
+table.marcas-table thead tr.mt-group-row th.mt-mat   { background: #1f4ba6; }
+table.marcas-table thead tr.mt-group-row th.mt-ytd   { background: #ea580c; }
+table.marcas-table thead tr.mt-group-row th.mt-mes   { background: #15803d; }
+table.marcas-table thead tr.mt-group-row th.mt-trim  { background: #7c3aed; }
+table.marcas-table thead tr.mt-group-row th.mt-marca-th {
+  background: var(--gray-100); color: var(--gray-700);
+  text-align: left; padding-left: 14px;
+  position: sticky; top: 0; left: 0; z-index: 6;
+  border-right: 1px solid var(--gray-200);
+  min-width: 160px;
+}
+table.marcas-table thead tr.mt-group-row th .mt-label {
+  display: block; font-size: 9px; font-weight: 400;
+  letter-spacing: .04em; text-transform: none;
+  opacity: .85; margin-top: 2px;
+}
+table.marcas-table thead tr.mt-sub-row th {
+  top: 38px; font-size: 9px; font-weight: 700;
+  padding: 5px 8px;
+  letter-spacing: .04em;
+  z-index: 4;
+}
+table.marcas-table thead tr.mt-sub-row th.mt-mat-bg  { background: #e6edf8; color: #1f4ba6; }
+table.marcas-table thead tr.mt-sub-row th.mt-ytd-bg  { background: #fef3eb; color: #ea580c; }
+table.marcas-table thead tr.mt-sub-row th.mt-mes-bg  { background: #e8f5ee; color: #15803d; }
+table.marcas-table thead tr.mt-sub-row th.mt-trim-bg { background: #f1ebfb; color: #7c3aed; }
+table.marcas-table thead tr.mt-sub-row th.mt-sep { border-right: 2px solid var(--gray-200); }
+table.marcas-table th[data-sort=asc]::after { content: ' ▲'; color: var(--white); }
+table.marcas-table th[data-sort=desc]::after { content: ' ▼'; color: var(--white); }
+table.marcas-table tr.mt-sub-row th[data-sort=asc]::after { color: currentColor; }
+table.marcas-table tr.mt-sub-row th[data-sort=desc]::after { color: currentColor; }
+table.marcas-table tbody td:nth-child(1) {
+  text-align: left; font-weight: 700; color: var(--gray-900);
+  position: sticky; left: 0; background: var(--white); z-index: 2;
+  border-right: 1px solid var(--gray-200);
+  font-family: 'IBM Plex Sans', sans-serif;
+  padding-left: 14px;
+}
+table.marcas-table tbody tr:hover td:nth-child(1) { background: var(--gray-50); }
+table.marcas-table tbody tr:hover td { background: rgba(243,244,246,.4); }
+/* Cell-level coloring (filled by JS) */
+table.marcas-table td.ie-cell { font-weight: 700; }
+table.marcas-table td.ie-good { background: rgba(22,128,61,.10); color: #15803d; }
+table.marcas-table td.ie-warn { background: rgba(217,119,6,.10); color: #d97706; }
+table.marcas-table td.ie-bad  { background: rgba(176,30,30,.10); color: #b01e1e; }
+table.marcas-table td.ie-flat { background: rgba(31,75,166,.08); color: #1f4ba6; }
+table.marcas-table td.varpp-good { color: #15803d; font-weight: 700; }
+table.marcas-table td.varpp-bad  { color: #b01e1e; font-weight: 700; }
+table.marcas-table td.varpp-flat { color: var(--gray-500); }
+table.marcas-table td .mt-arrow { font-size: 9px; opacity: .6; margin-right: 3px; }
+table.marcas-table td .mt-arrow.up { color: #15803d; }
+table.marcas-table td .mt-arrow.down { color: #b01e1e; }
+table.marcas-table td.mt-sep { border-right: 2px solid var(--gray-200); }
+table.marcas-table .mt-line-pill {
+  display: inline-block; font-size: 8px; font-weight: 700;
+  padding: 2px 5px; border-radius: 3px; margin-left: 6px;
+  letter-spacing: .05em; text-transform: uppercase;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--white); opacity: .85;
+}
+
 .empty-state {
   text-align: center; padding: 48px 24px; color: var(--gray-400); font-size: 13px;
 }
@@ -415,6 +511,7 @@ table.products tbody tr:hover td:nth-child(3) { background: var(--gray-50); }
     <div class="toggle" role="tablist" aria-label="Vista">
       <button data-view="lines"    class="active">Por Línea</button>
       <button data-view="products">Por Producto</button>
+      <button data-view="marcas">Por Marca</button>
     </div>
     <div class="period-tabs" role="tablist" aria-label="Período">
       <button data-period="mensual">Mensual</button>
@@ -448,6 +545,56 @@ table.products tbody tr:hover td:nth-child(3) { background: var(--gray-50); }
             <th data-key="units_curr" data-sort="desc">Units IQVIA</th>
             <th data-key="units_ie">IE U.</th>
             <th data-key="int_curr">Venta Interna</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="view-marcas" style="display:none;">
+    <div class="products-toolbar">
+      <select id="marca-line">
+        <option value="">Todas las líneas</option>
+      </select>
+      <input id="marca-search" type="search" placeholder="Buscar marca/familia…" />
+      <div class="toolbar-stats" id="marca-count-label">—</div>
+    </div>
+    <div class="marcas-table-wrap">
+      <table class="marcas-table" id="marcas-table">
+        <thead>
+          <tr class="mt-group-row">
+            <th rowspan="2" class="mt-marca-th" data-key="family">Marca</th>
+            <th colspan="6" class="mt-group mt-mat">MAT <span class="mt-label" id="mt-lbl-mat"></span></th>
+            <th colspan="6" class="mt-group mt-ytd">YTD <span class="mt-label" id="mt-lbl-ytd"></span></th>
+            <th colspan="6" class="mt-group mt-mes">MES <span class="mt-label" id="mt-lbl-mes"></span></th>
+            <th colspan="6" class="mt-group mt-trim">TRIM <span class="mt-label" id="mt-lbl-trim"></span></th>
+          </tr>
+          <tr class="mt-sub-row">
+            <th data-key="mat.market_prev" class="mt-mat-bg">U Ant</th>
+            <th data-key="mat.market_curr" data-sort="desc" class="mt-mat-bg">U Act</th>
+            <th data-key="mat.ms_prev" class="mt-mat-bg">MS% Ant</th>
+            <th data-key="mat.ms_curr" class="mt-mat-bg">MS% Act</th>
+            <th data-key="mat.ie" class="mt-mat-bg">IE</th>
+            <th data-key="mat.var_pp" class="mt-mat-bg mt-sep">Var pp</th>
+            <th data-key="ytd.market_prev" class="mt-ytd-bg">U Ant</th>
+            <th data-key="ytd.market_curr" class="mt-ytd-bg">U Act</th>
+            <th data-key="ytd.ms_prev" class="mt-ytd-bg">MS% Ant</th>
+            <th data-key="ytd.ms_curr" class="mt-ytd-bg">MS% Act</th>
+            <th data-key="ytd.ie" class="mt-ytd-bg">IE</th>
+            <th data-key="ytd.var_pp" class="mt-ytd-bg mt-sep">Var pp</th>
+            <th data-key="mes.market_prev" class="mt-mes-bg">U Ant</th>
+            <th data-key="mes.market_curr" class="mt-mes-bg">U Act</th>
+            <th data-key="mes.ms_prev" class="mt-mes-bg">MS% Ant</th>
+            <th data-key="mes.ms_curr" class="mt-mes-bg">MS% Act</th>
+            <th data-key="mes.ie" class="mt-mes-bg">IE</th>
+            <th data-key="mes.var_pp" class="mt-mes-bg mt-sep">Var pp</th>
+            <th data-key="trimestre.market_prev" class="mt-trim-bg">U Ant</th>
+            <th data-key="trimestre.market_curr" class="mt-trim-bg">U Act</th>
+            <th data-key="trimestre.ms_prev" class="mt-trim-bg">MS% Ant</th>
+            <th data-key="trimestre.ms_curr" class="mt-trim-bg">MS% Act</th>
+            <th data-key="trimestre.ie" class="mt-trim-bg">IE</th>
+            <th data-key="trimestre.var_pp" class="mt-trim-bg">Var pp</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -493,7 +640,8 @@ function monthSortKey(mk) {
 }
 
 let DATA = null;
-let state = { view:'lines', period:'ytd', prodLine:'', prodSearch:'', sortKey:'units_curr', sortDir:'desc' };
+let state = { view:'lines', period:'ytd', prodLine:'', prodSearch:'', sortKey:'units_curr', sortDir:'desc',
+              marcaLine:'', marcaSearch:'', marcaSortKey:'mat.market_curr', marcaSortDir:'desc' };
 
 function deltaClass(curr, prev, mode) {
   if (curr == null || prev == null) return 'na';
@@ -659,12 +807,152 @@ function renderProducts() {
   });
 }
 
+// ── MARCAS VIEW (multi-period table) ────────────────────────────────
+let MARCAS_DATA = null;
+const LINE_COLORS = {
+  'cardio':  '#b01e1e',
+  'antibio': '#7c2d12',
+  'otx':     '#0369a1',
+  'resp':    '#0891b2',
+  'mujer':   '#be185d',
+  'snc':     '#7c3aed',
+  'derma':   '#d97706',
+};
+
+function fmtInt(n) {
+  if (n == null) return '—';
+  return Number(n).toLocaleString('es-AR');
+}
+function fmtPct(n, decimals) {
+  if (n == null) return '—';
+  return Number(n).toFixed(decimals != null ? decimals : 1) + '%';
+}
+function ieClass(ie) {
+  if (ie == null) return 'ie-flat';
+  if (ie >= 105) return 'ie-good';
+  if (ie >= 95)  return 'ie-flat';
+  if (ie >= 85)  return 'ie-warn';
+  return 'ie-bad';
+}
+function varppClass(v) {
+  if (v == null) return 'varpp-flat';
+  if (v > 0.05) return 'varpp-good';
+  if (v < -0.05) return 'varpp-bad';
+  return 'varpp-flat';
+}
+function arrowFor(curr, prev) {
+  if (curr == null || prev == null) return '';
+  if (curr > prev * 1.001) return '<span class="mt-arrow up">▲</span>';
+  if (curr < prev * 0.999) return '<span class="mt-arrow down">▼</span>';
+  return '';
+}
+
+function renderMarcasPeriodCells(period, periodKey, sep) {
+  const m = period || {};
+  const ie = m.ie;
+  const vp = m.var_pp;
+  const sepCls = sep ? ' mt-sep' : '';
+  const bgKey = periodKey === 'mat' ? 'mt-mat-bg'
+             : periodKey === 'ytd' ? 'mt-ytd-bg'
+             : periodKey === 'mes' ? 'mt-mes-bg'
+             : 'mt-trim-bg';
+  // Arrows next to U Act and MS% Act
+  const uArrow = arrowFor(m.market_curr, m.market_prev);
+  const msArrow = arrowFor(m.ms_curr, m.ms_prev);
+  return ''
+    + '<td>' + fmtInt(m.market_prev) + '</td>'
+    + '<td>' + uArrow + fmtInt(m.market_curr) + '</td>'
+    + '<td>' + fmtPct(m.ms_prev) + '</td>'
+    + '<td>' + msArrow + fmtPct(m.ms_curr) + '</td>'
+    + '<td class="ie-cell ' + ieClass(ie) + '">' + (ie == null ? '—' : ie) + '</td>'
+    + '<td class="' + varppClass(vp) + sepCls + '">' + (vp == null ? '—' : (vp > 0 ? '+' : '') + Number(vp).toFixed(2) + ' pp') + '</td>';
+}
+
+function getMarcaSortValue(f, key) {
+  const parts = key.split('.');
+  if (parts.length === 1) return (f[key] || '').toString().toLowerCase();
+  const period = f.periods[parts[0]] || {};
+  const v = period[parts[1]];
+  return (v == null) ? -Infinity : Number(v);
+}
+
+function renderMarcas() {
+  if (!MARCAS_DATA) {
+    document.querySelector('#marcas-table tbody').innerHTML =
+      '<tr><td colspan="25" class="empty-state">Cargando datos…</td></tr>';
+    return;
+  }
+  // Period labels
+  const lbls = MARCAS_DATA.period_labels || {};
+  document.getElementById('mt-lbl-mat').textContent  = '(' + (lbls.mat       || '') + ')';
+  document.getElementById('mt-lbl-ytd').textContent  = '(' + (lbls.ytd       || '') + ')';
+  document.getElementById('mt-lbl-mes').textContent  = '(' + (lbls.mes       || '') + ')';
+  document.getElementById('mt-lbl-trim').textContent = '(' + (lbls.trimestre || '') + ')';
+
+  // Filter + sort
+  let list = (MARCAS_DATA.families || []).slice();
+  if (state.marcaLine) list = list.filter(f => f.line === state.marcaLine);
+  if (state.marcaSearch) {
+    const q = state.marcaSearch.toLowerCase();
+    list = list.filter(f => (f.family || '').toLowerCase().includes(q)
+                         || (f.lineName || '').toLowerCase().includes(q)
+                         || (f.sie_brands || []).join(' ').toLowerCase().includes(q));
+  }
+  list.sort((a,b) => {
+    const va = getMarcaSortValue(a, state.marcaSortKey);
+    const vb = getMarcaSortValue(b, state.marcaSortKey);
+    if (va < vb) return state.marcaSortDir === 'asc' ? -1 : 1;
+    if (va > vb) return state.marcaSortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  document.getElementById('marca-count-label').textContent = list.length + ' marca' + (list.length===1?'':'s');
+
+  // Body
+  const body = document.querySelector('#marcas-table tbody');
+  if (!list.length) {
+    body.innerHTML = '<tr><td colspan="25" class="empty-state">Sin resultados</td></tr>';
+    return;
+  }
+  body.innerHTML = list.map(f => {
+    const lineColor = LINE_COLORS[f.line] || '#6b7280';
+    const linePill = '<span class="mt-line-pill" style="background:'+lineColor+'">'+f.line.toUpperCase()+'</span>';
+    return '<tr>'
+      + '<td>' + f.family + linePill + '</td>'
+      + renderMarcasPeriodCells(f.periods.mat,       'mat',  true)
+      + renderMarcasPeriodCells(f.periods.ytd,       'ytd',  true)
+      + renderMarcasPeriodCells(f.periods.mes,       'mes',  true)
+      + renderMarcasPeriodCells(f.periods.trimestre, 'trim', false)
+      + '</tr>';
+  }).join('');
+
+  // Sort indicator
+  document.querySelectorAll('#marcas-table th[data-key]').forEach(th => {
+    th.removeAttribute('data-sort');
+    if (th.dataset.key === state.marcaSortKey) th.dataset.sort = state.marcaSortDir;
+  });
+}
+
+function fetchMarcas() {
+  return fetch('kpis-families.json?_=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { MARCAS_DATA = d; })
+    .catch(err => { console.error('[kpis-families] load failed:', err); });
+}
+
 function render() {
   document.getElementById('view-lines').style.display    = state.view==='lines'    ? '' : 'none';
   document.getElementById('view-products').style.display = state.view==='products' ? '' : 'none';
+  document.getElementById('view-marcas').style.display   = state.view==='marcas'   ? '' : 'none';
   document.getElementById('period-label').textContent = (DATA && DATA.period_labels) ? DATA.period_labels[state.period] : '';
   if (state.view === 'lines') renderLines();
-  else                        renderProducts();
+  else if (state.view === 'products') renderProducts();
+  else if (state.view === 'marcas') {
+    if (!MARCAS_DATA) {
+      fetchMarcas().then(() => { renderMarcas(); });
+    } else {
+      renderMarcas();
+    }
+  }
 }
 
 function init(d) {
@@ -708,6 +996,35 @@ function init(d) {
       if (state.sortKey === k) state.sortDir = (state.sortDir === 'asc' ? 'desc' : 'asc');
       else { state.sortKey = k; state.sortDir = 'desc'; }
       renderProducts();
+    });
+  });
+
+  // MARCAS: line filter + search + sort handlers
+  const marcaSel = document.getElementById('marca-line');
+  if (marcaSel) {
+    d.lines.forEach(l => {
+      const o = document.createElement('option');
+      o.value = l.key; o.textContent = l.name;
+      marcaSel.appendChild(o);
+    });
+    marcaSel.addEventListener('change', e => { state.marcaLine = e.target.value; renderMarcas(); });
+  }
+  const marcaSearch = document.getElementById('marca-search');
+  if (marcaSearch) {
+    marcaSearch.addEventListener('input', e => { state.marcaSearch = e.target.value; renderMarcas(); });
+  }
+  document.querySelectorAll('#marcas-table th[data-key]').forEach(th => {
+    th.addEventListener('click', () => {
+      const k = th.dataset.key;
+      if (!k || k === 'family' && state.marcaSortKey === 'family') {
+        state.marcaSortDir = (state.marcaSortDir === 'asc' ? 'desc' : 'asc');
+      } else if (state.marcaSortKey === k) {
+        state.marcaSortDir = (state.marcaSortDir === 'asc' ? 'desc' : 'asc');
+      } else {
+        state.marcaSortKey = k;
+        state.marcaSortDir = (k === 'family') ? 'asc' : 'desc';
+      }
+      renderMarcas();
     });
   });
 
