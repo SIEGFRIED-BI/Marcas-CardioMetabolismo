@@ -234,18 +234,20 @@
 
     function periodCells(p, isLast) {
       var sep = isLast ? '' : ' mp-sep';
+      // Tooltip con valores anteriores (U Ant y MS% Ant) que sacamos de las cols visibles
+      var tip = 'U Ant: ' + fmtInt(p.market_prev) + ' → ' + fmtInt(p.market_curr)
+              + ' | MS% Ant: ' + fmtPct(p.ms_prev) + ' → ' + fmtPct(p.ms_curr);
+      var vpStr = (p.var_pp == null) ? '—' : (p.var_pp > 0 ? '+' : '') + p.var_pp.toFixed(1);
       return ''
-        + '<td class="mp-num">' + fmtInt(p.market_prev) + '</td>'
-        + '<td class="mp-num">' + arrow(p.market_curr, p.market_prev) + fmtInt(p.market_curr) + '</td>'
-        + '<td class="mp-num">' + fmtPct(p.ms_prev) + '</td>'
-        + '<td class="mp-num">' + arrow(p.ms_curr, p.ms_prev) + fmtPct(p.ms_curr) + '</td>'
+        + '<td class="mp-num" title="' + tip + '">' + arrow(p.market_curr, p.market_prev) + fmtInt(p.market_curr) + '</td>'
+        + '<td class="mp-num" title="' + tip + '">' + arrow(p.ms_curr, p.ms_prev) + fmtPct(p.ms_curr) + '</td>'
         + '<td class="mp-ie ' + ieClass(p.ie) + '">' + (p.ie == null ? '—' : p.ie) + '</td>'
-        + '<td class="' + varppClass(p.var_pp) + sep + '">' + (p.var_pp == null ? '—' : (p.var_pp > 0 ? '+' : '') + p.var_pp.toFixed(2) + ' pp') + '</td>';
+        + '<td class="' + varppClass(p.var_pp) + sep + '">' + vpStr + '</td>';
     }
 
     var rows = data.families.map(function(f){
       return '<tr>'
-        + '<td class="mp-fam">' + f.family + '</td>'
+        + '<td class="mp-fam" title="' + f.family + '">' + f.family + '</td>'
         + periodCells(f.periods.mat,       false)
         + periodCells(f.periods.ytd,       false)
         + periodCells(f.periods.mes,       false)
@@ -257,28 +259,26 @@
       + '<div class="mp-wrap">'
       + '<table class="mp-table">'
       + '<colgroup>'
-      + '<col style="width:9%">'
-      + '<col span="6" style="width:3.8%">'   // MAT 6 cols
-      + '<col span="6" style="width:3.8%">'   // YTD 6 cols
-      + '<col span="6" style="width:3.8%">'   // MES 6 cols
-      + '<col span="6" style="width:3.8%">'   // TRIM 6 cols
+      + '<col style="width:16%">'             // Marca
+      + '<col span="4" style="width:5.25%">'  // MAT 4 cols
+      + '<col span="4" style="width:5.25%">'  // YTD 4 cols
+      + '<col span="4" style="width:5.25%">'  // MES 4 cols
+      + '<col span="4" style="width:5.25%">'  // TRIM 4 cols
       + '</colgroup>'
       + '<thead>'
       + '<tr class="mp-group-row">'
       +   '<th rowspan="2" class="mp-fam-th">Marca</th>'
-      +   '<th colspan="6" class="mp-g mp-g-mat">MAT <span class="mp-lbl">' + lbls.mat + '</span></th>'
-      +   '<th colspan="6" class="mp-g mp-g-ytd">YTD <span class="mp-lbl">' + lbls.ytd + '</span></th>'
-      +   '<th colspan="6" class="mp-g mp-g-mes">MES <span class="mp-lbl">' + lbls.mes + '</span></th>'
-      +   '<th colspan="6" class="mp-g mp-g-trim">TRIM <span class="mp-lbl">' + lbls.trimestre + '</span></th>'
+      +   '<th colspan="4" class="mp-g mp-g-mat">MAT <span class="mp-lbl">' + lbls.mat + '</span></th>'
+      +   '<th colspan="4" class="mp-g mp-g-ytd">YTD <span class="mp-lbl">' + lbls.ytd + '</span></th>'
+      +   '<th colspan="4" class="mp-g mp-g-mes">MES <span class="mp-lbl">' + lbls.mes + '</span></th>'
+      +   '<th colspan="4" class="mp-g mp-g-trim">TRIM <span class="mp-lbl">' + lbls.trimestre + '</span></th>'
       + '</tr>'
       + '<tr class="mp-sub-row">'
       +   ['mat','ytd','mes','trim'].map(function(grp){
-            return ['<th class="mp-sh mp-sh-'+grp+'">U Ant</th>',
-                    '<th class="mp-sh mp-sh-'+grp+'">U Act</th>',
-                    '<th class="mp-sh mp-sh-'+grp+'">MS% Ant</th>',
-                    '<th class="mp-sh mp-sh-'+grp+'">MS% Act</th>',
-                    '<th class="mp-sh mp-sh-'+grp+'">IE</th>',
-                    '<th class="mp-sh mp-sh-'+grp+' mp-sep">Var pp</th>'].join('');
+            return ['<th class="mp-sh mp-sh-'+grp+'" title="Unidades / Recetas período actual (con flecha vs anterior)">Units</th>',
+                    '<th class="mp-sh mp-sh-'+grp+'" title="Market Share % período actual (con flecha vs anterior)">MS%</th>',
+                    '<th class="mp-sh mp-sh-'+grp+'" title="Índice de Evolución: (SIE growth / Market growth) × 100">IE</th>',
+                    '<th class="mp-sh mp-sh-'+grp+' mp-sep" title="Variación en puntos porcentuales del MS% (Act - Ant)">Var pp</th>'].join('');
           }).join('')
       + '</tr>'
       + '</thead>'
