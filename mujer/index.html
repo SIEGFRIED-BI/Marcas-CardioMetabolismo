@@ -950,6 +950,12 @@ function renderBudget(){
     if(p >= 85)  return '#d97706';
     return '#b01e1e';
   };
+  var pctBg = function(p){
+    if(p == null) return 'transparent';
+    if(p >= 100) return 'rgba(22,163,74,.08)';
+    if(p >= 85)  return 'rgba(217,119,6,.08)';
+    return 'rgba(176,30,30,.08)';
+  };
   var rows = [];
   var totalsReal = new Array(12).fill(0);
   var totalsBud  = new Array(12).fill(0);
@@ -971,55 +977,102 @@ function renderBudget(){
       if(rv != null){ totR += +rv || 0; totalsReal[i] += +rv || 0; hasReal[i] = true; }
       if(bv != null && +bv > 0){ totB += +bv || 0; totalsBud[i] += +bv || 0; hasBud[i] = true; }
     }
-    var pct = (totB > 0 && totR > 0) ? (totR / totB * 100) : null;
-    rows.push({prod: prod, real: real, totR: totR, totB: totB, pct: pct});
+    rows.push({prod: prod, real: real, bud: bud, totR: totR, totB: totB});
   });
+  // Header (1 fila): PRODUCTO | METRICA | Ene .. Dic | TOTAL
   var head = document.getElementById('bud-table-head');
   if(head){
     var hh = '<tr style="border-bottom:1px solid #e5e7eb;">';
     hh += '<th style="text-align:left;padding:8px 10px;font-size:10px;font-weight:700;color:#374151;letter-spacing:.08em;text-transform:uppercase;">Producto</th>';
+    hh += '<th style="text-align:left;padding:8px 8px;font-size:9px;font-weight:600;color:#6b7280;letter-spacing:.05em;text-transform:uppercase;"></th>';
     MESES_L.forEach(function(m){
       hh += '<th style="text-align:right;padding:8px 8px;font-size:10px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;">'+m+'</th>';
     });
-    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#b01e1e;letter-spacing:.06em;text-transform:uppercase;border-left:2px solid #fde2e2;">Venta</th>';
-    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#1f4ba6;letter-spacing:.06em;text-transform:uppercase;">Presup</th>';
-    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;">% Cumpl</th>';
+    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#b01e1e;letter-spacing:.06em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
     hh += '</tr>';
     head.innerHTML = hh;
   }
+  // Body: 3 filas por producto
   var body = document.getElementById('bud-table-body');
   if(body){
-    body.innerHTML = rows.map(function(r){
-      var cells = r.real.map(function(v){
-        return '<td style="padding:6px 8px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(Math.round(v)))+'</td>';
-      }).join('');
-      var pctStr = r.pct == null ? '—' : r.pct.toFixed(1)+'%';
-      return '<tr style="border-bottom:1px solid #f3f4f6;">'+
-        '<td style="padding:6px 10px;font-weight:600;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;">'+r.prod+'</td>'+
-        cells +
-        '<td style="padding:6px 10px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(Math.round(r.totR))+'</td>'+
-        '<td style="padding:6px 10px;text-align:right;color:#1f4ba6;">'+(r.totB>0?fmtU(Math.round(r.totB)):'—')+'</td>'+
-        '<td style="padding:6px 10px;text-align:right;font-weight:700;color:'+pctColor(r.pct)+';">'+pctStr+'</td>'+
-      '</tr>';
-    }).join('');
+    var html = '';
+    rows.forEach(function(r, idx){
+      var rowBorderTop = idx===0 ? '' : 'border-top:1px solid #e5e7eb;';
+      // Row 1: Venta
+      html += '<tr style="'+rowBorderTop+'">';
+      html += '<td rowspan="3" style="padding:8px 10px;font-weight:700;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;">'+r.prod+'</td>';
+      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;">Venta</td>';
+      r.real.forEach(function(v){
+        html += '<td style="padding:4px 8px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(Math.round(v)))+'</td>';
+      });
+      html += '<td style="padding:4px 10px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(Math.round(r.totR))+'</td>';
+      html += '</tr>';
+      // Row 2: Presup
+      html += '<tr>';
+      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Presup</td>';
+      r.bud.forEach(function(v){
+        var disp = (v==null || +v<=0) ? '—' : fmtU(Math.round(v));
+        html += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
+      });
+      var totBStr = r.totB>0 ? fmtU(Math.round(r.totB)) : '—';
+      html += '<td style="padding:4px 10px;text-align:right;color:#1f4ba6;font-weight:700;border-left:2px solid #fde2e2;">'+totBStr+'</td>';
+      html += '</tr>';
+      // Row 3: % Cumpl (mes a mes)
+      html += '<tr style="border-bottom:1px solid #f3f4f6;">';
+      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;">% Cumpl</td>';
+      for(var i=0;i<12;i++){
+        var rv = r.real[i], bv = r.bud[i];
+        var pct = (bv && +bv>0 && rv!=null) ? (+rv / +bv * 100) : null;
+        var pctStr = pct==null ? '—' : pct.toFixed(0)+'%';
+        html += '<td style="padding:4px 8px;text-align:right;font-weight:700;color:'+pctColor(pct)+';background:'+pctBg(pct)+';">'+pctStr+'</td>';
+      }
+      var totPct = (r.totB>0 && r.totR>0) ? (r.totR/r.totB*100) : null;
+      var totPctStr = totPct==null ? '—' : totPct.toFixed(1)+'%';
+      html += '<td style="padding:4px 10px;text-align:right;font-weight:800;color:'+pctColor(totPct)+';background:'+pctBg(totPct)+';border-left:2px solid #fde2e2;">'+totPctStr+'</td>';
+      html += '</tr>';
+    });
+    body.innerHTML = html;
   }
+  // Footer: TOTAL LINEA (3 filas)
   var foot = document.getElementById('bud-table-foot');
   if(foot){
     var grandReal = totalsReal.reduce(function(a,b){return a+b;},0);
     var grandBud  = totalsBud.reduce(function(a,b){return a+b;},0);
     var grandPct  = (grandBud > 0 && grandReal > 0) ? (grandReal/grandBud*100) : null;
-    var fr = '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
-    fr += '<td style="padding:8px 10px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:11px;">TOTAL LÍNEA</td>';
+    var fhtml = '';
+    // Row 1: TOTAL LINEA - Venta
+    fhtml += '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
+    fhtml += '<td rowspan="3" style="padding:8px 10px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:11px;font-weight:800;vertical-align:top;border-right:1px solid #fecaca;">TOTAL LÍNEA</td>';
+    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;">Venta</td>';
     for(var j=0;j<12;j++){
       var tv = hasReal[j] ? fmtU(Math.round(totalsReal[j])) : '—';
-      fr += '<td style="padding:8px 8px;text-align:right;color:#111827;">'+tv+'</td>';
+      fhtml += '<td style="padding:4px 8px;text-align:right;color:#111827;">'+tv+'</td>';
     }
-    fr += '<td style="padding:8px 10px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(Math.round(grandReal))+'</td>';
-    fr += '<td style="padding:8px 10px;text-align:right;color:#1f4ba6;font-weight:800;">'+(grandBud>0?fmtU(Math.round(grandBud)):'—')+'</td>';
+    fhtml += '<td style="padding:4px 10px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(Math.round(grandReal))+'</td>';
+    fhtml += '</tr>';
+    // Row 2: TOTAL LINEA - Presup
+    fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
+    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Presup</td>';
+    for(var k=0;k<12;k++){
+      var tb = hasBud[k] ? fmtU(Math.round(totalsBud[k])) : '—';
+      fhtml += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+tb+'</td>';
+    }
+    var gbStr = grandBud>0 ? fmtU(Math.round(grandBud)) : '—';
+    fhtml += '<td style="padding:4px 10px;text-align:right;color:#1f4ba6;font-weight:800;border-left:2px solid #fde2e2;">'+gbStr+'</td>';
+    fhtml += '</tr>';
+    // Row 3: TOTAL LINEA - % Cumpl
+    fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
+    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;">% Cumpl</td>';
+    for(var n=0;n<12;n++){
+      var rr = totalsReal[n], bb = totalsBud[n];
+      var mpct = (bb>0 && rr>0) ? (rr/bb*100) : null;
+      var mpctStr = mpct==null ? '—' : mpct.toFixed(0)+'%';
+      fhtml += '<td style="padding:4px 8px;text-align:right;font-weight:800;color:'+pctColor(mpct)+';background:'+pctBg(mpct)+';">'+mpctStr+'</td>';
+    }
     var gpctStr = grandPct == null ? '—' : grandPct.toFixed(1)+'%';
-    fr += '<td style="padding:8px 10px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';">'+gpctStr+'</td>';
-    fr += '</tr>';
-    foot.innerHTML = fr;
+    fhtml += '<td style="padding:4px 10px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';background:'+pctBg(grandPct)+';border-left:2px solid #fde2e2;">'+gpctStr+'</td>';
+    fhtml += '</tr>';
+    foot.innerHTML = fhtml;
   }
 }
 
