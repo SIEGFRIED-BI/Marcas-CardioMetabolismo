@@ -24,7 +24,8 @@ FILES = [
     'OTC/index.html',
     'respiratorio/index.html',
     'mujer/index.html',
-    'SNC/index.html',
+    # SNC EXCLUIDO a pedido del usuario: en SNC se mantiene el grafico/tabla
+    # 'SIE · Evolucion mensual / SIE vs Mercado · Total Anual' visible.
     'dermatologia/dermato_dashboard.html',
 ]
 
