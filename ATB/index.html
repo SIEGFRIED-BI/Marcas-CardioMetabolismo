@@ -357,8 +357,9 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
         <div class="pill-group" id="bud-pills" style="display:none;"></div>
         <div style="margin-left:auto;"><div class="yr-ctrl" id="bud-yr"></div></div>
       </div>
-      <div id="bud-table-wrap" style="overflow-x:auto;margin-top:8px;">
-        <table id="bud-table" style="width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:11px;">
+      <div id="bud-table-wrap" style="overflow-x:hidden;margin-top:8px;width:100%;">
+        <table id="bud-table" style="width:100%;table-layout:fixed;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:10.5px;">
+          <colgroup id="bud-table-cols"></colgroup>
           <thead id="bud-table-head"></thead>
           <tbody id="bud-table-body"></tbody>
           <tfoot id="bud-table-foot"></tfoot>
@@ -866,7 +867,15 @@ function setBY(y){bYear=y;renderBudYr();renderBudget();}
 function renderBudget(){
   var BUD_PRODS_LOCAL = Object.keys(D.budget||{});
   var MESES_L = (typeof MESES!=='undefined' && MESES.length===12) ? MESES : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  var fmtU = function(n){ return Number(n||0).toLocaleString('es-AR'); };
+  // Compact format: 1234 -> 1.2k, 1234567 -> 1.2M. Default to '—' for null.
+  var fmtU = function(n){
+    if(n==null) return '—';
+    var x = Math.abs(+n||0);
+    if(x===0) return '0';
+    if(x>=1e6) return (n/1e6).toFixed(x>=1e7?1:2).replace(/\.?0+$/,'')+'M';
+    if(x>=1e3) return (n/1e3).toFixed(x>=1e4?0:1).replace(/\.0$/,'')+'k';
+    return Math.round(n).toString();
+  };
   var pctColor = function(p){
     if(p == null) return '#9ca3af';
     if(p >= 100) return '#16a34a';
@@ -902,16 +911,25 @@ function renderBudget(){
     }
     rows.push({prod: prod, real: real, bud: bud, totR: totR, totB: totB});
   });
+  // Colgroup: distribuye anchos para responsive sin scroll horizontal
+  var cg = document.getElementById('bud-table-cols');
+  if(cg){
+    var cgh = '<col style="width:11%">';      // Producto
+    cgh    += '<col style="width:5%">';       // Metrica label
+    for(var ci=0;ci<12;ci++) cgh += '<col style="width:6.5%">';  // 12 meses
+    cgh    += '<col style="width:6%">';       // Total
+    cg.innerHTML = cgh;
+  }
   // Header (1 fila): PRODUCTO | METRICA | Ene .. Dic | TOTAL
   var head = document.getElementById('bud-table-head');
   if(head){
     var hh = '<tr style="border-bottom:1px solid #e5e7eb;">';
-    hh += '<th style="text-align:left;padding:8px 10px;font-size:10px;font-weight:700;color:#374151;letter-spacing:.08em;text-transform:uppercase;">Producto</th>';
-    hh += '<th style="text-align:left;padding:8px 8px;font-size:9px;font-weight:600;color:#6b7280;letter-spacing:.05em;text-transform:uppercase;"></th>';
+    hh += '<th style="text-align:left;padding:5px 6px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;">Producto</th>';
+    hh += '<th style="text-align:left;padding:5px 2px;font-size:8px;font-weight:600;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;"></th>';
     MESES_L.forEach(function(m){
-      hh += '<th style="text-align:right;padding:8px 8px;font-size:10px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;">'+m+'</th>';
+      hh += '<th style="text-align:right;padding:5px 4px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.04em;text-transform:uppercase;">'+m+'</th>';
     });
-    hh += '<th style="text-align:right;padding:8px 10px;font-size:10px;font-weight:700;color:#b01e1e;letter-spacing:.06em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
+    hh += '<th style="text-align:right;padding:5px 6px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
     hh += '</tr>';
     head.innerHTML = hh;
   }
@@ -923,35 +941,35 @@ function renderBudget(){
       var rowBorderTop = idx===0 ? '' : 'border-top:1px solid #e5e7eb;';
       // Row 1: Venta
       html += '<tr style="'+rowBorderTop+'">';
-      html += '<td rowspan="3" style="padding:8px 10px;font-weight:700;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;">'+r.prod+'</td>';
-      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;">Venta</td>';
+      html += '<td rowspan="3" title="'+r.prod+'" style="padding:5px 6px;font-weight:700;font-size:10px;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.prod+'</td>';
+      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#b01e1e;letter-spacing:.03em;text-transform:uppercase;">Venta</td>';
       r.real.forEach(function(v){
-        html += '<td style="padding:4px 8px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(Math.round(v)))+'</td>';
+        html += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(v))+'</td>';
       });
-      html += '<td style="padding:4px 10px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(Math.round(r.totR))+'</td>';
+      html += '<td style="padding:2px 5px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(r.totR)+'</td>';
       html += '</tr>';
       // Row 2: Estim.
       html += '<tr>';
-      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Estim.</td>';
+      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#1f4ba6;letter-spacing:.03em;text-transform:uppercase;">Estim.</td>';
       r.bud.forEach(function(v){
-        var disp = (v==null || +v<=0) ? '—' : fmtU(Math.round(v));
-        html += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
+        var disp = (v==null || +v<=0) ? '—' : fmtU(v);
+        html += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
       });
-      var totBStr = r.totB>0 ? fmtU(Math.round(r.totB)) : '—';
-      html += '<td style="padding:4px 10px;text-align:right;color:#1f4ba6;font-weight:700;border-left:2px solid #fde2e2;">'+totBStr+'</td>';
+      var totBStr = r.totB>0 ? fmtU(r.totB) : '—';
+      html += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:700;border-left:2px solid #fde2e2;">'+totBStr+'</td>';
       html += '</tr>';
       // Row 3: % Cumpl (mes a mes)
       html += '<tr style="border-bottom:1px solid #f3f4f6;">';
-      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;">% Cumpl</td>';
+      html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#6b7280;letter-spacing:.03em;text-transform:uppercase;">% Cumpl</td>';
       for(var i=0;i<12;i++){
         var rv = r.real[i], bv = r.bud[i];
         var pct = (bv && +bv>0 && rv!=null) ? (+rv / +bv * 100) : null;
         var pctStr = pct==null ? '—' : pct.toFixed(0)+'%';
-        html += '<td style="padding:4px 8px;text-align:right;font-weight:700;color:'+pctColor(pct)+';background:'+pctBg(pct)+';">'+pctStr+'</td>';
+        html += '<td style="padding:2px 3px;text-align:right;font-weight:700;color:'+pctColor(pct)+';background:'+pctBg(pct)+';">'+pctStr+'</td>';
       }
       var totPct = (r.totB>0 && r.totR>0) ? (r.totR/r.totB*100) : null;
-      var totPctStr = totPct==null ? '—' : totPct.toFixed(1)+'%';
-      html += '<td style="padding:4px 10px;text-align:right;font-weight:800;color:'+pctColor(totPct)+';background:'+pctBg(totPct)+';border-left:2px solid #fde2e2;">'+totPctStr+'</td>';
+      var totPctStr = totPct==null ? '—' : totPct.toFixed(0)+'%';
+      html += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(totPct)+';background:'+pctBg(totPct)+';border-left:2px solid #fde2e2;">'+totPctStr+'</td>';
       html += '</tr>';
     });
     body.innerHTML = html;
@@ -965,35 +983,35 @@ function renderBudget(){
     var fhtml = '';
     // Row 1: TOTAL LINEA - Venta
     fhtml += '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
-    fhtml += '<td rowspan="3" style="padding:8px 10px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:11px;font-weight:800;vertical-align:top;border-right:1px solid #fecaca;">TOTAL LÍNEA</td>';
-    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;">Venta</td>';
+    fhtml += '<td rowspan="3" style="padding:5px 6px;color:#111827;text-transform:uppercase;letter-spacing:.04em;font-size:9px;font-weight:800;vertical-align:top;border-right:1px solid #fecaca;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">TOTAL</td>';
+    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#b01e1e;letter-spacing:.03em;text-transform:uppercase;">Venta</td>';
     for(var j=0;j<12;j++){
-      var tv = hasReal[j] ? fmtU(Math.round(totalsReal[j])) : '—';
-      fhtml += '<td style="padding:4px 8px;text-align:right;color:#111827;">'+tv+'</td>';
+      var tv = hasReal[j] ? fmtU(totalsReal[j]) : '—';
+      fhtml += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+tv+'</td>';
     }
-    fhtml += '<td style="padding:4px 10px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(Math.round(grandReal))+'</td>';
+    fhtml += '<td style="padding:2px 5px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(grandReal)+'</td>';
     fhtml += '</tr>';
     // Row 2: TOTAL LINEA - Estim.
     fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
-    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Estim.</td>';
+    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#1f4ba6;letter-spacing:.03em;text-transform:uppercase;">Estim.</td>';
     for(var k=0;k<12;k++){
-      var tb = hasBud[k] ? fmtU(Math.round(totalsBud[k])) : '—';
-      fhtml += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+tb+'</td>';
+      var tb = hasBud[k] ? fmtU(totalsBud[k]) : '—';
+      fhtml += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+tb+'</td>';
     }
-    var gbStr = grandBud>0 ? fmtU(Math.round(grandBud)) : '—';
-    fhtml += '<td style="padding:4px 10px;text-align:right;color:#1f4ba6;font-weight:800;border-left:2px solid #fde2e2;">'+gbStr+'</td>';
+    var gbStr = grandBud>0 ? fmtU(grandBud) : '—';
+    fhtml += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:800;border-left:2px solid #fde2e2;">'+gbStr+'</td>';
     fhtml += '</tr>';
     // Row 3: TOTAL LINEA - % Cumpl
     fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
-    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;">% Cumpl</td>';
+    fhtml += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#6b7280;letter-spacing:.03em;text-transform:uppercase;">% Cumpl</td>';
     for(var n=0;n<12;n++){
       var rr = totalsReal[n], bb = totalsBud[n];
       var mpct = (bb>0 && rr>0) ? (rr/bb*100) : null;
       var mpctStr = mpct==null ? '—' : mpct.toFixed(0)+'%';
-      fhtml += '<td style="padding:4px 8px;text-align:right;font-weight:800;color:'+pctColor(mpct)+';background:'+pctBg(mpct)+';">'+mpctStr+'</td>';
+      fhtml += '<td style="padding:2px 3px;text-align:right;font-weight:800;color:'+pctColor(mpct)+';background:'+pctBg(mpct)+';">'+mpctStr+'</td>';
     }
-    var gpctStr = grandPct == null ? '—' : grandPct.toFixed(1)+'%';
-    fhtml += '<td style="padding:4px 10px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';background:'+pctBg(grandPct)+';border-left:2px solid #fde2e2;">'+gpctStr+'</td>';
+    var gpctStr = grandPct == null ? '—' : grandPct.toFixed(0)+'%';
+    fhtml += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';background:'+pctBg(grandPct)+';border-left:2px solid #fde2e2;">'+gpctStr+'</td>';
     fhtml += '</tr>';
     foot.innerHTML = fhtml;
   }
