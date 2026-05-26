@@ -283,8 +283,7 @@
         });
       }
       competitors.sort(function(a,b){
-        if (a.is_sie && !b.is_sie) return -1;
-        if (!a.is_sie && b.is_sie) return 1;
+        // Ranking por MAT units desc (SIE en su posicion natural, no forzado primero)
         return (b.periods.mat.market_curr||0) - (a.periods.mat.market_curr||0);
       });
       families.push({ family: fam, periods: periods, competitors: competitors });
@@ -311,14 +310,26 @@
     var lbls = data.period_labels;
     var sourceLabel = (opts && opts.source === 'recetas') ? 'Recetas' : 'Unidades IQVIA';
 
-    function periodCells(p, isLast) {
+    function periodCells(p, isLast, useSieUnits) {
       var sep = isLast ? '' : ' mp-sep';
-      // Tooltip con valores anteriores (U Ant y MS% Ant) que sacamos de las cols visibles
-      var tip = 'U Ant: ' + fmtInt(p.market_prev) + ' → ' + fmtInt(p.market_curr)
-              + ' | MS% Ant: ' + fmtPct(p.ms_prev) + ' → ' + fmtPct(p.ms_curr);
+      // useSieUnits=true: muestra unidades SIE (para fila de Mercado, para que coincida con MS%)
+      // useSieUnits=false (default): muestra market_curr (para filas de competidores, donde
+      //   market_curr fue seteado por computeBrand al valor propio de cada marca).
+      var unitsCurr = useSieUnits ? p.sie_curr : p.market_curr;
+      var unitsPrev = useSieUnits ? p.sie_prev : p.market_prev;
+      // Tooltip con valores anteriores para contexto
+      var tip;
+      if (useSieUnits) {
+        tip = 'SIE: ' + fmtInt(p.sie_prev) + ' → ' + fmtInt(p.sie_curr)
+            + ' | Mercado total: ' + fmtInt(p.market_prev) + ' → ' + fmtInt(p.market_curr)
+            + ' | MS%: ' + fmtPct(p.ms_prev) + ' → ' + fmtPct(p.ms_curr);
+      } else {
+        tip = 'U Ant: ' + fmtInt(p.market_prev) + ' → ' + fmtInt(p.market_curr)
+            + ' | MS% Ant: ' + fmtPct(p.ms_prev) + ' → ' + fmtPct(p.ms_curr);
+      }
       var vpStr = (p.var_pp == null) ? '—' : (p.var_pp > 0 ? '+' : '') + p.var_pp.toFixed(1);
       return ''
-        + '<td class="mp-num" title="' + tip + '">' + arrow(p.market_curr, p.market_prev) + fmtInt(p.market_curr) + '</td>'
+        + '<td class="mp-num" title="' + tip + '">' + arrow(unitsCurr, unitsPrev) + fmtInt(unitsCurr) + '</td>'
         + '<td class="mp-num" title="' + tip + '">' + arrow(p.ms_curr, p.ms_prev) + fmtPct(p.ms_curr) + '</td>'
         + '<td class="mp-ie ' + ieClass(p.ie) + '">' + (p.ie == null ? '—' : p.ie) + '</td>'
         + '<td class="' + varppClass(p.var_pp) + sep + '">' + vpStr + '</td>';
@@ -337,10 +348,10 @@
       var trClass = hasComps ? 'mp-fam-row mp-expandable' : 'mp-fam-row';
       return '<tr class="' + trClass + '"' + clickAttr + '>'
         + '<td class="mp-fam" title="' + escapeHtml(f.family) + '">' + caret + escapeHtml(f.family) + '</td>'
-        + periodCells(f.periods.mat,       false)
-        + periodCells(f.periods.ytd,       false)
-        + periodCells(f.periods.mes,       false)
-        + periodCells(f.periods.trimestre, true)
+        + periodCells(f.periods.mat,       false, true)
+        + periodCells(f.periods.ytd,       false, true)
+        + periodCells(f.periods.mes,       false, true)
+        + periodCells(f.periods.trimestre, true,  true)
         + '</tr>';
     }).join('');
 
@@ -356,7 +367,7 @@
       + '</colgroup>'
       + '<thead>'
       + '<tr class="mp-group-row">'
-      +   '<th rowspan="2" class="mp-fam-th">Marca</th>'
+      +   '<th rowspan="2" class="mp-fam-th">Mercado</th>'
       +   '<th colspan="4" class="mp-g mp-g-mat">MAT <span class="mp-lbl">' + lbls.mat + '</span></th>'
       +   '<th colspan="4" class="mp-g mp-g-ytd">YTD <span class="mp-lbl">' + lbls.ytd + '</span></th>'
       +   '<th colspan="4" class="mp-g mp-g-mes">MES <span class="mp-lbl">' + lbls.mes + '</span></th>'
