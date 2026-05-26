@@ -296,7 +296,7 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 <div class="wrap">
   <p class="pg-eyebrow">Siegfried · Antibióticos · Inteligencia de Mercados</p>
   <h1 class="pg-title" style="color:#111827!important;font-size:36px;font-weight:900;">Gestión de Marcas · Línea ATB</h1>
-  <p class="pg-sub">IE · MS% · Unidades · Recetas · Presupuesto · Performance vs Mercado · Canales · Convenios · Precios</p>
+  <p class="pg-sub">IE · MS% · Unidades · Recetas · Estimado Vtas · Performance vs Mercado · Canales · Convenios · Precios</p>
   <!-- ═══ LÍNEA + MARCA + FILTRO SIDEBAR ═══ -->
   <!-- LÍNEA: bloque con border rojo, KPIs full-width -->
   <div class="line-block" style="border:2px solid #b01e1e;border-radius:12px;padding:16px 18px 18px;background:#fff;margin-bottom:20px;">
@@ -348,10 +348,10 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 
   <!-- KPI TOGGLE + STRIP -->
 
-  <!-- ══ 01 PRESUPUESTO ══════════════════════════════════════════════ -->
+  <!-- ══ 01 VENTA INTERNA ══════════════════════════════════════════════ -->
   <div class="sec" id="s-bud">
-    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Presupuesto</h2></div>
-    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs presupuesto · % cumplimiento por producto</p>
+    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Estimado de Ventas</h2></div>
+    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs estimado de ventas · % cumplimiento por producto</p>
     <div class="card">
       <div class="ctrl-row">
         <div class="pill-group" id="bud-pills" style="display:none;"></div>
@@ -679,7 +679,7 @@ function applyMetaLabels(){
 
   if(ytdBtn) ytdBtn.textContent = ytd;
   if(matBtn) matBtn.textContent = mat;
-  if(budCopy) budCopy.textContent = `Unidades mensuales: venta interna Siegfried vs presupuesto planificado · 2025 cierre · 2026 disponible a ${budgetCut}`;
+  if(budCopy) budCopy.textContent = `Unidades mensuales: venta interna Siegfried vs estimado de ventas planificado · 2025 cierre · 2026 disponible a ${budgetCut}`;
   if(convCopy) convCopy.textContent = `Top obras sociales por familia · ${currYear} año cerrado vs ${prevYear} año cerrado`;
   if(priceCopy) priceCopy.textContent = `${pricePrev} vs ${priceCurr} · Misma familia y presentación · SIE destacado`;
   if(footer) footer.textContent = footerDate;
@@ -781,7 +781,7 @@ function setKpiPeriod(p){
 function _kpiSrc(lbl){
   if(!lbl) return '';
   if(lbl.indexOf('Recetas')!==-1) return '<span class="kpi-source rec">Recetas</span>';
-  if(lbl.indexOf('Presupuesto')!==-1) return '<span class="kpi-source vi">Vta Int</span>';
+  if(lbl.indexOf('Estimado')!==-1) return '<span class="kpi-source vi">Vta Int</span>';
   return '<span class="kpi-source iq">IQVIA</span>';
 }
 
@@ -810,7 +810,7 @@ function renderBrandKpis(){
     items.push({lbl:`Crecimiento · ${view==='ytd'?(D.meta?.kpi_ytd_label||'YTD'):(D.meta?.kpi_mat_label||'MAT')}`,num:(data.growth>=0?'+':'')+data.growth.toFixed(1)+'%',cls:data.growth>=0?'g':'r',accent:data.growth>=0?'var(--green)':'var(--red)',sub:data.ie!=null?`iEvol ${data.ie}`:'',sub2:''});
   }
   if(src.budget&&src.budget.pct!=null){
-    items.push({lbl:`Presupuesto · ${D.meta?.budget_label||'2026'}`,num:src.budget.pct+'%',cls:src.budget.pct>=100?'g':src.budget.pct>=85?'y':'r',accent:src.budget.pct>=100?'var(--green)':src.budget.pct>=85?'var(--yellow)':'var(--red)',sub:`${fmt(src.budget.real)} de ${fmt(src.budget.target)} u.`,sub2:src.budget.pct>=100?'✓ Objetivo alcanzado':''});
+    items.push({lbl:`Estimado · ${D.meta?.budget_label||'2026'}`,num:src.budget.pct+'%',cls:src.budget.pct>=100?'g':src.budget.pct>=85?'y':'r',accent:src.budget.pct>=100?'var(--green)':src.budget.pct>=85?'var(--yellow)':'var(--red)',sub:`${fmt(src.budget.real)} de ${fmt(src.budget.target)} u.`,sub2:src.budget.pct>=100?'✓ Objetivo alcanzado':''});
   }
   if(src.rec&&src.rec.ms!=null){
     items.push({lbl:`MS% Recetas · ${D.meta?.rec_label||'Recetas'}`,num:src.rec.ms.toFixed(1)+'%',cls:'p',accent:'var(--purple)',sub:'CloseUp · mercado familia',sub2:''});
@@ -839,7 +839,7 @@ function renderKpis(){
     {lbl:`IE Línea · ${period}`,num:ie||'—',cls:!ie?'b':ie>=100?'g':ie>=90?'y':'r',accent:!ie?'var(--blue)':ie>=100?'var(--green)':ie>=90?'var(--yellow)':'var(--red)',sub:`vs ${periodPrev}`,sub2:ie?(ie>=100?'▲ Por encima del año anterior':'▼ Por debajo del año anterior'):''},
     {lbl:`MS% Línea · ${period}`,num:ms!=null?ms.toFixed(1)+'%':'—',cls:'b',accent:'var(--blue)',sub:'del mercado OTC',sub2:mkt?`${fmt(mkt)} u. total mercado`:''},
     {lbl:`Unidades · ${period}`,num:!units?'—':units>=1e6?(units/1e6).toFixed(2)+'M':units>=1e3?(units/1e3).toFixed(1)+'k':fmt(units),cls:'b',accent:'var(--cyan)',sub:'SIE OTC',sub2:unitsPrev?`${periodPrev}: ${fmt(unitsPrev)} u.`:''},    {lbl:`Crecimiento Línea · ${period}`,num:ie&&ie>0?(ie>=100?'+':'')+(ie-100).toFixed(1)+'%':'—',cls:ie>=100?'g':'r',accent:ie>=100?'var(--green)':'var(--red)',sub:ie?`iEvol ${ie}`:'',sub2:units&&unitsPrev?`${fmt(units)} vs ${fmt(unitsPrev)} u.`:''},
-    {lbl:`Presupuesto · ${D.meta?.budget_label||'2026'}`,num:bud?bud+'%':'—',cls:bud>=100?'g':bud>=85?'y':'r',accent:bud>=100?'var(--green)':bud>=85?'var(--yellow)':'var(--red)',sub:k.bud_total?`${fmt(k.real_total)} de ${fmt(k.bud_total)} u.`:'Sin datos budget',sub2:!k.bud_total?'':bud>=100?'✓ Objetivo alcanzado':`Δ ${fmt((k.real_total||0)-(k.bud_total||0))} u.`},
+    {lbl:`Estimado · ${D.meta?.budget_label||'2026'}`,num:bud?bud+'%':'—',cls:bud>=100?'g':bud>=85?'y':'r',accent:bud>=100?'var(--green)':bud>=85?'var(--yellow)':'var(--red)',sub:k.bud_total?`${fmt(k.real_total)} de ${fmt(k.bud_total)} u.`:'Sin datos de estimado',sub2:!k.bud_total?'':bud>=100?'✓ Objetivo alcanzado':`Δ ${fmt((k.real_total||0)-(k.bud_total||0))} u.`},
 
     {lbl:`MS% Recetas · ${D.meta?.rec_label||'Recetas'}`,num:k.ms_rec?k.ms_rec.toFixed(1)+'%':'—',cls:'p',accent:'var(--purple)',sub:k.sie_rec_dic25?`${fmt(k.sie_rec_dic25)} de ${fmt(k.tot_rec_dic25)} rec.`:'',sub2:'CloseUp · mercado OTC'},
   ];
@@ -930,9 +930,9 @@ function renderBudget(){
       });
       html += '<td style="padding:4px 10px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(Math.round(r.totR))+'</td>';
       html += '</tr>';
-      // Row 2: Presup
+      // Row 2: Estim.
       html += '<tr>';
-      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Presup</td>';
+      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Estim.</td>';
       r.bud.forEach(function(v){
         var disp = (v==null || +v<=0) ? '—' : fmtU(Math.round(v));
         html += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
@@ -973,9 +973,9 @@ function renderBudget(){
     }
     fhtml += '<td style="padding:4px 10px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(Math.round(grandReal))+'</td>';
     fhtml += '</tr>';
-    // Row 2: TOTAL LINEA - Presup
+    // Row 2: TOTAL LINEA - Estim.
     fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
-    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Presup</td>';
+    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Estim.</td>';
     for(var k=0;k<12;k++){
       var tb = hasBud[k] ? fmtU(Math.round(totalsBud[k])) : '—';
       fhtml += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+tb+'</td>';

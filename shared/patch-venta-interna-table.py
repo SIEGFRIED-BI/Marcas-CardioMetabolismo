@@ -1,6 +1,6 @@
 """Patch Venta Interna en las 6 lineas (cardio, ATB, respi, mujer, SNC, derma)
 para usar el mismo template tabla que OTC: 1 fila por producto, monthly Venta +
-columnas Venta total / Presup total / %Cumplimiento.
+columnas Venta total / Estim. total / %Cumplimiento.
 
 Reemplaza:
   - HTML section <div class="sec" id="s-bud">..</div>
@@ -31,8 +31,8 @@ FILES = [
 
 # --- HTML section template ---
 NEW_HTML_SECTION = '''<div class="sec" id="s-bud">
-    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Presupuesto</h2></div>
-    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs presupuesto · % cumplimiento por producto</p>
+    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Estimado de Ventas</h2></div>
+    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs estimado de ventas · % cumplimiento por producto</p>
     <div class="card">
       <div class="ctrl-row">
         <div class="pill-group" id="bud-pills" style="display:none;"></div>
@@ -49,7 +49,7 @@ NEW_HTML_SECTION = '''<div class="sec" id="s-bud">
   </div>'''
 
 # --- renderBudget function template ---
-# Layout: 3 sub-filas por producto (Venta / Presup / %Cumpl) con comparacion
+# Layout: 3 sub-filas por producto (Venta / Estim. / %Cumpl) con comparacion
 # mes a mes en las 12 columnas + columna TOTAL al final.
 NEW_RENDER_BUDGET = '''function renderBudget(){
   var BUD_PRODS_LOCAL = Object.keys(D.budget||{});
@@ -118,9 +118,9 @@ NEW_RENDER_BUDGET = '''function renderBudget(){
       });
       html += '<td style="padding:4px 10px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(Math.round(r.totR))+'</td>';
       html += '</tr>';
-      // Row 2: Presup
+      // Row 2: Estim.
       html += '<tr>';
-      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Presup</td>';
+      html += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Estim.</td>';
       r.bud.forEach(function(v){
         var disp = (v==null || +v<=0) ? '—' : fmtU(Math.round(v));
         html += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
@@ -161,9 +161,9 @@ NEW_RENDER_BUDGET = '''function renderBudget(){
     }
     fhtml += '<td style="padding:4px 10px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(Math.round(grandReal))+'</td>';
     fhtml += '</tr>';
-    // Row 2: TOTAL LINEA - Presup
+    // Row 2: TOTAL LINEA - Estim.
     fhtml += '<tr style="background:#fef2f2;font-weight:700;">';
-    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Presup</td>';
+    fhtml += '<td style="padding:4px 8px;font-size:9px;font-weight:700;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;">Estim.</td>';
     for(var k=0;k<12;k++){
       var tb = hasBud[k] ? fmtU(Math.round(totalsBud[k])) : '—';
       fhtml += '<td style="padding:4px 8px;text-align:right;color:#1f4ba6;">'+tb+'</td>';
