@@ -353,6 +353,12 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
         <div class="pill-group" id="bud-pills" style="display:none;"></div>
         <div style="margin-left:auto;"><div class="yr-ctrl" id="bud-yr"></div></div>
       </div>
+      <div class="ctrl-row" id="bud-filter-row" style="margin-top:8px;flex-wrap:wrap;gap:6px;align-items:center;">
+        <span style="font-size:9px;font-weight:700;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;">Filtrar productos:</span>
+        <div id="bud-filter-chips" style="display:flex;flex-wrap:wrap;gap:4px;flex:1;"></div>
+        <button id="bud-filter-all" onclick="setBudFilterAll()" style="font-size:9px;font-weight:700;padding:4px 10px;border:1px solid #d1d5db;background:#fff;border-radius:4px;color:#374151;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;">Todos</button>
+        <button id="bud-filter-clear" onclick="setBudFilterClear()" style="font-size:9px;font-weight:700;padding:4px 10px;border:1px solid #fecaca;background:#fff;border-radius:4px;color:#b01e1e;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;">Limpiar</button>
+      </div>
       <div id="bud-table-wrap" style="overflow-x:hidden;margin-top:8px;width:100%;">
         <table id="bud-table" style="width:100%;table-layout:fixed;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:10.5px;">
           <colgroup id="bud-table-cols"></colgroup>
@@ -947,10 +953,41 @@ function renderBudYr(){
     <button class="yr-btn ${y===bYear?'on':''}" onclick="setBY('${y}')">${y}</button>`).join('');
 }
 function setBP(p){ /* deprecated: tabla muestra todos los productos */ renderBudget(); }
+function setBudFilter(p){
+  // Toggle producto en el set de filtros. window.__bSelected:
+  //   null/undefined = mostrar todos (default)
+  //   Set            = mostrar solo los productos en el set
+  if(!window.__bSelected){
+    // Primera interaccion: arrancar con todos seleccionados, luego sacar el clickeado
+    window.__bSelected = new Set(Object.keys((typeof D!=='undefined'?D.budget:null)||{}));
+  }
+  if(window.__bSelected.has(p)) window.__bSelected.delete(p);
+  else window.__bSelected.add(p);
+  // Si quedan todos, vuelvo a 'null' (modo default = mostrar todos)
+  var total = Object.keys((typeof D!=='undefined'?D.budget:null)||{}).length;
+  if(window.__bSelected.size === total) window.__bSelected = null;
+  renderBudget();
+}
+function setBudFilterAll(){ window.__bSelected = null; renderBudget(); }
+function setBudFilterClear(){ window.__bSelected = new Set(); renderBudget(); }
 function setBY(y){bYear=y;renderBudYr();renderBudget();}
 
 function renderBudget(){
-  var BUD_PRODS_LOCAL = Object.keys(D.budget||{});
+  // Filtro de productos: window.__bSelected = null (todos) o Set de prods seleccionados
+  var ALL_PRODS = Object.keys(D.budget||{});
+  var sel = window.__bSelected;
+  var BUD_PRODS_LOCAL = (sel === null || sel === undefined) ? ALL_PRODS : ALL_PRODS.filter(function(p){ return sel.has(p); });
+  // Render chips de filtro si existe el container
+  var chipsEl = document.getElementById('bud-filter-chips');
+  if(chipsEl){
+    chipsEl.innerHTML = ALL_PRODS.map(function(p){
+      var isOn = (sel === null || sel === undefined) ? true : sel.has(p);
+      var color = isOn ? '#b01e1e' : '#9ca3af';
+      var bg = isOn ? '#fef2f2' : '#f9fafb';
+      var weight = isOn ? '700' : '500';
+      return '<button onclick="setBudFilter(\''+p.replace(/'/g,"\\'")+'\')" style="font-size:9px;font-weight:'+weight+';padding:3px 8px;border:1px solid '+color+';background:'+bg+';border-radius:4px;color:'+color+';cursor:pointer;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;">'+p+'</button>';
+    }).join('');
+  }
   var MESES_L = (typeof MESES!=='undefined' && MESES.length===12) ? MESES : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   // Compact format: 1234 -> 1.2k, 1234567 -> 1.2M. Default to '—' for null.
   var fmtU = function(n){
