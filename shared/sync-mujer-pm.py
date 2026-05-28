@@ -335,6 +335,34 @@ def main():
     new_text = text[:abs_start] + json.dumps(D, ensure_ascii=False) + text[abs_end:]
     html_path.write_text(new_text, encoding='utf-8', newline='')
     print(f'\n-> {html_path} reescrito ({html_path.stat().st_size:,} bytes)')
+
+    # ─── Hook: locked markets ──────────────────────────────────────────────
+    # Algunos mercados tienen una composicion FIJA definida por marketing
+    # (no se incluyen todas las presentaciones del master, solo las relevantes).
+    # Despues del sync general, re-aplicar esos rebuilds para mantener el mercado
+    # como esta definido. Lista de scripts:
+    #   - rebuild-mujer-45-market.py : Mercado '45' = TRIP+45 + VIASEK MENOCARE
+    #     G02X9 (CAPS + GEL), excluye BARRA SYNDET (G01D0 cleanser).
+    import subprocess
+    LOCKED_REBUILDS = [
+        ('rebuild-mujer-45-market.py', "Mercado '45' (TRIP +45 vs VIASEK MENOCARE)"),
+    ]
+    print('\n-- Aplicando rebuilds de mercados con composicion fija --')
+    for script, desc in LOCKED_REBUILDS:
+        script_path = Path(__file__).resolve().parent / script
+        if not script_path.is_file():
+            print(f'  SKIP: {script} no existe')
+            continue
+        print(f'  > {script}: {desc}')
+        result = subprocess.run([sys.executable, str(script_path)],
+                                capture_output=True, text=True, encoding='utf-8')
+        if result.returncode != 0:
+            print(f'    ERROR (rc={result.returncode}):', result.stderr[:500])
+        else:
+            # Solo printear la ultima linea util del subscript
+            last_lines = [l for l in result.stdout.strip().split('\n') if l.strip()][-2:]
+            for l in last_lines:
+                print(f'    {l}')
     return 0
 
 
