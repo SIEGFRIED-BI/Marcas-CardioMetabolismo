@@ -1,18 +1,18 @@
 """Reconstruye mol_perf['45'] en mujer/index.html para que SOLO incluya los
-productos marcados en amarillo por el usuario (sus competidores reales para
-TRIP +45):
+competidores REALES de TRIP +45 (suplemento menopausico ORAL):
 
-  - VIASEK MENOCARE (E6B) - ATC G02X9, Mol ESTROGENIC SUBSTANCE_HYALURONIC ACID
-    (las presentaciones GEL 100ML + GEL 50ML)
-  - VIASEK MENOCARE (E6B) - ATC G02X9, Mol ESTROGENIC SUBSTANCE_MAGNESIUM_PANAX...
-    (la presentacion CAPS x 32)
-  - TRIP +45 (SIE) - ATC V03X0 (la unica presentacion: TABL RECUBIE x 30)
+  - VIASEK MENOCARE (E6B) - ATC G02X9, Mol que contiene 'MAGNESIUM'
+    -> Esto matchea SOLO la presentacion CAPS x 32 (suplemento oral con
+       MAGNESIUM_PANAX GINSENG_RESVERATROL — moleculas similares a TRIP +45).
+    MAT Apr 2026: ~45,479u
+  - TRIP +45 (SIE) - ATC V03X0 (TABL RECUBIE x 30, suplemento oral).
+    MAT Apr 2026: ~15,096u
 
-Se EXCLUYE VIASEK MENOCARE - ATC G01D0 (DL-LACTIC ACID - BARRA SYNDET cleanser),
-que no es competidor real de TRIP +45.
-
-Los dos rows G02X9 de VIASEK MENOCARE se combinan en UN SOLO producto
-'VIASEK MENOCARE (E6B)' para mantener compatibilidad con el dashboard.
+Se EXCLUYE:
+  - VIASEK MENOCARE BARRA SYNDET (G01D0, DL-LACTIC ACID): es un cleanser.
+  - VIASEK MENOCARE GEL 100ML / GEL 50ML (G02X9, mol ESTROGENIC+HYALURONIC):
+    son para uso VAGINAL (diferente formato que TRIP +45 oral, no son
+    competidores reales).
 
 NO se toca:
   - Otras familias en mujer mol_perf (SIN ESTROGENO, ALTA DOSIS, etc.)
@@ -31,11 +31,16 @@ DATA_FILE = REPO / 'mujer' / 'index.html'
 MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\Ateneo Total - MAT Movil_May-19-2026 (3).xlsx')
 
 # Productos que SI deben ir en el mercado '45':
-# (Product, ATC prefix, must NOT contain) - whitelist
+# (Product, ATC prefix, molecule_must_contain or None)
+# - Si molecule_must_contain != None, SOLO se incluye la row cuyo Molecules
+#   contiene ese keyword (case-insensitive). Esto sirve para distinguir
+#   presentaciones del mismo Product cuando difieren por molecula.
 INCLUDED = [
-    # (product_name, atc_prefix, exclude_molecule_keyword or None)
-    ('VIASEK MENOCARE (E6B)', 'G02X9', None),   # GEL + CAPS rows (2 rows en master)
-    ('TRIP +45 (SIE)',         'V03X0', None),  # TABL RECUBIE x 30
+    # VIASEK MENOCARE: SOLO la presentacion CAPS x 32 (suplemento oral).
+    # Se distingue de GEL/BARRA por la molecula MAGNESIUM_PANAX GINSENG.
+    ('VIASEK MENOCARE (E6B)', 'G02X9', 'MAGNESIUM'),
+    # TRIP +45: unica presentacion (TABL RECUBIE x 30, oral).
+    ('TRIP +45 (SIE)',         'V03X0', None),
 ]
 
 MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
@@ -145,11 +150,14 @@ def main():
         if not prod or not atc: continue
         prod_str = str(prod).strip()
         atc_str = str(atc).strip()
-        # Check if this (prod, atc) is in our INCLUDED list
+        mol_str = str(row[col_mol] or '').strip() if col_mol < len(row) else ''
+        # Check if this (prod, atc, mol) matches our INCLUDED list
         matched = None
-        for inc_prod, inc_atc_pref, _ in INCLUDED:
-            if prod_str == inc_prod and atc_str.startswith(inc_atc_pref):
-                matched = (inc_prod, inc_atc_pref); break
+        for inc_prod, inc_atc_pref, mol_keyword in INCLUDED:
+            if prod_str != inc_prod: continue
+            if not atc_str.startswith(inc_atc_pref): continue
+            if mol_keyword and mol_keyword.upper() not in mol_str.upper(): continue
+            matched = (inc_prod, inc_atc_pref); break
         if not matched: continue
         mfr = row[col_mfr] if col_mfr < len(row) else None
         mol = row[col_mol] if col_mol < len(row) else None
