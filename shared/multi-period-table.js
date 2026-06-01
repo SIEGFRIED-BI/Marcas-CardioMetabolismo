@@ -246,6 +246,17 @@
       var s = (name||'').toString().toUpperCase();
       return /\bSIE\b/.test(s) || s.endsWith(' SIE') || s.endsWith('-SIE');
     }
+    // Helper para extraer monthly de brandData (shape nested o flat).
+    function extractBrandMonthly(brandData) {
+      if (!brandData || typeof brandData !== 'object') return {};
+      if (brandData.monthly && typeof brandData.monthly === 'object') return brandData.monthly;
+      // Fallback: detectar si las keys son meses directos (shape flat)
+      var sampleKey = Object.keys(brandData)[0];
+      if (sampleKey && /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/.test(sampleKey)) {
+        return brandData;
+      }
+      return {};
+    }
     for (var fam in rm) {
       var sieMonthly = (rm[fam] && rm[fam].sie) || {};
       var mktMonthly = (rm[fam] && rm[fam].mkt) || {};
@@ -253,32 +264,47 @@
       var hasAnySie = false;
       for (var mk in sieMonthly) { if (+sieMonthly[mk] > 0) { hasAnySie = true; break; } }
       if (!hasAnySie) continue;
+      // Pre-build competitor monthly maps (necesario antes de fallback de mkt)
+      var famComps = rc[fam] || {};
+      var compMonthlies = {};
+      for (var brandName in famComps) {
+        compMonthlies[brandName] = extractBrandMonthly(famComps[brandName]);
+      }
+      // FALLBACK: si rec_ms[fam].mkt esta vacio, computar mercado = sie + sum(competidores).
+      // Esto pasa en mujer (rec_ms[fam].mkt es {} en todas las familias).
+      var mktIsEmpty = true;
+      for (var _mk in mktMonthly) { if (+mktMonthly[_mk] > 0) { mktIsEmpty = false; break; } }
+      if (mktIsEmpty) {
+        var computedMkt = {};
+        // sumar SIE
+        for (var mk2 in sieMonthly) {
+          computedMkt[mk2] = (computedMkt[mk2] || 0) + (+sieMonthly[mk2] || 0);
+        }
+        // sumar cada competidor (excluyendo SIE-flagged en rec_comp si lo tuviera)
+        for (var bn in compMonthlies) {
+          // Si el competidor esta flag-eado como SIE en rec_comp (raro), no doble-contar
+          var bdata = famComps[bn];
+          if (bdata && bdata.is_sie === true) continue;
+          var bmon = compMonthlies[bn];
+          for (var mk3 in bmon) {
+            computedMkt[mk3] = (computedMkt[mk3] || 0) + (+bmon[mk3] || 0);
+          }
+        }
+        mktMonthly = computedMkt;
+      }
       var periods = {};
       for (var pk in windows) periods[pk] = computeFamily(mktMonthly, sieMonthly, windows[pk]);
       // Build competitors from rec_comp[fam]
       // rec_comp[fam][brand] tiene shape { monthly: {month: N}, quarterly: {...}, total: N }
       // (fallback a flat dict si la shape es directa)
       var competitors = [];
-      var famComps = rc[fam] || {};
-      for (var brandName in famComps) {
-        var brandData = famComps[brandName];
-        var brandMonthly = {};
-        if (brandData && typeof brandData === 'object') {
-          if (brandData.monthly && typeof brandData.monthly === 'object') {
-            brandMonthly = brandData.monthly;
-          } else {
-            // Fallback: detectar si las keys son meses directos (shape flat)
-            var sampleKey = Object.keys(brandData)[0];
-            if (sampleKey && /^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$/.test(sampleKey)) {
-              brandMonthly = brandData;
-            }
-          }
-        }
+      for (var brandName2 in famComps) {
+        var brandMonthly = compMonthlies[brandName2] || {};
         var brandPeriods = {};
         for (var pk2 in windows) brandPeriods[pk2] = computeBrand(brandMonthly, mktMonthly, windows[pk2]);
         competitors.push({
-          brand: brandName,
-          is_sie: isSieBrand(brandName),
+          brand: brandName2,
+          is_sie: isSieBrand(brandName2),
           periods: brandPeriods,
         });
       }
