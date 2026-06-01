@@ -2155,13 +2155,14 @@ function renderCovBrandPills(){
   const el = document.getElementById('cov-brand-pills');
   if(!el) return;
   el.innerHTML = familias.map(f=>{
-    const color = COLORS[f]||'#6b7280';
     const isOn = covBrand===f;
+    // Sin colores por marca: pills neutrales (gris). Solo el activo se destaca con bg oscuro.
     const sty = isOn
-      ? `background:${color};color:#fff;border-color:${color};`
-      : `border-color:${color};color:${color};`;
+      ? 'background:#374151;color:#fff;border-color:#374151;'
+      : 'border-color:#d1d5db;color:#4b5563;background:#fff;';
+    const dotColor = isOn ? '#fff' : '#9ca3af';
     return `<button onclick="setCovBrand('${f}')" style="padding:2px 8px;border-radius:10px;border:1px solid;font-size:10px;font-weight:600;cursor:pointer;${sty}">
-      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${isOn?'#fff':color};margin-right:3px;vertical-align:middle;"></span>${f}
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${dotColor};margin-right:3px;vertical-align:middle;"></span>${f}
     </button>`;
   }).join('');
 }
