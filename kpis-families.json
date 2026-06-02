@@ -1248,59 +1248,6 @@
       }
     },
     {
-      "family": "HEXALER BRONQUIAL",
-      "display": "HEXALER BRONQUIAL",
-      "line": "resp",
-      "lineName": "Respiratoria",
-      "sie_brands": [
-        "HEXALER BRONQUIAL (SIE)",
-        "HEXALER NASAL (SIE)",
-        "MOMETAX (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 82472,
-          "market_prev": 232151,
-          "sie_curr": 63888,
-          "sie_prev": 56884,
-          "ms_curr": 77.5,
-          "ms_prev": 24.5,
-          "ie": 316.0,
-          "var_pp": 53.0
-        },
-        "ytd": {
-          "market_curr": 465713,
-          "market_prev": 627346,
-          "sie_curr": 202845,
-          "sie_prev": 179582,
-          "ms_curr": 43.6,
-          "ms_prev": 28.6,
-          "ie": 152.0,
-          "var_pp": 15.0
-        },
-        "trimestre": {
-          "market_curr": 348763,
-          "market_prev": 517086,
-          "sie_curr": 155983,
-          "sie_prev": 141036,
-          "ms_curr": 44.7,
-          "ms_prev": 27.3,
-          "ie": 164.0,
-          "var_pp": 17.4
-        },
-        "mat": {
-          "market_curr": 2334898,
-          "market_prev": 2664232,
-          "sie_curr": 709502,
-          "sie_prev": 625033,
-          "ms_curr": 30.4,
-          "ms_prev": 23.5,
-          "ie": 130.0,
-          "var_pp": 6.9
-        }
-      }
-    },
-    {
       "family": "HEXALER PLUS",
       "display": "HEXALER PLUS",
       "line": "resp",
@@ -2117,6 +2064,57 @@
           "ms_prev": 10.2,
           "ie": 119.0,
           "var_pp": 1.8
+        }
+      }
+    },
+    {
+      "family": "HEXALER BRONQUIAL",
+      "display": "HEXALER BRONQUIAL",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "HEXALER BRONQUIAL (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 941,
+          "market_prev": 157800,
+          "sie_curr": 941,
+          "sie_prev": 956,
+          "ms_curr": 100.0,
+          "ms_prev": 0.6,
+          "ie": 16506.0,
+          "var_pp": 99.4
+        },
+        "ytd": {
+          "market_curr": 198149,
+          "market_prev": 382963,
+          "sie_curr": 2941,
+          "sie_prev": 3234,
+          "ms_curr": 1.5,
+          "ms_prev": 0.8,
+          "ie": 176.0,
+          "var_pp": 0.7
+        },
+        "trimestre": {
+          "market_curr": 143927,
+          "market_prev": 327376,
+          "sie_curr": 2264,
+          "sie_prev": 2441,
+          "ms_curr": 1.6,
+          "ms_prev": 0.7,
+          "ie": 211.0,
+          "var_pp": 0.9
+        },
+        "mat": {
+          "market_curr": 1406115,
+          "market_prev": 1810043,
+          "sie_curr": 10233,
+          "sie_prev": 11418,
+          "ms_curr": 0.7,
+          "ms_prev": 0.6,
+          "ie": 115.0,
+          "var_pp": 0.1
         }
       }
     },
