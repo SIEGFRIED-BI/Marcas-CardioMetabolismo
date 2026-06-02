@@ -51,4 +51,18 @@ if git diff --cached --name-only | grep -qE '(data\.js|kpis\.json|index\.html|de
     fi
     echo "Audit OK"
 fi
+
+# Check 4: venta interna vs estimado (bloquea %Cumpl >500% = lumping col0/col1,
+# el bug ALTA DOSIS=705%). Solo si cambio algun data.js / pagina con budget.
+if git diff --cached --name-only | grep -qE '(data\.js|index\.html|dermato_dashboard\.html)$'; then
+    echo "Running venta-vs-estimado check..."
+    py shared/check-venta-vs-estimado.py
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "VENTA/ESTIMADO CHECK FAILED -- commit bloqueado"
+        echo "Hay %Cumpl >500%: la venta interna esta sumando una Gran Familia"
+        echo "entera a una sub-marca. Revisar merge-ventas-internas.py (Familia col1)."
+        exit 1
+    fi
+fi
 exit 0

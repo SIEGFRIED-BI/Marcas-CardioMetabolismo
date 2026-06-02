@@ -1,0 +1,131 @@
+# 07 · Lecciones y errores (NO repetir)
+
+> Registro de bugs reales que pasaron, su causa raíz, el fix, y el **guardrail**
+> que evita que vuelvan. Leer antes de tocar datos. Las reglas están al final.
+
+---
+
+## ❌ Bug 1 — El deployado mostraba datos viejos (cache-buster)
+
+**Síntoma:** editaba `data.js`, pusheaba, pero la web seguía mostrando lo viejo
+(ROXOLAN/MAGNUS sin los cambios).
+**Causa:** el HTML cargaba `data.js?v=202605051436` (fecha fija) y ese `?v` no se
+bumpeaba al cambiar `data.js`. El navegador/CDN servía la versión cacheada bajo
+esa misma URL. (Además el sitio está detrás de Cloudflare Access, así que no se
+puede verificar el deployado con curl externo — da la pantalla de login.)
+**Fix:** `?v=<hash-del-contenido>` vía `shared/bump-cache-busters.py`.
+**Guardrail (automático):**
+- `build-all.ps1` corre `bump-cache-busters.py` al final.
+- El **pre-commit hook** lo corre y re-stagea en cada commit que toque
+  data.js / shared assets / páginas.
+- Verificar a mano: `py shared/bump-cache-busters.py --check`.
+
+---
+
+## ❌ Bug 2 — Familias de Mercado IQVIA que mezclaban 2 mercados
+
+**Síntoma:** ROXOLAN mostraba un mercado/MS% que no coincidía con la fuente.
+**Causa:** la familia `mol_perf['ROXOLAN']` fusionaba DOS mercados que la fuente
+separa: `Roxolan (Rosuvastatina)` (mono) + `Roxolan Plus` (rosuvastatina+ezetimibe).
+También `HEXALER BRONQUIAL` estaba contaminada con productos **nasales**
+(HEXALER NASAL, MOMETAX) que ya estaban en `HEXALER NASAL`.
+**Fix:** split ROXOLAN→ROXOLAN+ROXOLAN PLUS; limpieza de HEXALER BRONQUIAL.
+Clasificación tomada del `<linea>/DDD/competidores-data.js` (verificada marca por
+marca contra la fuente, 0 mismatches).
+**Regla:** **una familia de `mol_perf` = UN mercado de la fuente (una molécula).**
+Si la fuente (PM nacional `Molecules Long`, o el competidores-data.js) separa dos
+moléculas/mercados, el dashboard también.
+**Guardrail:** `py shared/check-mercados-fuente.py` (detector de familias que
+mezclan ≥2 mercados-fuente con SIE). Correr tras cualquier sync/rebuild de IQVIA.
+
+---
+
+## ❌ Bug 3 — Venta Interna: %Cumpl absurdo (705%) por col0 vs col1
+
+**Síntoma:** mujer ALTA DOSIS mostraba %Cumpl 705% (venta 118k vs estimado 17k).
+**Causa:** la **planilla SAP** tiene `Gran Familia (col0)` y `Familia (col1)`.
+La Gran Familia `ISIS` agrupa TODAS las variantes (ISIS alta dosis, ISIS FREE,
+ISIS MINI, ISIS MINI 24). El merge de mujer matcheaba por **col0**, así que
+ALTA DOSIS (target Familia `ISIS`) se tragaba las 4 variantes (~118k) y
+SIN ESTROGENO / BAJA DOSIS / COMPLEX quedaban en 0. El estimado (17k) sí estaba
+a nivel Familia → de ahí el 705%.
+**Fix:** `merge-ventas-internas.py` matchea por **Familia (col1)**, no Gran Familia.
+**Regla:** **la planilla SAP agrupa por Gran Familia; siempre resolver a la
+granularidad del budget key (Familia / presentación), nunca sumar la Gran Familia
+entera a una sub-marca.** Esto vale para TODAS las líneas (TETRALGIN/NOVO,
+BACTRIM/FORTE, DILATREND/AP/D, EMPAX/MET, ROXOLAN/PLUS, MAGNUS/36, ISIS/variantes).
+**Guardrail:** `py shared/check-venta-vs-estimado.py` (flaggea %Cumpl absurdos,
+> 300% o < 30%, que casi siempre son un error de granularidad/mapeo).
+
+---
+
+## ❌ Bug 4 — Recetas: IE / Var pp faltaban en casi todos los mercados
+
+**Síntoma:** en la tabla multi-período de Recetas, solo unos pocos mercados
+tenían IE y Var pp; el resto mostraba "—".
+**Causa:** `rec_ms[fam].mkt` (mercado total) venía casi vacío — 3 meses o menos.
+Sin año anterior no se puede calcular IE/Var pp. Pero `rec_comp[fam]`
+(competidores) sí tiene la historia completa.
+**Fix:** el renderer (`multi-period-table.js`) computa el mercado de recetas desde
+`rec_comp` (suma de marcas, historia completa), usando el origen con más cobertura.
+**Regla:** **el mercado de recetas se arma de `rec_comp` (la fuente completa de
+competidores), no de `rec_ms.mkt` (que suele venir parcial).**
+
+---
+
+## ❌ Bug 5 — IE absurdo (76.188) por base del año anterior ~0
+
+**Síntoma:** EMPAX mostraba IE = 76.188.
+**Causa:** productos nuevos con base del año anterior ≈0 → el ratio de crecimiento
+explota.
+**Fix:** cap igual que `brandKpis`: si el SIE creció >5×, IE = "—" (no comparable).
+La Var pp (cambio de share) sí se muestra.
+**Regla:** **IE solo es válido con base previa significativa. Si el crecimiento
+es >5×, mostrar "—", no un número.**
+
+---
+
+## ❌ Bug 6 — Re-correr el merge revierte los splits
+
+**Síntoma latente:** los splits MAGNUS 36 / ROXOLAN PLUS / etc. NO son parte de
+`merge-ventas-internas.py`. Re-correr el merge completo los **revierte** (vuelve a
+matchear la Gran Familia y pisa el split).
+**Regla:** los splits de Venta Interna (MAGNUS/36, ROXOLAN/PLUS) viven en scripts
+aparte (`apply-otc-magnus-split.py`, `split-cardio-roxolan.py`). **Después de
+cualquier `merge-ventas-internas.py`, RE-APLICAR esos splits** (o no re-correr el
+merge completo; correr la corrección de la línea puntual). Mismo patrón que los
+`LOCKED_REBUILDS` de mujer.
+
+---
+
+## ❌ Bug 7 (histórico) — Pérdida de historia al actualizar IQVIA
+
+**Causa:** reemplazar el time-series de `mol_perf` en vez de AGREGAR el mes nuevo.
+**Regla:** los merges AGREGAN meses, nunca reemplazan. **Guardrail:**
+`verify-history-preserved.py` (en el pre-commit, bloquea si se pierden meses).
+
+---
+
+## ✅ Reglas de oro (resumen)
+
+1. **`?v=<hash>` siempre fresco** — automático (build-all + pre-commit). Nunca
+   editar data.js sin que el `?v` se actualice. Verificar: `bump-cache-busters.py --check`.
+2. **Una familia mol_perf = un mercado de la fuente (una molécula).** No fusionar.
+3. **Planilla SAP: matchear por Familia (col1), no por Gran Familia (col0).**
+4. **Mercado de recetas = suma de `rec_comp` (historia completa), no `rec_ms.mkt`.**
+5. **IE con base previa <20% del actual o crecimiento >5× → "—" (no comparable).**
+6. **Splits de Venta Interna se RE-APLICAN después de cada merge.**
+7. **Los merges AGREGAN meses, nunca reemplazan** (lo bloquea el guardian).
+8. **El estimado ("Estimado de Ventas") nunca se llama "Presupuesto"** (ver CLAUDE.md).
+
+## Antes de pushear un corte, correr SIEMPRE:
+```
+py shared/recompute-mol-perf-aggregates.py
+py shared/build-kpis.py && py shared/build-families-perf.py
+py shared/sync-kpistrip-with-kpis-json.py
+py shared/bump-cache-busters.py
+py shared/check-mercados-fuente.py        # familias que mezclan mercados
+py shared/check-venta-vs-estimado.py      # %Cumpl absurdos
+py shared/audit-full.py                   # DEBE dar 0 FAIL
+```
+(El pre-commit hook corre syntax + history + audit + cache-buster automáticamente.)
