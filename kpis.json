@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T15:42:41",
+  "generated_at": "2026-06-02T15:53:29",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -1152,8 +1152,8 @@
             "prev": 9.44
           },
           "mercado_recetas": {
-            "curr": 38617,
-            "prev": 37782,
+            "curr": 38633,
+            "prev": 37783,
             "ie": 102.2
           },
           "units_sie": {
@@ -1183,12 +1183,12 @@
             "ie": 85.9
           },
           "ms_recetas": {
-            "curr": 8.21,
-            "prev": 9.5
+            "curr": 8.2,
+            "prev": 9.49
           },
           "mercado_recetas": {
-            "curr": 113852,
-            "prev": 114568,
+            "curr": 113882,
+            "prev": 114580,
             "ie": 99.4
           },
           "units_sie": {
@@ -1218,12 +1218,12 @@
             "ie": 85.9
           },
           "ms_recetas": {
-            "curr": 8.21,
-            "prev": 9.5
+            "curr": 8.2,
+            "prev": 9.49
           },
           "mercado_recetas": {
-            "curr": 113852,
-            "prev": 114568,
+            "curr": 113882,
+            "prev": 114580,
             "ie": 99.4
           },
           "units_sie": {
@@ -1257,8 +1257,8 @@
             "prev": 9.51
           },
           "mercado_recetas": {
-            "curr": 229914,
-            "prev": 235171,
+            "curr": 229958,
+            "prev": 235203,
             "ie": 97.8
           },
           "units_sie": {
@@ -1292,8 +1292,8 @@
             "prev": 9.79
           },
           "mercado_recetas": {
-            "curr": 463113,
-            "prev": 474488,
+            "curr": 463171,
+            "prev": 474540,
             "ie": 97.6
           },
           "units_sie": {
@@ -1733,57 +1733,57 @@
       "family": "MAGNUS",
       "periods": {
         "mensual": {
-          "rec_curr": 982,
-          "rec_prev": 1134,
-          "rec_ie": 78.1,
+          "rec_curr": 851,
+          "rec_prev": 982,
+          "rec_ie": 98.4,
           "units_curr": 68864,
           "units_prev": 61286,
-          "units_ie": 133.3,
-          "int_curr": 50998,
+          "units_ie": 126.7,
+          "int_curr": 54072,
           "int_prev": 0,
           "int_ie": null
         },
         "ytd": {
-          "rec_curr": 2914,
-          "rec_prev": 3539,
-          "rec_ie": 78.2,
+          "rec_curr": 2547,
+          "rec_prev": 3126,
+          "rec_ie": 96.7,
           "units_curr": 256965,
           "units_prev": 253207,
-          "units_ie": 108.6,
-          "int_curr": 193833,
+          "units_ie": 116.1,
+          "int_curr": 205493,
           "int_prev": 0,
           "int_ie": null
         },
         "trimestre": {
-          "rec_curr": 2913,
-          "rec_prev": 3538,
-          "rec_ie": 78.2,
+          "rec_curr": 2547,
+          "rec_prev": 3126,
+          "rec_ie": 96.7,
           "units_curr": 191808,
           "units_prev": 188181,
-          "units_ie": 111.0,
-          "int_curr": 193763,
+          "units_ie": 116.8,
+          "int_curr": 205493,
           "int_prev": 0,
           "int_ie": null
         },
         "semestre": {
-          "rec_curr": 5945,
-          "rec_prev": 7226,
-          "rec_ie": 79.0,
+          "rec_curr": 5232,
+          "rec_prev": 6405,
+          "rec_ie": 95.1,
           "units_curr": 376628,
           "units_prev": 386682,
-          "units_ie": 105.0,
-          "int_curr": 279272,
+          "units_ie": 113.7,
+          "int_curr": 295934,
           "int_prev": 0,
           "int_ie": null
         },
         "mat": {
-          "rec_curr": 12403,
-          "rec_prev": 14829,
-          "rec_ie": 79.8,
+          "rec_curr": 10862,
+          "rec_prev": 13186,
+          "rec_ie": 96.0,
           "units_curr": 740872,
           "units_prev": 774750,
-          "units_ie": 99.2,
-          "int_curr": 278480,
+          "units_ie": 107.4,
+          "int_curr": 295934,
           "int_prev": 0,
           "int_ie": null
         }
@@ -4439,59 +4439,59 @@
       "name": "MAGNUS 36 (SIE)",
       "line": "otx",
       "lineName": "OTC",
-      "family": "MAGNUS",
+      "family": "MAGNUS 36",
       "periods": {
         "mensual": {
-          "rec_curr": 59,
-          "rec_prev": 68,
-          "rec_ie": 78.2,
+          "rec_curr": 190,
+          "rec_prev": 220,
+          "rec_ie": 69.6,
           "units_curr": 4151,
           "units_prev": 4005,
-          "units_ie": 123.0,
+          "units_ie": 138.4,
           "int_curr": 3725,
           "int_prev": 0,
           "int_ie": null
         },
         "ytd": {
-          "rec_curr": 175,
-          "rec_prev": 213,
-          "rec_ie": 78.0,
+          "rec_curr": 542,
+          "rec_prev": 626,
+          "rec_ie": 73.3,
           "units_curr": 15457,
           "units_prev": 15898,
-          "units_ie": 104.1,
+          "units_ie": 90.4,
           "int_curr": 11846,
           "int_prev": 0,
           "int_ie": null
         },
         "trimestre": {
-          "rec_curr": 176,
-          "rec_prev": 214,
-          "rec_ie": 78.1,
+          "rec_curr": 542,
+          "rec_prev": 626,
+          "rec_ie": 73.3,
           "units_curr": 11612,
           "units_prev": 11783,
-          "units_ie": 107.3,
+          "units_ie": 96.2,
           "int_curr": 11846,
           "int_prev": 0,
           "int_ie": null
         },
         "semestre": {
-          "rec_curr": 355,
-          "rec_prev": 431,
-          "rec_ie": 79.1,
+          "rec_curr": 1068,
+          "rec_prev": 1252,
+          "rec_ie": 73.7,
           "units_curr": 22470,
           "units_prev": 23934,
-          "units_ie": 101.2,
+          "units_ie": 85.5,
           "int_curr": 17296,
           "int_prev": 0,
           "int_ie": null
         },
         "mat": {
-          "rec_curr": 777,
-          "rec_prev": 929,
-          "rec_ie": 79.8,
+          "rec_curr": 2318,
+          "rec_prev": 2572,
+          "rec_ie": 76.2,
           "units_curr": 46434,
           "units_prev": 48405,
-          "units_ie": 99.6,
+          "units_ie": 83.8,
           "int_curr": 17296,
           "int_prev": 0,
           "int_ie": null

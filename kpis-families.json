@@ -1041,58 +1041,6 @@
       }
     },
     {
-      "family": "MAGNUS",
-      "display": "MAGNUS",
-      "line": "otx",
-      "lineName": "OTX",
-      "sie_brands": [
-        "MAGNUS (SIE)",
-        "MAGNUS 36 (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 245748,
-          "market_prev": 291627,
-          "sie_curr": 73015,
-          "sie_prev": 65291,
-          "ms_curr": 29.7,
-          "ms_prev": 22.4,
-          "ie": 133.0,
-          "var_pp": 7.3
-        },
-        "ytd": {
-          "market_curr": 1105779,
-          "market_prev": 1183600,
-          "sie_curr": 272422,
-          "sie_prev": 269105,
-          "ms_curr": 24.6,
-          "ms_prev": 22.7,
-          "ie": 108.0,
-          "var_pp": 1.9
-        },
-        "trimestre": {
-          "market_curr": 806040,
-          "market_prev": 877396,
-          "sie_curr": 203420,
-          "sie_prev": 199964,
-          "ms_curr": 25.2,
-          "ms_prev": 22.8,
-          "ie": 111.0,
-          "var_pp": 2.4
-        },
-        "mat": {
-          "market_curr": 3439144,
-          "market_prev": 3569334,
-          "sie_curr": 787306,
-          "sie_prev": 823155,
-          "ms_curr": 22.9,
-          "ms_prev": 23.1,
-          "ie": 99.0,
-          "var_pp": -0.2
-        }
-      }
-    },
-    {
       "family": "QUETIAPINE",
       "display": "QUETIAPINE",
       "line": "snc",
@@ -1452,6 +1400,57 @@
           "ms_prev": 5.3,
           "ie": 105.0,
           "var_pp": 0.2
+        }
+      }
+    },
+    {
+      "family": "MAGNUS",
+      "display": "MAGNUS",
+      "line": "otx",
+      "lineName": "OTX",
+      "sie_brands": [
+        "MAGNUS (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 175477,
+          "market_prev": 197790,
+          "sie_curr": 68864,
+          "sie_prev": 61286,
+          "ms_curr": 39.2,
+          "ms_prev": 31.0,
+          "ie": 127.0,
+          "var_pp": 8.2
+        },
+        "ytd": {
+          "market_curr": 726234,
+          "market_prev": 830805,
+          "sie_curr": 256965,
+          "sie_prev": 253207,
+          "ms_curr": 35.4,
+          "ms_prev": 30.5,
+          "ie": 116.0,
+          "var_pp": 4.9
+        },
+        "trimestre": {
+          "market_curr": 532038,
+          "market_prev": 609859,
+          "sie_curr": 191808,
+          "sie_prev": 188181,
+          "ms_curr": 36.1,
+          "ms_prev": 30.9,
+          "ie": 117.0,
+          "var_pp": 5.2
+        },
+        "mat": {
+          "market_curr": 2266550,
+          "market_prev": 2545163,
+          "sie_curr": 740872,
+          "sie_prev": 774750,
+          "ms_curr": 32.7,
+          "ms_prev": 30.4,
+          "ie": 107.0,
+          "var_pp": 2.3
         }
       }
     },
@@ -2380,6 +2379,57 @@
           "ms_prev": 9.6,
           "ie": 122.0,
           "var_pp": 2.1
+        }
+      }
+    },
+    {
+      "family": "MAGNUS 36",
+      "display": "MAGNUS 36",
+      "line": "otx",
+      "lineName": "OTX",
+      "sie_brands": [
+        "MAGNUS 36 (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 70271,
+          "market_prev": 93837,
+          "sie_curr": 4151,
+          "sie_prev": 4005,
+          "ms_curr": 5.9,
+          "ms_prev": 4.3,
+          "ie": 138.0,
+          "var_pp": 1.6
+        },
+        "ytd": {
+          "market_curr": 379545,
+          "market_prev": 352795,
+          "sie_curr": 15457,
+          "sie_prev": 15898,
+          "ms_curr": 4.1,
+          "ms_prev": 4.5,
+          "ie": 90.0,
+          "var_pp": -0.4
+        },
+        "trimestre": {
+          "market_curr": 274002,
+          "market_prev": 267537,
+          "sie_curr": 11612,
+          "sie_prev": 11783,
+          "ms_curr": 4.2,
+          "ms_prev": 4.4,
+          "ie": 96.0,
+          "var_pp": -0.2
+        },
+        "mat": {
+          "market_curr": 1172594,
+          "market_prev": 1024171,
+          "sie_curr": 46434,
+          "sie_prev": 48405,
+          "ms_curr": 4.0,
+          "ms_prev": 4.7,
+          "ie": 84.0,
+          "var_pp": -0.7
         }
       }
     },
