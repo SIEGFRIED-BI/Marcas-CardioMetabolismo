@@ -356,6 +356,17 @@ if (-not $DryRun -and -not $SkipKpis) {
     }
 }
 
+# ─── Cache-busters: bump ?v=<hash> tras regenerar data.js / kpis.json ───
+# Evita que el navegador/CDN sirva una version vieja cacheada de data.js.
+if (-not $DryRun) {
+    $cbScript = Join-Path $PSScriptRoot 'bump-cache-busters.py'
+    if (Test-Path -LiteralPath $cbScript) {
+        Write-Host ""
+        Write-Host "Actualizando cache-busters (?v=hash)..." -ForegroundColor Cyan
+        & $pyExe $cbScript
+    }
+}
+
 # Commit & push
 if ($CommitPush -and -not $DryRun) {
     $hadFailure = $results.Values | Where-Object { $_ -like 'FAILED*' }
@@ -372,8 +383,10 @@ if ($CommitPush -and -not $DryRun) {
     try {
         # data.js de las lineas + shared/cross-line-summary.json + kpis.json
         # + inline D de mujer/SNC (si merge-ventas o sync los toco)
-        git add '*/data.js' 'shared/cross-line-summary.json' 'kpis.json' `
-                'mujer/index.html' 'SNC/index.html' 2>&1 | Out-Null
+        git add '*/data.js' 'shared/cross-line-summary.json' 'kpis.json' 'kpis-families.json' `
+                'cardio/index.html' 'ATB/index.html' 'OTC/index.html' 'respiratorio/index.html' `
+                'mujer/index.html' 'SNC/index.html' 'dermatologia/dermato_dashboard.html' `
+                'kpis.html' 'index.html' 2>&1 | Out-Null
         $staged = git diff --cached --name-only
         if (-not $staged) {
             Write-Host "  Sin cambios para commitear." -ForegroundColor Yellow

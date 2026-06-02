@@ -161,10 +161,23 @@ py shared/recompute-mol-perf-aggregates.py     # quarterly/ytd/mat/ms_* desde mo
 py shared/build-kpis.py                         # → kpis.json (hub, Por Línea/Producto)
 py shared/build-families-perf.py                # → kpis-families.json (hub, Por Marca)
 py shared/sync-kpistrip-with-kpis-json.py       # alinea el strip de cada tablero con kpis.json
+py shared/bump-cache-busters.py                 # ?v=<hash> en data.js/assets (anti-cache viejo)
 py shared/audit-full.py                         # DEBE dar 0 FAIL (ver 03-verificar.md)
 git add -A && git commit -m "Actualización corte YYYY-MM" && git push origin main
 ```
 Cloudflare Pages redeploya solo al pushear a `main` (~1-2 min).
+
+> **Cache-buster (importante):** cada `<linea>/index.html` carga `data.js?v=<hash>`
+> y los assets `shared/*.js|css?v=<hash>`. El `?v` se deriva del **hash del
+> contenido** vía `bump-cache-busters.py`. Si cambia data.js pero NO se bumpea el
+> `?v`, el navegador/CDN sirve la **versión vieja cacheada** (bug real que pasó en
+> jun-2026). Por eso:
+> - `build-all.ps1` ya corre `bump-cache-busters.py` al final (automático).
+> - El **pre-commit hook** también lo corre y re-stagea (red de seguridad).
+> - El hook vive en `.git/hooks/pre-commit` (no se versiona). Copia de respaldo:
+>   `shared/git-pre-commit.sh`. Si reclonás el repo, reinstalalo:
+>   `cp shared/git-pre-commit.sh .git/hooks/pre-commit`
+> - Verificar a mano: `py shared/bump-cache-busters.py --check` (0 = al día).
 
 ---
 
