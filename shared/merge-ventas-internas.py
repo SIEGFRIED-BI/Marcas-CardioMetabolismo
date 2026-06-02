@@ -217,6 +217,16 @@ def update_budget(budget, pairs, by_col0, years_seen, line_key):
     updated, unmatched = 0, []
 
     if line_key == 'mujer':
+        # IMPORTANTE: matchear por FAMILIA (col1), NO por Gran Familia (col0).
+        # En la planilla, col0 'ISIS' agrupa TODAS las variantes (ISIS, ISIS FREE,
+        # ISIS MINI, ISIS MINI 24). Los targets del map (ISIS, ISIS FREE, ...) son
+        # nombres de Familia (col1). Si se matchea por col0, ALTA DOSIS (target
+        # Familia 'ISIS') absorbe TODO el ISIS (~118k) y el resto queda en 0,
+        # dando %Cumpl absurdos (705%). Por col1, ALTA DOSIS = ISIS alta dosis (~17k).
+        by_col1 = defaultdict(lambda: defaultdict(int))
+        for (g, f), vals in pairs.items():
+            for ym, v in vals.items():
+                by_col1[f][ym] += v
         for budget_key in list(budget.keys()):
             if budget_key not in MUJER_SEGMENT_TO_FAMS:
                 unmatched.append(budget_key); continue
@@ -226,9 +236,10 @@ def update_budget(budget, pairs, by_col0, years_seen, line_key):
             sum_data = defaultdict(int)
             had_any = False
             for tf in target_fams:
-                if tf in by_col0:
+                src = by_col1.get(tf) or by_col0.get(tf)  # preferir Familia (col1)
+                if src:
                     had_any = True
-                    for ym, v in by_col0[tf].items():
+                    for ym, v in src.items():
                         sum_data[ym] += v
             if not had_any:
                 unmatched.append(budget_key); continue
