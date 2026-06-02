@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T15:33:42",
+  "generated_at": "2026-06-02T15:42:41",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -1739,7 +1739,7 @@
           "units_curr": 68864,
           "units_prev": 61286,
           "units_ie": 133.3,
-          "int_curr": 54511,
+          "int_curr": 50998,
           "int_prev": 0,
           "int_ie": null
         },
@@ -1750,7 +1750,7 @@
           "units_curr": 256965,
           "units_prev": 253207,
           "units_ie": 108.6,
-          "int_curr": 205007,
+          "int_curr": 193833,
           "int_prev": 0,
           "int_ie": null
         },
@@ -1761,7 +1761,7 @@
           "units_curr": 191808,
           "units_prev": 188181,
           "units_ie": 111.0,
-          "int_curr": 204932,
+          "int_curr": 193763,
           "int_prev": 0,
           "int_ie": null
         },
@@ -1772,7 +1772,7 @@
           "units_curr": 376628,
           "units_prev": 386682,
           "units_ie": 105.0,
-          "int_curr": 295595,
+          "int_curr": 279272,
           "int_prev": 0,
           "int_ie": null
         },
@@ -1783,7 +1783,7 @@
           "units_curr": 740872,
           "units_prev": 774750,
           "units_ie": 99.2,
-          "int_curr": 294756,
+          "int_curr": 278480,
           "int_prev": 0,
           "int_ie": null
         }
@@ -4448,7 +4448,7 @@
           "units_curr": 4151,
           "units_prev": 4005,
           "units_ie": 123.0,
-          "int_curr": 3286,
+          "int_curr": 3725,
           "int_prev": 0,
           "int_ie": null
         },
@@ -4459,7 +4459,7 @@
           "units_curr": 15457,
           "units_prev": 15898,
           "units_ie": 104.1,
-          "int_curr": 12332,
+          "int_curr": 11846,
           "int_prev": 0,
           "int_ie": null
         },
@@ -4470,7 +4470,7 @@
           "units_curr": 11612,
           "units_prev": 11783,
           "units_ie": 107.3,
-          "int_curr": 12407,
+          "int_curr": 11846,
           "int_prev": 0,
           "int_ie": null
         },
@@ -4481,7 +4481,7 @@
           "units_curr": 22470,
           "units_prev": 23934,
           "units_ie": 101.2,
-          "int_curr": 17635,
+          "int_curr": 17296,
           "int_prev": 0,
           "int_ie": null
         },
@@ -4492,7 +4492,7 @@
           "units_curr": 46434,
           "units_prev": 48405,
           "units_ie": 99.6,
-          "int_curr": 18474,
+          "int_curr": 17296,
           "int_prev": 0,
           "int_ie": null
         }
