@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa del Proyecto · Marcas-CardioMetabolismo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#B01E1E; --red-dark:#7A1518; --red-pale:#FEF2F2; --red-tint:#FFF7F7;
+    --blue:#1f4ba6; --orange:#ea580c; --green:#15803d; --purple:#7c3aed;
+    --g50:#F9FAFB; --g100:#F3F4F6; --g200:#E5E7EB; --g300:#D1D5DB;
+    --g400:#9CA3AF; --g500:#6B7280; --g700:#374151; --g900:#111827;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--g50);color:var(--g900);line-height:1.5;-webkit-font-smoothing:antialiased}
+  code,.mono{font-family:'IBM Plex Mono',monospace}
+  a{color:var(--red);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .nav{background:var(--red);color:#fff;padding:14px 28px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(139,21,21,.3)}
+  .nav .mark{width:34px;height:34px;border-radius:7px;background:#fff;color:var(--red);font-family:'IBM Plex Mono';font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .nav h1{font-size:15px;font-weight:600;letter-spacing:.01em}
+  .nav .sub{font-size:11px;color:rgba(255,255,255,.7);font-weight:400}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 24px 80px}
+  .lead{font-size:13.5px;color:var(--g500);margin:6px 0 26px;max-width:760px}
+  .lead b{color:var(--g900)}
+  h2.sec{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin:34px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--red-pale)}
+
+  /* flow diagram */
+  .flow{display:flex;flex-direction:column;gap:0}
+  .layer{background:#fff;border:1px solid var(--g200);border-radius:12px;padding:16px 18px;position:relative}
+  .layer + .layer{margin-top:30px}
+  .layer + .layer::before{content:"▼";position:absolute;top:-25px;left:50%;transform:translateX(-50%);color:var(--g300);font-size:15px}
+  .layer .ltag{font-family:'IBM Plex Mono';font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--g400);margin-bottom:11px}
+  .row{display:flex;flex-wrap:wrap;gap:10px}
+  .box{flex:1;min-width:150px;border-radius:9px;padding:11px 13px;border:1px solid var(--g200);background:var(--g50);transition:transform .12s,box-shadow .12s,border-color .12s;display:block;color:inherit}
+  .box:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08);text-decoration:none;border-color:var(--red)}
+  .box .t{font-weight:700;font-size:13px;color:var(--g900);display:flex;align-items:center;gap:6px}
+  .box .d{font-size:11px;color:var(--g500);margin-top:3px}
+  .box .f{font-family:'IBM Plex Mono';font-size:10px;color:var(--red);margin-top:6px;word-break:break-word}
+  .box.src{background:#fff;border-left:4px solid var(--g500)}
+  .box.scr{background:var(--red-tint);border-left:4px solid var(--red)}
+  .box.dat{background:#eef4ff;border-left:4px solid var(--blue)}
+  .box.der{background:#fff5ec;border-left:4px solid var(--orange)}
+  .box.pre{background:#ecfdf3;border-left:4px solid var(--green)}
+
+  /* "qué quiero hacer" */
+  .qcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .qcard{background:#fff;border:1px solid var(--g200);border-radius:11px;padding:16px;display:block;color:inherit;transition:transform .12s,box-shadow .12s}
+  .qcard:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08);text-decoration:none;border-color:var(--red)}
+  .qcard .ic{font-size:22px}
+  .qcard .qt{font-weight:700;font-size:14px;margin:7px 0 3px}
+  .qcard .qd{font-size:12px;color:var(--g500)}
+  .qcard .go{font-family:'IBM Plex Mono';font-size:10.5px;color:var(--red);font-weight:600;margin-top:9px;display:inline-block}
+
+  /* tabla líneas */
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--g200);border-radius:11px;overflow:hidden;font-size:12.5px}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--g100)}
+  th{background:var(--g50);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g500)}
+  tbody tr:hover{background:var(--red-tint)}
+  td .mono{font-size:11px;color:var(--g700)}
+  .chip{display:inline-block;font-family:'IBM Plex Mono';font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--g100);color:var(--g700)}
+  .chip.ext{background:#eef4ff;color:var(--blue)}
+  .chip.inl{background:var(--red-pale);color:var(--red)}
+  .ok{color:var(--green);font-weight:700}
+  .no{color:var(--g300)}
+
+  .cmd{background:var(--g900);color:#e7e7e7;border-radius:10px;padding:14px 16px;font-family:'IBM Plex Mono';font-size:12px;line-height:1.7;overflow-x:auto;margin-top:6px}
+  .cmd .c{color:#7ee787}
+  .cmd .h{color:#8b949e}
+  .docs-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .doc-pill{background:#fff;border:1px solid var(--g200);border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;color:var(--g700)}
+  .doc-pill:hover{border-color:var(--red);color:var(--red);text-decoration:none}
+  .note{background:var(--red-tint);border:1px solid #f6d5d5;border-radius:10px;padding:13px 16px;font-size:12.5px;color:var(--g700);margin-top:14px}
+  .note b{color:var(--red)}
+  footer{margin-top:40px;padding-top:18px;border-top:1px solid var(--g200);font-size:11px;color:var(--g400)}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="mark">M</div>
+  <div>
+    <h1>Mapa del Proyecto · Marcas-CardioMetabolismo</h1>
+    <div class="sub">Cómo se conecta todo · fuentes → scripts → datos → tableros</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <p class="lead">
+    Este es el <b>mapa único</b> del hub de tableros. Todo lo que ves abajo es
+    clickeable. Las <b>fuentes Excel</b> viven en OneDrive (<code>Hub-Marcas-Inputs/</code>),
+    los <b>scripts</b> en <code>shared/</code>, y los <b>datos</b> son archivos generados
+    (<code>data.js</code> o <code>const D</code> inline). Nunca se edita un número a mano:
+    se corre el script que lo regenera.
+  </p>
+
+  <!-- QUÉ QUIERO HACER -->
+  <h2 class="sec">¿Qué querés hacer?</h2>
+  <div class="qcards">
+    <a class="qcard" href="02-actualizar.md">
+      <div class="ic">🔄</div>
+      <div class="qt">Actualizar un mes nuevo</div>
+      <div class="qd">Llegó el IQVIA / SAP / CloseUp. Qué correr y en qué orden.</div>
+      <span class="go">→ 02-actualizar.md</span>
+    </a>
+    <a class="qcard" href="03-verificar.md">
+      <div class="ic">✅</div>
+      <div class="qt">Verificar que está bien</div>
+      <div class="qd">Un comando: <code>py shared/audit-full.py</code>. Qué significa cada check.</div>
+      <span class="go">→ 03-verificar.md</span>
+    </a>
+    <a class="qcard" href="04-diccionario.md">
+      <div class="ic">📖</div>
+      <div class="qt">Entender una variable</div>
+      <div class="qd">Qué es cada clave (mol_perf, rec_ms, budget…), su shape y ejemplo real.</div>
+      <span class="go">→ 04-diccionario.md</span>
+    </a>
+    <a class="qcard" href="05-scripts.md">
+      <div class="ic">🛠️</div>
+      <div class="qt">Encontrar un script</div>
+      <div class="qd">Los 97 de <code>shared/</code> por categoría: qué hace y qué toca.</div>
+      <span class="go">→ 05-scripts.md</span>
+    </a>
+  </div>
+
+  <!-- FLUJO -->
+  <h2 class="sec">El flujo de datos (clickeá cada capa)</h2>
+  <div class="flow">
+
+    <div class="layer">
+      <div class="ltag">① Fuentes · Excel en OneDrive · Hub-Marcas-Inputs/</div>
+      <div class="row">
+        <a class="box src" href="02-actualizar.md#a-iqvia-mercado--el-corazón-define-mol_perf">
+          <div class="t">📈 IQVIA Premium</div>
+          <div class="d">Mercado / unidades. La fuente de <code>mol_perf</code>.</div>
+          <div class="f">_iqvia-master/YYYY-MM/AR_PM_FV_Standard_*.xlsx</div>
+        </a>
+        <a class="box src" href="02-actualizar.md#b-venta-interna-sap--define-budgetfamañoreal">
+          <div class="t">💼 SAP · Venta + Estimado</div>
+          <div class="d">Venta Interna y Estimado de Ventas.</div>
+          <div class="f">Planilla de Ventas · Estimados VENTA…xlsx</div>
+        </a>
+        <a class="box src" href="02-actualizar.md#d-recetas-closeup--define-recetas-rec_ms-rec_comp">
+          <div class="t">💊 CloseUp · Recetas</div>
+          <div class="d">Recetadas. Lag ~1 mes vs IQVIA.</div>
+          <div class="f">pivot CloseUp · Tabla dinámica.xlsx</div>
+        </a>
+        <a class="box src" href="02-actualizar.md#h-competidores-ddd-heatmap-regional--define-competidores-datajs">
+          <div class="t">🌎 Regional · DDD</div>
+          <div class="d">Competidores por provincia/región.</div>
+          <div class="f">Producto-Molécula-ATC-provincia.xlsx</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="ltag">② Scripts · shared/ (97 archivos)</div>
+      <div class="row">
+        <a class="box scr" href="05-scripts.md#sync">
+          <div class="t">sync-*-pm.py</div>
+          <div class="d">IQVIA → mol_perf (mujer/SNC/derma).</div>
+        </a>
+        <a class="box scr" href="05-scripts.md#build">
+          <div class="t">build-data.ps1 / build-all.ps1</div>
+          <div class="d">IQVIA → data.js (cardio/ATB/OTC/respi).</div>
+        </a>
+        <a class="box scr" href="05-scripts.md#merge">
+          <div class="t">merge-*.py</div>
+          <div class="d">Venta, recetas, stock, precios (agregan meses).</div>
+        </a>
+        <a class="box scr" href="05-scripts.md#rebuild">
+          <div class="t">rebuild-*.py</div>
+          <div class="d">Mercados con composición fija (mujer 45, ACEMUK).</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="ltag">③ Datos por línea (generados)</div>
+      <div class="row">
+        <a class="box dat" href="../cardio/data.js">
+          <div class="t">cardio/data.js</div>
+          <div class="d">window.OTC_DASHBOARD · cardio/ATB/OTC/respi</div>
+          <div class="f">→ 04-diccionario.md</div>
+        </a>
+        <a class="box dat" href="../mujer/index.html">
+          <div class="t">mujer · const D inline</div>
+          <div class="d">mujer/SNC/dermatologia (dentro del HTML)</div>
+          <div class="f">→ 04-diccionario.md</div>
+        </a>
+        <a class="box dat" href="04-diccionario.md">
+          <div class="t">Claves núcleo</div>
+          <div class="d">mol_perf · rec_ms · rec_comp · budget · kpiStrip · stock</div>
+          <div class="f">→ diccionario exhaustivo</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="ltag">④ Derivados del hub · build-kpis.py + build-families-perf.py</div>
+      <div class="row">
+        <a class="box der" href="../kpis.json">
+          <div class="t">kpis.json</div>
+          <div class="d">KPIs por línea/producto × 5 períodos.</div>
+          <div class="f">build-kpis.py</div>
+        </a>
+        <a class="box der" href="../kpis-families.json">
+          <div class="t">kpis-families.json</div>
+          <div class="d">86 familias × MAT/YTD/MES/TRIM (vista Por Marca).</div>
+          <div class="f">build-families-perf.py</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="ltag">⑤ Presentación · git push → Cloudflare Pages</div>
+      <div class="row">
+        <a class="box pre" href="../index.html">
+          <div class="t">index.html</div>
+          <div class="d">Hub · tarjetas de las 7 líneas.</div>
+        </a>
+        <a class="box pre" href="../kpis.html">
+          <div class="t">kpis.html</div>
+          <div class="d">Indicadores cross-línea (Por Línea / Producto / Marca).</div>
+        </a>
+        <a class="box pre" href="../cardio/index.html">
+          <div class="t">&lt;linea&gt;/index.html</div>
+          <div class="d">Tablero + DDD/competidores por línea.</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TABLA LINEAS -->
+  <h2 class="sec">Las 7 líneas</h2>
+  <table>
+    <thead><tr><th>Línea</th><th>Archivo principal</th><th>Variable</th><th>Datos</th><th>Particularidad</th></tr></thead>
+    <tbody>
+      <tr><td><b>cardio</b></td><td><a href="../cardio/index.html" class="mono">cardio/index.html</a> + <a href="../cardio/data.js" class="mono">data.js</a></td><td><span class="chip ext">OTC_DASHBOARD</span></td><td>separado</td><td>+ respPerf, brandKpis</td></tr>
+      <tr><td><b>ATB</b></td><td><a href="../ATB/index.html" class="mono">ATB/index.html</a> + <a href="../ATB/data.js" class="mono">data.js</a></td><td><span class="chip ext">OTC_DASHBOARD</span></td><td>separado</td><td>+ respPerf, brandKpis</td></tr>
+      <tr><td><b>OTC</b></td><td><a href="../OTC/index.html" class="mono">OTC/index.html</a> + <a href="../OTC/data.js" class="mono">data.js</a></td><td><span class="chip ext">OTC_DASHBOARD</span></td><td>separado</td><td>sin respPerf</td></tr>
+      <tr><td><b>respiratorio</b></td><td><a href="../respiratorio/index.html" class="mono">respiratorio/index.html</a> + <a href="../respiratorio/data.js" class="mono">data.js</a></td><td><span class="chip ext">OTC_DASHBOARD</span></td><td>separado</td><td>data.js 5.4 MB</td></tr>
+      <tr><td><b>mujer</b></td><td><a href="../mujer/index.html" class="mono">mujer/index.html</a></td><td><span class="chip inl">const D</span></td><td>inline</td><td>+ iqviaMeta · mercado 45 fijo</td></tr>
+      <tr><td><b>SNC</b></td><td><a href="../SNC/index.html" class="mono">SNC/index.html</a></td><td><span class="chip inl">const D</span></td><td>inline</td><td>+ kpiByBrand · chart Venta propio</td></tr>
+      <tr><td><b>dermatologia</b></td><td><a href="../dermatologia/dermato_dashboard.html" class="mono">dermato_dashboard.html</a></td><td><span class="chip inl">const D</span></td><td>inline</td><td>+ familyMap · precios flat</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ACTUALIZAR RAPIDO -->
+  <h2 class="sec">Actualizar un mes — el flujo feliz</h2>
+  <div class="cmd">
+<span class="h"># 1. dejar el IQVIA en Hub-Marcas-Inputs/_iqvia-master/YYYY-MM/  y sincronizar</span><br>
+<span class="c">py</span> shared/sync-mujer-pm.py &nbsp;&nbsp;<span class="c">py</span> shared/sync-snc-pm.py &nbsp;&nbsp;<span class="c">py</span> shared/sync-dermato-pm.py<br>
+<span class="c">pwsh</span> shared/build-all.ps1 -Month YYYY-MM -Lines cardio,ATB,OTC,respiratorio<br>
+<span class="h"># 2. venta interna / recetas / stock</span><br>
+<span class="c">py</span> shared/merge-ventas-internas.py &lt;planilla.xlsx&gt;<br>
+<span class="c">py</span> shared/merge-recetas-snc.py &lt;pivot.xlsx&gt; &nbsp;<span class="h"># (el merge que corresponda)</span><br>
+<span class="c">py</span> shared/merge-stock.py &lt;pivot.xlsx&gt;<br>
+<span class="h"># 3. recalcular derivados + verificar + publicar</span><br>
+<span class="c">py</span> shared/recompute-mol-perf-aggregates.py<br>
+<span class="c">py</span> shared/build-kpis.py &nbsp;&nbsp;<span class="c">py</span> shared/build-families-perf.py<br>
+<span class="c">py</span> shared/sync-kpistrip-with-kpis-json.py<br>
+<span class="c">py</span> shared/audit-full.py &nbsp;&nbsp;<span class="h"># debe dar FAIL: 0</span><br>
+<span class="c">git</span> add -A &amp;&amp; <span class="c">git</span> commit -m "Corte YYYY-MM" &amp;&amp; <span class="c">git</span> push
+  </div>
+  <div class="note">
+    <b>⚠ Nunca</b> edites un número a mano en <code>data.js</code> / <code>const D</code>:
+    corré el script. <b>Nunca</b> reemplaces el time-series entero (los merge
+    <b>agregan</b> meses). El pre-commit hook bloquea si se pierde historia o si el
+    audit falla — no uses <code>--no-verify</code>.
+  </div>
+
+  <!-- DOCS -->
+  <h2 class="sec">Toda la documentación</h2>
+  <div class="docs-row">
+    <a class="doc-pill" href="README.md">📁 README (índice)</a>
+    <a class="doc-pill" href="01-arquitectura.md">01 · Arquitectura</a>
+    <a class="doc-pill" href="02-actualizar.md">02 · Actualizar</a>
+    <a class="doc-pill" href="03-verificar.md">03 · Verificar</a>
+    <a class="doc-pill" href="04-diccionario.md">04 · Diccionario</a>
+    <a class="doc-pill" href="05-scripts.md">05 · Scripts (97)</a>
+    <a class="doc-pill" href="06-reorganizacion.md">06 · Reorg futura</a>
+    <a class="doc-pill" href="../CLAUDE.md">CLAUDE.md (naming)</a>
+  </div>
+
+  <footer>
+    Documentación de referencia · solo informativa, no cambia el comportamiento del proyecto.<br>
+    Abrí este archivo con doble-click (no necesita servidor). Los links a <code>.md</code>
+    se ven mejor en VS Code o GitHub.
+  </footer>
+</div>
+
+</body>
+</html>
