@@ -113,58 +113,6 @@
       }
     },
     {
-      "family": "ROXOLAN",
-      "display": "ROXOLAN",
-      "line": "cardio",
-      "lineName": "Cardiometabolismo",
-      "sie_brands": [
-        "ROXOLAN (SIE)",
-        "ROXOLAN PLUS (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 669670,
-          "market_prev": 896423,
-          "sie_curr": 20321,
-          "sie_prev": 19577,
-          "ms_curr": 3.0,
-          "ms_prev": 2.2,
-          "ie": 139.0,
-          "var_pp": 0.8
-        },
-        "ytd": {
-          "market_curr": 3567207,
-          "market_prev": 3370802,
-          "sie_curr": 86984,
-          "sie_prev": 71381,
-          "ms_curr": 2.4,
-          "ms_prev": 2.1,
-          "ie": 115.0,
-          "var_pp": 0.3
-        },
-        "trimestre": {
-          "market_curr": 2576195,
-          "market_prev": 2553096,
-          "sie_curr": 63645,
-          "sie_prev": 54356,
-          "ms_curr": 2.5,
-          "ms_prev": 2.1,
-          "ie": 116.0,
-          "var_pp": 0.4
-        },
-        "mat": {
-          "market_curr": 11174949,
-          "market_prev": 10919148,
-          "sie_curr": 260472,
-          "sie_prev": 228891,
-          "ms_curr": 2.3,
-          "ms_prev": 2.1,
-          "ie": 111.0,
-          "var_pp": 0.2
-        }
-      }
-    },
-    {
       "family": "METGLUCON AP",
       "display": "METGLUCON AP",
       "line": "cardio",
@@ -316,6 +264,57 @@
           "ms_prev": 6.1,
           "ie": 85.0,
           "var_pp": -0.9
+        }
+      }
+    },
+    {
+      "family": "ROXOLAN",
+      "display": "ROXOLAN",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "ROXOLAN (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 666191,
+          "market_prev": 745813,
+          "sie_curr": 16842,
+          "sie_prev": 15613,
+          "ms_curr": 2.5,
+          "ms_prev": 2.1,
+          "ie": 121.0,
+          "var_pp": 0.4
+        },
+        "ytd": {
+          "market_curr": 2959198,
+          "market_prev": 2831448,
+          "sie_curr": 64437,
+          "sie_prev": 57839,
+          "ms_curr": 2.2,
+          "ms_prev": 2.0,
+          "ie": 107.0,
+          "var_pp": 0.2
+        },
+        "trimestre": {
+          "market_curr": 2175050,
+          "market_prev": 2141134,
+          "sie_curr": 47718,
+          "sie_prev": 43978,
+          "ms_curr": 2.2,
+          "ms_prev": 2.1,
+          "ie": 107.0,
+          "var_pp": 0.1
+        },
+        "mat": {
+          "market_curr": 9144006,
+          "market_prev": 9285780,
+          "sie_curr": 194281,
+          "sie_prev": 193343,
+          "ms_curr": 2.1,
+          "ms_prev": 2.1,
+          "ie": 102.0,
+          "var_pp": 0.0
         }
       }
     },
@@ -1554,6 +1553,57 @@
           "ms_prev": 32.3,
           "ie": 98.0,
           "var_pp": -0.8
+        }
+      }
+    },
+    {
+      "family": "ROXOLAN PLUS",
+      "display": "ROXOLAN PLUS",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "ROXOLAN PLUS (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 3479,
+          "market_prev": 150610,
+          "sie_curr": 3479,
+          "sie_prev": 3964,
+          "ms_curr": 100.0,
+          "ms_prev": 2.6,
+          "ie": 3799.0,
+          "var_pp": 97.4
+        },
+        "ytd": {
+          "market_curr": 608009,
+          "market_prev": 539354,
+          "sie_curr": 22547,
+          "sie_prev": 13542,
+          "ms_curr": 3.7,
+          "ms_prev": 2.5,
+          "ie": 148.0,
+          "var_pp": 1.2
+        },
+        "trimestre": {
+          "market_curr": 401145,
+          "market_prev": 411962,
+          "sie_curr": 15927,
+          "sie_prev": 10378,
+          "ms_curr": 4.0,
+          "ms_prev": 2.5,
+          "ie": 158.0,
+          "var_pp": 1.5
+        },
+        "mat": {
+          "market_curr": 2030943,
+          "market_prev": 1633368,
+          "sie_curr": 66191,
+          "sie_prev": 35548,
+          "ms_curr": 3.3,
+          "ms_prev": 2.2,
+          "ie": 150.0,
+          "var_pp": 1.1
         }
       }
     },
