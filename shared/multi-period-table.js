@@ -118,7 +118,10 @@
     if (sie_prev > 0 && market_prev > 0 && market_curr > 0) {
       var sg = sie_curr / sie_prev;
       var mg = market_curr / market_prev;
-      if (mg > 0) ie = Math.round(sg / mg * 100);
+      // Cap igual que brandKpis: si el SIE crecio >5x (base del año anterior
+      // demasiado chica) el IE no es comparable -> null. Evita IE absurdos
+      // (p.ej. productos nuevos con base ~0).
+      if (mg > 0 && sg < 5) ie = Math.round(sg / mg * 100);
     }
     var var_pp = null;
     if (ms_curr != null && ms_prev != null) var_pp = +(ms_curr - ms_prev).toFixed(2);
@@ -147,7 +150,7 @@
     if (brand_prev > 0 && market_prev > 0 && market_curr > 0) {
       var bg = brand_curr / brand_prev;
       var mg = market_curr / market_prev;
-      if (mg > 0) ie = Math.round(bg / mg * 100);
+      if (mg > 0 && bg < 5) ie = Math.round(bg / mg * 100);  // cap off-base (igual que brandKpis)
     }
     var var_pp = null;
     if (ms_curr != null && ms_prev != null) var_pp = +(ms_curr - ms_prev).toFixed(2);
@@ -270,28 +273,27 @@
       for (var brandName in famComps) {
         compMonthlies[brandName] = extractBrandMonthly(famComps[brandName]);
       }
-      // FALLBACK: si rec_ms[fam].mkt esta vacio, computar mercado = sie + sum(competidores).
-      // Esto pasa en mujer (rec_ms[fam].mkt es {} en todas las familias).
-      var mktIsEmpty = true;
-      for (var _mk in mktMonthly) { if (+mktMonthly[_mk] > 0) { mktIsEmpty = false; break; } }
-      if (mktIsEmpty) {
-        var computedMkt = {};
-        // sumar SIE
-        for (var mk2 in sieMonthly) {
-          computedMkt[mk2] = (computedMkt[mk2] || 0) + (+sieMonthly[mk2] || 0);
-        }
-        // sumar cada competidor (excluyendo SIE-flagged en rec_comp si lo tuviera)
-        for (var bn in compMonthlies) {
-          // Si el competidor esta flag-eado como SIE en rec_comp (raro), no doble-contar
-          var bdata = famComps[bn];
-          if (bdata && bdata.is_sie === true) continue;
-          var bmon = compMonthlies[bn];
-          for (var mk3 in bmon) {
-            computedMkt[mk3] = (computedMkt[mk3] || 0) + (+bmon[mk3] || 0);
-          }
-        }
-        mktMonthly = computedMkt;
+      // MERCADO: rec_ms[fam].mkt suele estar incompleto (p.ej. cardio trae solo
+      // 3 meses; mujer lo trae vacio) lo que rompe IE/VarPP por falta de año
+      // anterior. rec_comp[fam] (competidores) tiene la historia COMPLETA y
+      // coincide con rec_ms.mkt en los meses que existen. Construimos el mercado
+      // desde rec_comp y usamos el origen con MAS cobertura (meses con dato).
+      //   - Si rec_comp YA incluye la marca SIE (cardio/OTC): mkt = suma de todo.
+      //   - Si NO la incluye (mujer): sumamos ademas el SIE total.
+      var hasSieInComp = false;
+      for (var _bn in famComps) {
+        if (isSieBrand(_bn) || (famComps[_bn] && famComps[_bn].is_sie === true)) { hasSieInComp = true; break; }
       }
+      var mktComp = {};
+      for (var bn in compMonthlies) {
+        var bmon = compMonthlies[bn];
+        for (var mk3 in bmon) mktComp[mk3] = (mktComp[mk3] || 0) + (+bmon[mk3] || 0);
+      }
+      if (!hasSieInComp) {
+        for (var mk2 in sieMonthly) mktComp[mk2] = (mktComp[mk2] || 0) + (+sieMonthly[mk2] || 0);
+      }
+      var _nz = function(o) { var n = 0; for (var k in o) { if (+o[k] > 0) n++; } return n; };
+      if (_nz(mktComp) >= _nz(mktMonthly)) mktMonthly = mktComp;
       var periods = {};
       for (var pk in windows) periods[pk] = computeFamily(mktMonthly, sieMonthly, windows[pk]);
       // Build competitors from rec_comp[fam]
