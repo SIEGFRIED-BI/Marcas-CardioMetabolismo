@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-26",
+  "generated_at": "2026-06-02",
   "as_of_month": "Apr 2026",
   "as_of_short": "Abr 2026",
   "period_labels": {
@@ -3716,57 +3716,6 @@
       }
     },
     {
-      "family": "45",
-      "display": "45",
-      "line": "mujer",
-      "lineName": "Mujer",
-      "sie_brands": [
-        "TRIP +45 (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 11833,
-          "market_prev": 5477,
-          "sie_curr": 2521,
-          "sie_prev": 0,
-          "ms_curr": 21.3,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 21.3
-        },
-        "ytd": {
-          "market_curr": 47821,
-          "market_prev": 20568,
-          "sie_curr": 8263,
-          "sie_prev": 0,
-          "ms_curr": 17.3,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 17.3
-        },
-        "trimestre": {
-          "market_curr": 37522,
-          "market_prev": 15842,
-          "sie_curr": 6306,
-          "sie_prev": 0,
-          "ms_curr": 16.8,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 16.8
-        },
-        "mat": {
-          "market_curr": 120938,
-          "market_prev": 34684,
-          "sie_curr": 15096,
-          "sie_prev": 0,
-          "ms_curr": 12.5,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 12.5
-        }
-      }
-    },
-    {
       "family": "DILATREND D",
       "display": "DILATREND D",
       "line": "cardio",
@@ -3968,6 +3917,57 @@
           "ms_prev": 17.7,
           "ie": 94.0,
           "var_pp": -1.0
+        }
+      }
+    },
+    {
+      "family": "45",
+      "display": "45",
+      "line": "mujer",
+      "lineName": "Mujer",
+      "sie_brands": [
+        "TRIP +45 (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 6445,
+          "market_prev": 3186,
+          "sie_curr": 2521,
+          "sie_prev": 0,
+          "ms_curr": 39.1,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 39.1
+        },
+        "ytd": {
+          "market_curr": 24409,
+          "market_prev": 10606,
+          "sie_curr": 8263,
+          "sie_prev": 0,
+          "ms_curr": 33.9,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 33.9
+        },
+        "trimestre": {
+          "market_curr": 19480,
+          "market_prev": 8614,
+          "sie_curr": 6306,
+          "sie_prev": 0,
+          "ms_curr": 32.4,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 32.4
+        },
+        "mat": {
+          "market_curr": 60575,
+          "market_prev": 17087,
+          "sie_curr": 15096,
+          "sie_prev": 0,
+          "ms_curr": 24.9,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 24.9
         }
       }
     },

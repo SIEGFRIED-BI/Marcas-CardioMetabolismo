@@ -69,6 +69,13 @@ MUJER_SEGMENT_TO_FAMS = {
 }
 
 
+# Aliases: budget keys cuyo nombre difiere de la 'Familia' en la planilla.
+# Formato: { budget_key_en_data : nombre_familia_en_planilla }
+KEY_ALIASES = {
+    'HEXALER BRONQUIAL DU': 'HEXALER BRONQUIAL DUO',   # a la key le falta la 'O'
+}
+
+
 def parse_xlsx(path, cutoff=None):
     """Devuelve dict[familia] = {(year, month_idx): value}.
     cutoff = (year, month_idx) o None. Meses posteriores se ignoran."""
@@ -108,24 +115,38 @@ def parse_xlsx(path, cutoff=None):
                 continue
         col_to_ym[i] = (year, midx)
 
-    out = {}
+    # Detectar si hay columna 'Familia' separada de 'Gran Familia'.
+    # Formato SAP nuevo: col0=Gran Familia, col1=Familia, col2=Producto, ...
+    # Formato viejo: col0=Familia, col1=primer mes. Si la col 1 es un mes,
+    # NO hay columna Familia separada -> f = g.
+    has_familia_col = (1 not in col_to_ym)
+
+    # by_col0: {gran_familia: {(year,midx): val}}  (suma de todas las filas)
+    # pairs:   {(gran_familia, familia): {(year,midx): val}}  (granularidad fina)
+    by_col0 = defaultdict(lambda: defaultdict(int))
+    pairs   = defaultdict(lambda: defaultdict(int))
     for row in ws.iter_rows(min_row=data_start, values_only=True):
         if not row or len(row) < 1 or not row[0]: continue
-        fam = str(row[0]).strip()
-        if not fam: continue
-        # Skip header-like rows (e.g., 'Familia' as data row in 2-header layout)
-        if fam.lower() in ('familia', 'familias', 'family'): continue
-        out[fam] = {}
+        g = str(row[0]).strip()
+        if not g: continue
+        # Skip header-like rows
+        if g.lower() in ('familia', 'familias', 'family', 'gran familia'): continue
+        f = (str(row[1]).strip() if has_familia_col and len(row) > 1 and row[1] else g)
+        if not f: f = g
         for ci, ym in col_to_ym.items():
             if ci >= len(row): continue
             v = row[ci]
             if v is None: continue
             try:
-                out[fam][ym] = int(round(float(v)))
-            except (ValueError, TypeError): pass
+                iv = int(round(float(v)))
+            except (ValueError, TypeError): continue
+            by_col0[g][ym] += iv
+            pairs[(g, f)][ym] += iv
     wb.close()
-    years_seen = sorted({y for fam_data in out.values() for (y, _) in fam_data})
-    return out, years_seen
+    by_col0 = {k: dict(v) for k, v in by_col0.items()}
+    pairs   = {k: dict(v) for k, v in pairs.items()}
+    years_seen = sorted({y for d in by_col0.values() for (y, _) in d})
+    return pairs, by_col0, years_seen
 
 
 def load_data_js(p):
@@ -167,49 +188,71 @@ def write_inline(text, D, abs_start, abs_end):
     return text[:abs_start] + json.dumps(D, ensure_ascii=False) + text[abs_end:]
 
 
-def update_budget(budget, fam_to_excel, years_seen, line_key):
-    """Devuelve count de familias actualizadas y lista de no matches."""
+def _write_real(budget, budget_key, new_data, years_seen):
+    """Escribe new_data {(year,midx):val} en budget[key].real, por año.
+    NO toca budget (estimado)."""
+    for year in years_seen:
+        yk = str(year)
+        year_obj = budget[budget_key].setdefault(yk, {})
+        real_arr = year_obj.get('real')
+        if not isinstance(real_arr, list) or len(real_arr) != 12:
+            real_arr = [None] * 12
+        for (y, midx), v in new_data.items():
+            if y == year:
+                real_arr[midx] = v
+        year_obj['real'] = real_arr
+        year_obj.setdefault('budget', [0]*12)
+
+
+def update_budget(budget, pairs, by_col0, years_seen, line_key):
+    """Actualiza budget[*].real desde la planilla.
+
+    - mujer: usa by_col0 + MUJER_SEGMENT_TO_FAMS (comportamiento historico).
+    - resto: asigna cada fila (Gran Familia g, Familia f) a su budget key MAS
+      ESPECIFICA: si f es un budget key -> f; si no, si g es un budget key -> g.
+      Asi una sub-familia (TETRALGIN NOVO, BACTRIM FORTE, DILATREND AP, ...) va
+      a su propia key, y las filas restantes de la Gran Familia (incluidas
+      variantes sin key propia, p.ej. TETRALGIN APC) quedan en la key padre.
+    """
     updated, unmatched = 0, []
-    for budget_key in list(budget.keys()):
-        # Para mujer, si la key es un segmento, sumamos las familias mapeadas
-        if line_key == 'mujer' and budget_key in MUJER_SEGMENT_TO_FAMS:
+
+    if line_key == 'mujer':
+        for budget_key in list(budget.keys()):
+            if budget_key not in MUJER_SEGMENT_TO_FAMS:
+                unmatched.append(budget_key); continue
             target_fams = MUJER_SEGMENT_TO_FAMS[budget_key]
             if not target_fams:
-                continue  # segmento sin mapeo, skip silently
-            # Sumar valores de todas las target_fams
+                continue  # segmento sin mapeo, skip silencioso
             sum_data = defaultdict(int)
             had_any = False
             for tf in target_fams:
-                if tf in fam_to_excel:
+                if tf in by_col0:
                     had_any = True
-                    for ym, v in fam_to_excel[tf].items():
+                    for ym, v in by_col0[tf].items():
                         sum_data[ym] += v
             if not had_any:
-                unmatched.append(budget_key)
-                continue
-            new_data = dict(sum_data)
-        else:
-            # Match directo
-            if budget_key not in fam_to_excel:
-                unmatched.append(budget_key)
-                continue
-            new_data = fam_to_excel[budget_key]
+                unmatched.append(budget_key); continue
+            _write_real(budget, budget_key, dict(sum_data), years_seen)
+            updated += 1
+        return updated, unmatched
 
-        # Asegurar que existan los años en budget[key]
-        for year in years_seen:
-            yk = str(year)
-            year_obj = budget[budget_key].setdefault(yk, {})
-            real_arr = year_obj.get('real')
-            if not isinstance(real_arr, list) or len(real_arr) != 12:
-                real_arr = [None] * 12
-            # Actualizar cada mes que tenga valor
-            for (y, midx), v in new_data.items():
-                if y == year:
-                    real_arr[midx] = v
-            year_obj['real'] = real_arr
-            # Si no existe budget array, asegurar que exista (no lo tocamos)
-            year_obj.setdefault('budget', [0]*12)
-        updated += 1
+    # Resto de lineas: asignacion mas-especifica (alias -> f -> g) por fila
+    line_keys = set(budget.keys())
+    # alias por familia: { familia_en_planilla : budget_key }
+    alias_fam_to_key = {fam: k for k, fam in KEY_ALIASES.items() if k in line_keys}
+    acc = defaultdict(lambda: defaultdict(int))
+    for (g, f), vals in pairs.items():
+        key = alias_fam_to_key.get(f) or (f if f in line_keys else (g if g in line_keys else None))
+        if key is None:
+            continue
+        for ym, v in vals.items():
+            acc[key][ym] += v
+    for budget_key in list(budget.keys()):
+        if budget_key in acc:
+            _write_real(budget, budget_key, dict(acc[budget_key]), years_seen)
+            updated += 1
+        else:
+            unmatched.append(budget_key)
     return updated, unmatched
 
 
@@ -233,8 +276,8 @@ def main():
         print(f'Cutoff: incluir hasta {args.cutoff} (mes idx {cutoff[1]})')
 
     print(f'Leyendo: {fp}')
-    fam_data, years_seen = parse_xlsx(fp, cutoff=cutoff)
-    print(f'  {len(fam_data)} familias en xlsx, años: {years_seen}')
+    pairs, by_col0, years_seen = parse_xlsx(fp, cutoff=cutoff)
+    print(f'  {len(by_col0)} familias (col0), {len(pairs)} pares (gran familia, familia), años: {years_seen}')
 
     for line in LINES:
         path = REPO / line['path']
@@ -252,7 +295,7 @@ def main():
                     print(f'  [{line["key"]}] SKIP: no D.budget'); continue
                 budget = D['budget']
 
-            updated, unmatched = update_budget(budget, fam_data, years_seen, line['key'])
+            updated, unmatched = update_budget(budget, pairs, by_col0, years_seen, line['key'])
 
             if args.dry_run:
                 print(f'  [{line["key"]}] DRY: actualizaria {updated} familias, sin match: {len(unmatched)}'.encode('ascii','replace').decode())
