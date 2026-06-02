@@ -21,6 +21,7 @@ los datos están bien.
 | Saber qué es una variable / clave de datos | `04-diccionario.md` |
 | Encontrar el script que hace X (los 97) | `05-scripts.md` |
 | Prolijear el proyecto a futuro (opcional) | `06-reorganizacion.md` |
+| **Errores que ya pasaron y NO repetir (+ guardrails)** | **`07-lecciones-y-errores.md`** |
 
 ---
 
