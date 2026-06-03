@@ -154,18 +154,30 @@ Solo hay que correrlo **cuando cambia el estimado**, no todos los meses.
 
 ### D) Recetas (CloseUp) — define `recetas`, `rec_ms`, `rec_comp`
 
-**Fuente:** pivot CloseUp (`Sin titulo - Tabla dinamica - <fecha>.xlsx`), columnas
-`[Mercado, Droga, Marca, AñoMes, Cant. Recetas, Cant. Medicos]`. **Lag ~1 mes** vs IQVIA.
+**Fuente:** pivot CloseUp (`Sin título - Tabla dinámica - <fecha>.xlsx`), columnas
+`[Mercado, Droga, Marca, Cant. Recetas, Cant. Médicos]` con la fecha del mes en el
+header. **Lag ~1 mes vs IQVIA**: el archivo "de junio" trae el último mes CERRADO de
+recetas = **abril** (CloseUp no cierra el mes corriente). El mes se lee del header.
 
-Hay un merge por familia de líneas (difieren por shape):
+Un merge por familia de líneas (difieren por shape); todos toman `--pivot`:
 ```
-py shared/merge-recetas-march.py <pivot.xlsx>        # cardio/ATB/OTC/respi (data.js)
-py shared/merge-recetas-respi.py <pivot.xlsx>        # respiratorio (10 mercados)
-py shared/merge-recetas-snc.py <pivot.xlsx>          # SNC (inline const D)
-py shared/merge-recetas-mujer-march.py <pivot.xlsx>  # mujer (inline)
+py shared/merge-recetas-march.py --pivot "<pivot.xlsx>" [--dry-run]   # cardio/ATB/OTC/respi
+py shared/merge-recetas-snc.py   --pivot "<pivot.xlsx>" [--dry-run]   # SNC (inline)
+py shared/merge-recetas-mujer-march.py --pivot "<pivot.xlsx>"         # mujer (inline; deriva el mes)
+py shared/build-kpis.py && py shared/build-families-perf.py && py shared/sync-kpistrip-with-kpis-json.py
+py shared/audit-full.py        # DEBE dar 0 FAIL
 ```
+- **Mercado dedup:** `recetas[fam].recetas` y `rec_ms[fam].mkt` usan el **total ÚNICO**
+  del pivot (fila `Totales` del mercado), NO la suma de marcas (CloseUp double-countea).
+  Ambos DEBEN coincidir (lo valida el audit). Lo arregla `merge-recetas-march.py`.
+- **dermatología: NO tiene merger de recetas** (inline, sin script dedicado). Hoy queda
+  rezagada un mes hasta construir uno (mapeo mercado→familia tipo SNC). Pendiente.
+- `merge-recetas-respi.py` es el rebuild histórico de respi (15 meses); para el corte
+  incremental alcanza con `merge-recetas-march.py`.
+
 **Confirmar:** tablero → Recetas → la tabla multi-período debe traer el mes nuevo
-con MS%/IE/Var pp calculados.
+con MS%/IE/Var pp calculados (recordá el guard: si el mercado del mes está incompleto,
+muestra "—" — ver `07-lecciones` Bug 5).
 
 ---
 

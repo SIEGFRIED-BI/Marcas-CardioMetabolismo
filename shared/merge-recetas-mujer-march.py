@@ -98,8 +98,24 @@ def droga_competitors(rows, market, droga):
 
 
 def main():
+    global PIVOT, TARGET_MONTH
+    import argparse, datetime
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--pivot', default=str(PIVOT))
+    ap.add_argument('--month', default=None, help="e.g. 'Apr 2026'; si falta se deriva del header del pivot")
+    args = ap.parse_args()
+    PIVOT = Path(args.pivot)
     if not PIVOT.is_file():
         print(f'ERROR: pivot no existe: {PIVOT}'); return 1
+    if args.month:
+        TARGET_MONTH = args.month
+    else:
+        _MES = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'}
+        _wb = openpyxl.load_workbook(PIVOT, read_only=True, data_only=True); _r1 = list(next(_wb.active.iter_rows(min_row=1, max_row=1, values_only=True))); _wb.close()
+        for _v in _r1:
+            if isinstance(_v, (datetime.datetime, datetime.date)):
+                TARGET_MONTH = f'{_MES[_v.month]} {_v.year}'; break
+    print(f'Mes objetivo: {TARGET_MONTH} | pivot: {PIVOT.name}')
     rows = read_pivot(PIVOT)
     print(f'Pivot rows: {len(rows)}')
 

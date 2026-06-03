@@ -260,24 +260,23 @@ def merge_line(data_js_path: Path, months_to_merge: list,
             sie_dict = rms.setdefault('sie', {})
             ms_dict = rms.setdefault('ms', {})
             mkt_dict = rms.setdefault('mkt', {})
+            # Mercado = total UNICO del pivot (fila 'Totales' del mercado) cuando existe.
+            # Es el conteo dedup real; la suma de marcas double-countea (CloseUp NO es
+            # sumable: un mismo medico/receta en varias marcas se cuenta multiple veces).
+            # rec_ms.mkt y recetas[fam] DEBEN coincidir (lo valida el audit) -> ambos
+            # usan este mismo mercado dedup.
+            uniq_rec = (fam_recetas.get(month_key_en) or {}).get(fam) if fam_recetas is not None else None
+            uniq_med = (fam_medicos.get(month_key_en) or {}).get(fam) if fam_medicos is not None else None
+            market_dedup = uniq_rec if uniq_rec is not None else market_total
             sie_dict[month_key_en] = sie_total
-            mkt_dict[month_key_en] = market_total
-            ms_pct = round((sie_total / market_total) * 100, 1) if market_total else 0
+            mkt_dict[month_key_en] = market_dedup
+            ms_pct = round((sie_total / market_dedup) * 100, 1) if market_dedup else 0
             ms_dict[month_key_en] = ms_pct
 
-            # recetas (per family monthly aggregate).
-            # Medicos: usar el count UNICO del pivot row (mercado, 'Totales', '')
-            # — NO la suma de medicos por marca (CloseUp NO es sumable: un mismo
-            # medico que prescribe varias marcas se contaria multiple veces).
+            # recetas (per family monthly aggregate). Mismo mercado dedup que rec_ms.mkt.
             rec_fam = d2.setdefault('recetas', {}).setdefault(fam, {})
-            uniq_med = None
-            uniq_rec = None
-            if fam_medicos is not None:
-                uniq_med = (fam_medicos.get(month_key_en) or {}).get(fam)
-            if fam_recetas is not None:
-                uniq_rec = (fam_recetas.get(month_key_en) or {}).get(fam)
             rec_fam[month_key_en] = {
-                'recetas': uniq_rec if uniq_rec is not None else market_total,
+                'recetas': market_dedup,
                 'medicos': uniq_med if uniq_med is not None else market_med_total,
             }
 
