@@ -106,6 +106,28 @@ merge completo; correr la corrección de la línea puntual). Mismo patrón que l
 
 ---
 
+## ❌ Bug 8 — Venta TRIP (mujer): variante solo en Presentación (col3)
+
+**Síntoma:** "TRIP 45 está mal, sí tiene datos de venta" — TRIP 45, TRIP D3 PLUS y
+TRIP MAGNESIO mostraban venta 0 en Abr/May 2026, mientras TRIP D3 estaba inflado.
+**Causa:** es el bug de granularidad (col0/col1, ver Bug 3) llevado un paso más:
+en la planilla SAP, **las 4 variantes de TRIP comparten Gran Familia = Familia =
+Producto = 'TRIP'**; lo único que las distingue es la **Presentación (col3)**
+(`TRIP +45`, `TRIP D3`, `TRIP D3 Plus`, `TRIP Magnesio`). El merge agrupa por
+Familia (col1) → no puede separarlas. El mapeo tenía `'D3'→['TRIP']` (se tragaba
+TODO TRIP) y `'45'/'D3 PLUS'/'MAGNESIO'→[]` (0).
+**Fix:** `shared/fix-mujer-trip-venta.py` clasifica las filas de TRIP por
+Presentación y setea la venta de las 4 keys. En el merge esas 4 keys quedan con
+mapeo **vacío** (las saltea, no las pisa → los valores del corrector persisten).
+**Regla:** cuando una Gran Familia agrupa varias marcas y **la planilla NO las
+separa en col1 (Familia) sino solo en col3 (Presentación)**, hay que clasificar
+por Presentación. No alcanza con matchear por Familia.
+**Guardrail:** `check-venta-vs-estimado.py` ya flaggeaba los 3 TRIP con %Cumpl
+bajísimo (6-15%) — esa señal (varios productos de una misma marca con cumpl muy
+bajo) es pista de venta sin mapear por granularidad.
+
+---
+
 ## ✅ Reglas de oro (resumen)
 
 1. **`?v=<hash>` siempre fresco** — automático (build-all + pre-commit). Nunca

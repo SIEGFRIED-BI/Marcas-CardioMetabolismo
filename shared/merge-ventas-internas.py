@@ -57,9 +57,15 @@ MUJER_SEGMENT_TO_FAMS = {
     'BAJA DOSIS 24':   ['ISIS MINI 24'],
     'COMPLEX':         ['SIDERBLUT COMPLEX', 'SIDERBLUT FOLIC'],
     'SOLO':            ['SIDERBLUT', 'SIDERBLUT POLI', 'FERINSOL'],
-    'D3':              ['TRIP', 'CALCITOL D3', 'CALCITRIOL'],
-    'D3 PLUS':         [],   # no hay match directo
-    '45':              [],   # idem
+    # TRIP (D3, D3 PLUS, +45, MAGNESIO): en la planilla las 4 variantes comparten
+    # Gran Familia=Familia=Producto='TRIP'; SOLO se distinguen por Presentacion (col3).
+    # El merge agrupa por Familia -> NO puede separarlas. Por eso van VACIAS aca y se
+    # corrigen con shared/fix-mujer-trip-venta.py (clasifica por Presentacion). Con []
+    # el merge las SALTA (no las pisa), asi los valores del corrector PERSISTEN.
+    # OJO: NO mapear 'D3' a 'TRIP' -> se traga todo TRIP (bug "TRIP 45 en 0", jun-2026).
+    'D3':              [],
+    'D3 PLUS':         [],
+    '45':              [],
     'MAGNESIO':        [],
     'DELTROX':         ['DELTROX'],
     'BASE':            ['CALCIO BASE DUPOMAR'],

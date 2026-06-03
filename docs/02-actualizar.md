@@ -109,6 +109,17 @@ py shared/merge-ventas-internas.py <ruta a la planilla.xlsx>
 ```
 Actualiza `budget[fam].YYYY.real[]` en todas las líneas. Preserva el resto.
 
+> **mujer · TRIP — paso obligatorio aparte.** Los productos TRIP (D3, D3 PLUS,
+> +45, MAGNESIO) comparten Gran Familia=Familia='TRIP' en la planilla; solo se
+> distinguen por **Presentación**, así que el merge NO puede separarlos (van con
+> mapeo vacío). Después del merge, correr:
+> ```
+> py shared/fix-mujer-trip-venta.py "<ruta a la planilla.xlsx>" --cutoff YYYY-MM
+> ```
+> Clasifica por Presentación y setea la venta de esas 4 keys. (Mismo patrón que
+> los splits: se re-aplica tras cada merge. Como el merge las saltea, en la
+> práctica solo hace falta re-correrlo cuando llega una planilla nueva.)
+
 ---
 
 ### C) Estimado de Ventas — define `budget[fam][año].budget` (vía overrides)
