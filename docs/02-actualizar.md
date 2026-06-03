@@ -42,20 +42,38 @@ IQVIA: es un **snapshot manual** del Excel `Comparativa de PRECIOS_DD.MM.AAAA.xl
 (precio público y por unidad de cada presentación SIE vs sus competidores, con el
 % de diferencia).
 
-**Para refrescarlo** cuando llegue un Excel nuevo:
+Hay **dos formas** de refrescarlo según qué Excel tengas:
 
+**(a) Solo actualizar precios** (lo más común). Llega el catálogo plano del Manual
+(una hoja: `Producto | Presentación | Droga | Laboratorio | Troquel | Q Pres | PVP
+al DD/MM | …`, p.ej. `Sin título - Tabla - <fecha>.xlsx`). Mantiene la MISMA
+estructura curada (mismos competidores) y solo refresca los precios, matcheando por
+**Troquel**, y recalcula $/unidad y % gap:
 ```
-py shared/parse-comparativa-precios.py "<ruta al .xlsx>"
+py shared/parse-comparativa-precios.py "<comparativa curada por marca.xlsx>" \
+    --prices "<catalogo plano con PVP.xlsx>" --fecha DD/MM/AAAA
+```
+(Toma la columna `PVP al ...` más a la derecha = la más reciente.)
+
+**(b) Reconstruir la estructura** desde una comparativa nueva ya organizada por
+marca (`Comparativa de PRECIOS_DD.MM.AAAA.xlsx`, una hoja por marca con bloques):
+```
+py shared/parse-comparativa-precios.py "<comparativa.xlsx>"
+```
+
+Después, siempre:
+```
 py shared/audit-full.py        # debe dar 0 FAIL
 git add -A && git commit && git push
 ```
 
-- Solo parsea las hojas de mujer (Isis, Trip, Gynoderm, Siderblut, Climatix,
+- Solo procesa las hojas/marcas de mujer (Isis, Trip, Gynoderm, Siderblut, Climatix,
   Deltox, Calcio Base); el resto del Excel se ignora.
 - Inyecta `prec_comp` + `prec_comp_meta` en `mujer/index.html` (idempotente:
-  reemplaza la inyección anterior, no duplica).
-- La **fecha del snapshot** sale del nombre del archivo (DD.MM.AAAA) y se muestra
-  en la sección ("al DD/MM/AAAA").
+  reemplaza la inyección anterior, no duplica). Cada fila guarda su `troq` (Troquel)
+  para poder rematchear precios en el futuro.
+- La **fecha del snapshot** sale de `--fecha` (o del nombre del archivo, DD.MM.AAAA)
+  y se muestra en la sección ("al DD/MM/AAAA").
 
 > Es el **único** dato del tablero que no se actualiza solo. Si nadie corre el
 > parser, la comparativa queda con la fecha vieja — por eso la fecha va siempre

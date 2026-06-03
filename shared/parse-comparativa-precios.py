@@ -18,7 +18,7 @@ Estructura inyectada:
   prec_comp_meta = { "fecha":"DD/MM/AAAA", "fuente":"..." }
 """
 from __future__ import annotations
-import sys, re, json, datetime
+import sys, re, json, datetime, argparse
 from types import SimpleNamespace
 from pathlib import Path
 import openpyxl
@@ -77,6 +77,40 @@ def fechastr(v):
     return None
 
 
+def troqnorm(v):
+    if v is None:
+        return None
+    if isinstance(v, float):
+        v = int(v)
+    s = str(v).strip()
+    return s or None
+
+
+def load_prices(path):
+    """Catalogo plano (Sheet1: ... Troquel ... 'PVP al DD/MM' ...) -> {troquel: PVP}.
+    Usa la columna 'PVP al ...' MAS A LA DERECHA (la mas reciente)."""
+    wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
+    ws = wb.active
+    tcol = pcol = None
+    pm = {}
+    for row in ws.iter_rows(values_only=True):
+        if tcol is None:
+            cells = [clean(x).lower() for x in row]
+            if 'troquel' in cells and any(c.startswith('pvp al') for c in cells):
+                for c, txt in enumerate(cells):
+                    if txt == 'troquel':
+                        tcol = c
+                    if txt.startswith('pvp al'):
+                        pcol = c  # la ultima (mas reciente) gana
+            continue
+        troq = troqnorm(row[tcol]) if tcol < len(row) else None
+        pv = row[pcol] if (pcol is not None and pcol < len(row)) else None
+        if troq and isinstance(pv, (int, float)) and not isinstance(pv, bool) and pv > 0:
+            pm[troq] = float(pv)
+    wb.close()
+    return pm
+
+
 def find_header(ws, maxscan=14):
     """Detecta la fila de encabezado por texto y devuelve (row, {campo: col})."""
     keys = {
@@ -88,6 +122,7 @@ def find_header(ws, maxscan=14):
         'unit': ['precio x comp'],
         'gap': ['%'],
         'fecha': ['fecha'],
+        'troq': ['troquel'],
     }
     for r in range(1, maxscan + 1):
         cells = {c: clean(ws.cell(r, c).value).lower() for c in range(1, ws.max_column + 1)}
@@ -105,6 +140,8 @@ def find_header(ws, maxscan=14):
                         ok = (txt == 'producto')
                     elif field == 'fecha':
                         ok = (txt == 'fecha')
+                    elif field == 'troq':
+                        ok = (txt == 'troquel')
                     else:
                         ok = any(k in txt for k in kk)
                     if ok and field not in cmap:
@@ -113,12 +150,13 @@ def find_header(ws, maxscan=14):
     return None, None
 
 
-def parse_sheet(ws):
+def parse_sheet(ws, pricemap=None):
     hr, cm = find_header(ws)
     if not cm or 'prod' not in cm or 'pub' not in cm:
         return []
     P, PRES, DROGA, LAB = cm.get('prod'), cm.get('pres'), cm.get('droga'), cm.get('lab')
     PUB, UNIT, GAP, FECHA = cm.get('pub'), cm.get('unit'), cm.get('gap'), cm.get('fecha')
+    TROQ = cm.get('troq')
     last = min(ws.max_row, hr + 500)
     # Agrupar en bloques separados por filas no-data (vacias / titulos / headers repetidos)
     blocks, cur = [], []
@@ -150,10 +188,22 @@ def parse_sheet(ws):
                 'unit': num(ws.cell(r, UNIT).value) if UNIT else None,
                 'gap': None if is_sie else (gapnum(ws.cell(r, GAP).value) if GAP else None),
                 'fecha': fechastr(ws.cell(r, FECHA).value) if FECHA else None,
+                'troq': troqnorm(ws.cell(r, TROQ).value) if TROQ else None,
                 'sie': is_sie,
             })
         if sie_idx is None:
             continue  # bloque sin producto SIE -> no es comparativa SIE
+        if pricemap is not None:
+            # Refrescar precios por Troquel desde el catalogo plano; recalcular $/unit y gap.
+            for rr in rows:
+                t = rr.get('troq')
+                if t and t in pricemap:
+                    pack = max(1, round(rr['pub'] / rr['unit'])) if (rr['pub'] and rr['unit']) else 1
+                    rr['pub'] = round(float(pricemap[t]), 2)
+                    rr['unit'] = round(float(pricemap[t]) / pack, 2)
+            su = rows[sie_idx]['unit']
+            for i2, rr in enumerate(rows):
+                rr['gap'] = None if (i2 == sie_idx or not su or rr['unit'] is None) else round((rr['unit'] - su) / su, 4)
         sie = rows[sie_idx]
         pres = clean(ws.cell(blk[sie_idx], PRES).value) if PRES else ''
         droga = clean(ws.cell(blk[sie_idx], DROGA).value) if DROGA else ''
@@ -175,10 +225,23 @@ def snapshot_date(xlsx_path):
 def main():
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
-    xlsx = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_XLSX
+    ap = argparse.ArgumentParser()
+    ap.add_argument('xlsx', nargs='?', default=DEFAULT_XLSX,
+                    help='Excel ESTRUCTURA (hojas por marca, formato comparativa curada)')
+    ap.add_argument('--prices', help='Catalogo plano con PVP actual; refresca precios por Troquel')
+    ap.add_argument('--fecha', help='Fecha snapshot DD/MM/AAAA (default: del nombre del archivo)')
+    args = ap.parse_args()
+    xlsx = args.xlsx
     if not Path(xlsx).is_file():
         print('ERROR: no existe el Excel:', xlsx)
         return 1
+    pricemap = None
+    if args.prices:
+        if not Path(args.prices).is_file():
+            print('ERROR: no existe el catalogo de precios:', args.prices)
+            return 1
+        pricemap = load_prices(args.prices)
+        print('Precios del catalogo: %d troqueles' % len(pricemap))
     wb = openpyxl.load_workbook(xlsx, data_only=True, read_only=True)
     prec_comp, total_pres, total_rows = {}, 0, 0
     for sheet, group in SHEET_GROUPS.items():
@@ -187,7 +250,7 @@ def main():
             continue
         ws = wb[sheet]
         grid = Grid([list(row) for i, row in enumerate(ws.iter_rows(values_only=True)) if i < 600])
-        pres_list = parse_sheet(grid)
+        pres_list = parse_sheet(grid, pricemap)
         if pres_list:
             prec_comp[group] = {'pres': pres_list}
             total_pres += len(pres_list)
@@ -195,7 +258,8 @@ def main():
             print('  [%-12s] %2d presentaciones, %3d filas' % (group, len(pres_list),
                   sum(len(p['rows']) for p in pres_list)))
     wb.close()
-    meta = {'fecha': snapshot_date(xlsx), 'fuente': 'Comparativa de Precios (Manual Farmacéutico)'}
+    fecha = args.fecha or (snapshot_date(args.prices) if args.prices else '') or snapshot_date(xlsx)
+    meta = {'fecha': fecha, 'fuente': 'Comparativa de Precios (Manual Farmacéutico)'}
 
     block = ('"prec_comp":' + json.dumps(prec_comp, ensure_ascii=False, separators=(',', ':'))
              + ',"prec_comp_meta":' + json.dumps(meta, ensure_ascii=False, separators=(',', ':')) + ',')
