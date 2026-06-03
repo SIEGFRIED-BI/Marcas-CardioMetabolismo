@@ -112,16 +112,21 @@
     var market_prev = sumWindow(marketMonthly, windowKeys.prev);
     var sie_curr    = sumWindow(sieMonthly, windowKeys.curr);
     var sie_prev    = sumWindow(sieMonthly, windowKeys.prev);
-    var ms_curr = (market_curr > 0) ? +(sie_curr / market_curr * 100).toFixed(1) : null;
-    var ms_prev = (market_prev > 0) ? +(sie_prev / market_prev * 100).toFixed(1) : null;
+    // Mercado COMPLETO solo si el SIE no lo supera (2% tolerancia de redondeo). En
+    // Recetas el ultimo mes suele venir con lag: faltan competidores -> mercado < SIE
+    // -> MS%>100% e IE/Var pp se disparan (8600%, IE 22144, +8561pp). Eso NO es
+    // confiable -> mostrar "—" en vez de un numero absurdo.
+    var ok_curr = market_curr > 0 && sie_curr <= market_curr * 1.02;
+    var ok_prev = market_prev > 0 && sie_prev <= market_prev * 1.02;
+    var ms_curr = ok_curr ? +(sie_curr / market_curr * 100).toFixed(1) : null;
+    var ms_prev = ok_prev ? +(sie_prev / market_prev * 100).toFixed(1) : null;
     var ie = null;
-    if (sie_prev > 0 && market_prev > 0 && market_curr > 0) {
+    if (sie_prev > 0 && ok_curr && ok_prev) {
       var sg = sie_curr / sie_prev;
       var mg = market_curr / market_prev;
-      // Cap igual que brandKpis: si el SIE crecio >5x (base del año anterior
-      // demasiado chica) el IE no es comparable -> null. Evita IE absurdos
-      // (p.ej. productos nuevos con base ~0).
-      if (mg > 0 && sg < 5) ie = Math.round(sg / mg * 100);
+      // Cap: si el SIE crecio >5x (base chica) o el mercado del periodo es volatil
+      // (crecio/cayo >5x, tipico de recetas mensuales con lag) el IE no es comparable.
+      if (sg < 5 && mg > 0.2 && mg < 5) ie = Math.round(sg / mg * 100);
     }
     var var_pp = null;
     if (ms_curr != null && ms_prev != null) var_pp = +(ms_curr - ms_prev).toFixed(2);
@@ -144,13 +149,16 @@
     var brand_prev  = sumWindow(brandMonthly, windowKeys.prev);
     var market_curr = sumWindow(marketMonthly, windowKeys.curr);
     var market_prev = sumWindow(marketMonthly, windowKeys.prev);
-    var ms_curr = (market_curr > 0) ? +(brand_curr / market_curr * 100).toFixed(2) : null;
-    var ms_prev = (market_prev > 0) ? +(brand_prev / market_prev * 100).toFixed(2) : null;
+    var ok_curr = market_curr > 0 && brand_curr <= market_curr * 1.02;
+    var ok_prev = market_prev > 0 && brand_prev <= market_prev * 1.02;
+    var ms_curr = ok_curr ? +(brand_curr / market_curr * 100).toFixed(2) : null;
+    var ms_prev = ok_prev ? +(brand_prev / market_prev * 100).toFixed(2) : null;
     var ie = null;
-    if (brand_prev > 0 && market_prev > 0 && market_curr > 0) {
+    if (brand_prev > 0 && ok_curr && ok_prev) {
       var bg = brand_curr / brand_prev;
       var mg = market_curr / market_prev;
-      if (mg > 0 && bg < 5) ie = Math.round(bg / mg * 100);  // cap off-base (igual que brandKpis)
+      // cap off-base (igual que brandKpis) + mercado volatil/incompleto del periodo
+      if (bg < 5 && mg > 0.2 && mg < 5) ie = Math.round(bg / mg * 100);
     }
     var var_pp = null;
     if (ms_curr != null && ms_prev != null) var_pp = +(ms_curr - ms_prev).toFixed(2);

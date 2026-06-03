@@ -83,6 +83,15 @@ La Var pp (cambio de share) sí se muestra.
 **Regla:** **IE solo es válido con base previa significativa. Si el crecimiento
 es >5×, mostrar "—", no un número.**
 
+**Extensión (jun-2026) — Recetas, período MES con mercado incompleto:** en la tabla
+multi-período de Recetas, el **último mes** suele venir con lag (faltan competidores)
+→ el mercado del mes queda MENOR que el propio SIE → MS% > 100% (se vieron 8600%),
+IE disparado (22.144) y Var pp imposible (+8.561 pp). **Fix:** en `multi-period-table.js`
+(`computeFamily`/`computeBrand`) el período solo computa MS%/IE/Var pp si el mercado
+es **completo** (`SIE ≤ mercado × 1.02`); además el IE exige mercado no-volátil
+(`0.2 < mg < 5`). Si no, "—". **Regla:** **MS% nunca puede superar 100%: si pasa, el
+mercado del período está incompleto → mostrar "—", no un número.**
+
 ---
 
 ## ❌ Bug 6 — Re-correr el merge revierte los splits
