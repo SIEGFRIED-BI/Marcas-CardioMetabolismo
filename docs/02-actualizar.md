@@ -164,14 +164,18 @@ Un merge por familia de líneas (difieren por shape); todos toman `--pivot`:
 py shared/merge-recetas-march.py --pivot "<pivot.xlsx>" [--dry-run]   # cardio/ATB/OTC/respi
 py shared/merge-recetas-snc.py   --pivot "<pivot.xlsx>" [--dry-run]   # SNC (inline)
 py shared/merge-recetas-mujer-march.py --pivot "<pivot.xlsx>"         # mujer (inline; deriva el mes)
+py shared/merge-recetas-dermato.py --pivot "<pivot.xlsx>" [--dry-run] # dermato (inline; mapeo mercado→familia)
 py shared/build-kpis.py && py shared/build-families-perf.py && py shared/sync-kpistrip-with-kpis-json.py
 py shared/audit-full.py        # DEBE dar 0 FAIL
 ```
 - **Mercado dedup:** `recetas[fam].recetas` y `rec_ms[fam].mkt` usan el **total ÚNICO**
   del pivot (fila `Totales` del mercado), NO la suma de marcas (CloseUp double-countea).
   Ambos DEBEN coincidir (lo valida el audit). Lo arregla `merge-recetas-march.py`.
-- **dermatología: NO tiene merger de recetas** (inline, sin script dedicado). Hoy queda
-  rezagada un mes hasta construir uno (mapeo mercado→familia tipo SNC). Pendiente.
+- **dermatología:** usa `merge-recetas-dermato.py` (mapeo explícito familia→mercado+marca
+  SIE; el mercado para MS% = suma de las marcas curadas de `rec_comp`, igual que el
+  multi-period; no agrega marcas nuevas). OJO PALDAR vs PALDAR H y MICROSONA vs
+  MICROSONA C se desambiguan por mercado; ACNECLIN/ACNECLIN AP comparten mercado con SIE
+  distinto.
 - `merge-recetas-respi.py` es el rebuild histórico de respi (15 meses); para el corte
   incremental alcanza con `merge-recetas-march.py`.
 

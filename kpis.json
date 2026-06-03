@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-03T12:01:37",
+  "generated_at": "2026-06-03T12:19:21",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -1325,7 +1325,7 @@
       "color": "#D97706",
       "href": "dermatologia/",
       "owner": "Javier Rodríguez",
-      "recetas_through": "Mar 2026",
+      "recetas_through": "Apr 2026",
       "iqvia_through": "Apr 2026",
       "venta_through": "May 2026",
       "has_recetas": true,
@@ -1360,18 +1360,18 @@
       "kpis": {
         "mensual": {
           "recetas_sie": {
-            "curr": 2244,
-            "prev": 2534,
-            "ie": 88.6
+            "curr": 18027,
+            "prev": 20930,
+            "ie": 86.1
           },
           "ms_recetas": {
-            "curr": 67.77,
-            "prev": 67.5
+            "curr": 32.19,
+            "prev": 33.68
           },
           "mercado_recetas": {
-            "curr": 3311,
-            "prev": 3754,
-            "ie": 88.2
+            "curr": 56006,
+            "prev": 62145,
+            "ie": 90.1
           },
           "units_sie": {
             "curr": 164914,
@@ -1395,18 +1395,18 @@
         },
         "ytd": {
           "recetas_sie": {
-            "curr": 39813,
-            "prev": 45167,
-            "ie": 88.1
+            "curr": 57840,
+            "prev": 66097,
+            "ie": 87.5
           },
           "ms_recetas": {
-            "curr": 33.58,
-            "prev": 34.48
+            "curr": 33.14,
+            "prev": 34.22
           },
           "mercado_recetas": {
-            "curr": 118546,
-            "prev": 130986,
-            "ie": 90.5
+            "curr": 174552,
+            "prev": 193131,
+            "ie": 90.4
           },
           "units_sie": {
             "curr": 603016,
@@ -1430,18 +1430,18 @@
         },
         "trimestre": {
           "recetas_sie": {
-            "curr": 39813,
-            "prev": 45167,
-            "ie": 88.1
+            "curr": 38643,
+            "prev": 44643,
+            "ie": 86.6
           },
           "ms_recetas": {
-            "curr": 33.58,
-            "prev": 34.48
+            "curr": 33.44,
+            "prev": 34.61
           },
           "mercado_recetas": {
-            "curr": 118546,
-            "prev": 130986,
-            "ie": 90.5
+            "curr": 115542,
+            "prev": 128971,
+            "ie": 89.6
           },
           "units_sie": {
             "curr": 450918,
@@ -1465,18 +1465,18 @@
         },
         "semestre": {
           "recetas_sie": {
-            "curr": 95417,
-            "prev": 116343,
-            "ie": 82.0
+            "curr": 94061,
+            "prev": 113274,
+            "ie": 83.0
           },
           "ms_recetas": {
-            "curr": 32.31,
-            "prev": 34.43
+            "curr": 32.42,
+            "prev": 34.28
           },
           "mercado_recetas": {
-            "curr": 295296,
-            "prev": 337872,
-            "ie": 87.4
+            "curr": 290088,
+            "prev": 330415,
+            "ie": 87.8
           },
           "units_sie": {
             "curr": 922790,
@@ -1500,18 +1500,18 @@
         },
         "mat": {
           "recetas_sie": {
-            "curr": 206940,
-            "prev": 252756,
-            "ie": 81.9
+            "curr": 204037,
+            "prev": 252011,
+            "ie": 81.0
           },
           "ms_recetas": {
-            "curr": 32.07,
-            "prev": 34.04
+            "curr": 31.92,
+            "prev": 34.13
           },
           "mercado_recetas": {
-            "curr": 645318,
-            "prev": 742634,
-            "ie": 86.9
+            "curr": 639178,
+            "prev": 738279,
+            "ie": 86.6
           },
           "units_sie": {
             "curr": 1978152,
@@ -2678,59 +2678,59 @@
       "family": "CLOTRIMAZOLE",
       "periods": {
         "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 2601,
-          "rec_ie": null,
+          "rec_curr": 2146,
+          "rec_prev": 2520,
+          "rec_ie": 91.8,
           "units_curr": 19193,
           "units_prev": 17138,
           "units_ie": 109.5,
-          "int_curr": 22210,
-          "int_prev": 15258,
-          "int_ie": 145.6
+          "int_curr": 21904,
+          "int_prev": 18477,
+          "int_ie": 118.5
         },
         "ytd": {
-          "rec_curr": 5092,
-          "rec_prev": 7901,
-          "rec_ie": 101.8,
+          "rec_curr": 7238,
+          "rec_prev": 10421,
+          "rec_ie": 98.7,
           "units_curr": 75763,
           "units_prev": 64505,
           "units_ie": 126.1,
-          "int_curr": 61080,
-          "int_prev": 52371,
-          "int_ie": 116.6
+          "int_curr": 82984,
+          "int_prev": 70848,
+          "int_ie": 117.1
         },
         "trimestre": {
-          "rec_curr": 5092,
-          "rec_prev": 7901,
-          "rec_ie": 101.8,
+          "rec_curr": 4658,
+          "rec_prev": 7775,
+          "rec_ie": 96.8,
           "units_curr": 57671,
           "units_prev": 48653,
           "units_ie": 123.6,
-          "int_curr": 61080,
-          "int_prev": 52371,
-          "int_ie": 116.6
+          "int_curr": 66470,
+          "int_prev": 50183,
+          "int_ie": 132.5
         },
         "semestre": {
-          "rec_curr": 13097,
-          "rec_prev": 16455,
-          "rec_ie": 101.6,
+          "rec_curr": 12588,
+          "rec_prev": 16237,
+          "rec_ie": 99.5,
           "units_curr": 113239,
           "units_prev": 95672,
           "units_ie": 125.5,
-          "int_curr": 116368,
-          "int_prev": 98724,
-          "int_ie": 117.9
+          "int_curr": 116407,
+          "int_prev": 99717,
+          "int_ie": 116.7
         },
         "mat": {
-          "rec_curr": 28242,
-          "rec_prev": 32396,
-          "rec_ie": 102.7,
+          "rec_curr": 27868,
+          "rec_prev": 32516,
+          "rec_ie": 101.0,
           "units_curr": 218516,
           "units_prev": 195992,
           "units_ie": 108.5,
-          "int_curr": 219705,
-          "int_prev": 198115,
-          "int_ie": 110.9
+          "int_curr": 223132,
+          "int_prev": 204302,
+          "int_ie": 109.2
         }
       }
     },
@@ -2924,6 +2924,69 @@
       }
     },
     {
+      "name": "MICROSONA (SIE)",
+      "line": "derma",
+      "lineName": "Dermatología",
+      "family": "HYDROCORTISONE",
+      "periods": {
+        "mensual": {
+          "rec_curr": 1803,
+          "rec_prev": 3764,
+          "rec_ie": 96.8,
+          "units_curr": 15761,
+          "units_prev": 14927,
+          "units_ie": 97.8,
+          "int_curr": 14500,
+          "int_prev": 13396,
+          "int_ie": 108.2
+        },
+        "ytd": {
+          "rec_curr": 5561,
+          "rec_prev": 16341,
+          "rec_ie": 94.2,
+          "units_curr": 68190,
+          "units_prev": 61637,
+          "units_ie": 98.9,
+          "int_curr": 70885,
+          "int_prev": 60158,
+          "int_ie": 117.8
+        },
+        "trimestre": {
+          "rec_curr": 3612,
+          "rec_prev": 11858,
+          "rec_ie": 96.0,
+          "units_curr": 47255,
+          "units_prev": 44476,
+          "units_ie": 98.5,
+          "int_curr": 44637,
+          "int_prev": 40336,
+          "int_ie": 110.7
+        },
+        "semestre": {
+          "rec_curr": 9874,
+          "rec_prev": 26150,
+          "rec_ie": 94.0,
+          "units_curr": 107448,
+          "units_prev": 95291,
+          "units_ie": 101.3,
+          "int_curr": 103733,
+          "int_prev": 88736,
+          "int_ie": 116.9
+        },
+        "mat": {
+          "rec_curr": 22986,
+          "rec_prev": 55524,
+          "rec_ie": 92.2,
+          "units_curr": 215665,
+          "units_prev": 205851,
+          "units_ie": 97.8,
+          "int_curr": 211035,
+          "int_prev": 198567,
+          "int_ie": 106.3
+        }
+      }
+    },
+    {
       "name": "ALIDIAL (SIE)",
       "line": "resp",
       "lineName": "Respiratoria",
@@ -2983,69 +3046,6 @@
           "int_curr": 201343,
           "int_prev": 144475,
           "int_ie": 139.4
-        }
-      }
-    },
-    {
-      "name": "MICROSONA (SIE)",
-      "line": "derma",
-      "lineName": "Dermatología",
-      "family": "HYDROCORTISONE",
-      "periods": {
-        "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 3884,
-          "rec_ie": null,
-          "units_curr": 15761,
-          "units_prev": 14927,
-          "units_ie": 97.8,
-          "int_curr": 13608,
-          "int_prev": 13571,
-          "int_ie": 100.3
-        },
-        "ytd": {
-          "rec_curr": 3758,
-          "rec_prev": 12577,
-          "rec_ie": 93.2,
-          "units_curr": 68190,
-          "units_prev": 61637,
-          "units_ie": 98.9,
-          "int_curr": 56385,
-          "int_prev": 46762,
-          "int_ie": 120.6
-        },
-        "trimestre": {
-          "rec_curr": 3758,
-          "rec_prev": 12577,
-          "rec_ie": 93.2,
-          "units_curr": 47255,
-          "units_prev": 44476,
-          "units_ie": 98.5,
-          "int_curr": 56385,
-          "int_prev": 46762,
-          "int_ie": 120.6
-        },
-        "semestre": {
-          "rec_curr": 10458,
-          "rec_prev": 27371,
-          "rec_ie": 93.4,
-          "units_curr": 107448,
-          "units_prev": 95291,
-          "units_ie": 101.3,
-          "int_curr": 109753,
-          "int_prev": 95397,
-          "int_ie": 115.0
-        },
-        "mat": {
-          "rec_curr": 24947,
-          "rec_prev": 56608,
-          "rec_ie": 92.1,
-          "units_curr": 215665,
-          "units_prev": 205851,
-          "units_ie": 97.8,
-          "int_curr": 209931,
-          "int_prev": 198865,
-          "int_ie": 105.6
         }
       }
     },
@@ -3119,59 +3119,59 @@
       "family": "ISOTRETINOIN",
       "periods": {
         "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 3702,
-          "rec_ie": null,
+          "rec_curr": 4182,
+          "rec_prev": 4059,
+          "rec_ie": 103.2,
           "units_curr": 15091,
           "units_prev": 15100,
           "units_ie": 93.8,
-          "int_curr": 16480,
-          "int_prev": 11426,
-          "int_ie": 144.2
+          "int_curr": 13723,
+          "int_prev": 15663,
+          "int_ie": 87.6
         },
         "ytd": {
-          "rec_curr": 7856,
-          "rec_prev": 10813,
-          "rec_ie": 101.5,
+          "rec_curr": 12038,
+          "rec_prev": 14872,
+          "rec_ie": 102.1,
           "units_curr": 53820,
           "units_prev": 51488,
           "units_ie": 96.3,
-          "int_curr": 41517,
-          "int_prev": 34655,
-          "int_ie": 119.8
+          "int_curr": 55240,
+          "int_prev": 50318,
+          "int_ie": 109.8
         },
         "trimestre": {
-          "rec_curr": 7856,
-          "rec_prev": 10813,
-          "rec_ie": 101.5,
+          "rec_curr": 8077,
+          "rec_prev": 11330,
+          "rec_ie": 103.0,
           "units_curr": 41558,
           "units_prev": 39932,
           "units_ie": 97.1,
-          "int_curr": 41517,
-          "int_prev": 34655,
-          "int_ie": 119.8
+          "int_curr": 42518,
+          "int_prev": 38336,
+          "int_ie": 110.9
         },
         "semestre": {
-          "rec_curr": 22368,
-          "rec_prev": 23548,
-          "rec_ie": 102.8,
+          "rec_curr": 21370,
+          "rec_prev": 23231,
+          "rec_ie": 102.7,
           "units_curr": 85909,
           "units_prev": 80203,
           "units_ie": 99.9,
-          "int_curr": 87275,
-          "int_prev": 77225,
-          "int_ie": 113.0
+          "int_curr": 79347,
+          "int_prev": 77101,
+          "int_ie": 102.9
         },
         "mat": {
-          "rec_curr": 50355,
-          "rec_prev": 46461,
-          "rec_ie": 104.4,
+          "rec_curr": 50478,
+          "rec_prev": 47162,
+          "rec_ie": 104.3,
           "units_curr": 198075,
           "units_prev": 166588,
           "units_ie": 105.0,
-          "int_curr": 197490,
-          "int_prev": 160034,
-          "int_ie": 123.4
+          "int_curr": 195550,
+          "int_prev": 165047,
+          "int_ie": 118.5
         }
       }
     },
@@ -3182,59 +3182,122 @@
       "family": "CLOBETASOL",
       "periods": {
         "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 2617,
-          "rec_ie": null,
+          "rec_curr": 2435,
+          "rec_prev": 2592,
+          "rec_ie": 100.9,
           "units_curr": 13529,
           "units_prev": 12799,
           "units_ie": 120.0,
-          "int_curr": 15051,
-          "int_prev": 11115,
-          "int_ie": 135.4
+          "int_curr": 13286,
+          "int_prev": 12320,
+          "int_ie": 107.8
         },
         "ytd": {
-          "rec_curr": 5333,
-          "rec_prev": 7940,
-          "rec_ie": 107.9,
+          "rec_curr": 7768,
+          "rec_prev": 10532,
+          "rec_ie": 106.0,
           "units_curr": 56287,
           "units_prev": 51990,
           "units_ie": 114.8,
-          "int_curr": 44317,
-          "int_prev": 41855,
-          "int_ie": 105.9
+          "int_curr": 57603,
+          "int_prev": 54175,
+          "int_ie": 106.3
         },
         "trimestre": {
-          "rec_curr": 5333,
-          "rec_prev": 7940,
-          "rec_ie": 107.9,
+          "rec_curr": 4971,
+          "rec_prev": 7844,
+          "rec_ie": 103.5,
           "units_curr": 41417,
           "units_prev": 37825,
           "units_ie": 120.1,
-          "int_curr": 44317,
-          "int_prev": 41855,
-          "int_ie": 105.9
+          "int_curr": 45454,
+          "int_prev": 36173,
+          "int_ie": 125.7
         },
         "semestre": {
-          "rec_curr": 14120,
-          "rec_prev": 16365,
-          "rec_ie": 110.6,
+          "rec_curr": 13571,
+          "rec_prev": 16132,
+          "rec_ie": 108.8,
           "units_curr": 87810,
           "units_prev": 76518,
           "units_ie": 120.7,
-          "int_curr": 89163,
-          "int_prev": 77574,
-          "int_ie": 114.9
+          "int_curr": 88099,
+          "int_prev": 76424,
+          "int_ie": 115.3
         },
         "mat": {
-          "rec_curr": 29861,
-          "rec_prev": 31757,
-          "rec_ie": 113.1,
+          "rec_curr": 29704,
+          "rec_prev": 32028,
+          "rec_ie": 111.1,
           "units_curr": 174307,
           "units_prev": 155052,
           "units_ie": 118.5,
-          "int_curr": 171462,
-          "int_prev": 152898,
-          "int_ie": 112.1
+          "int_curr": 172428,
+          "int_prev": 155332,
+          "int_ie": 111.0
+        }
+      }
+    },
+    {
+      "name": "MOMETAX (SIE)",
+      "line": "derma",
+      "lineName": "Dermatología",
+      "family": "MOMETASONE",
+      "periods": {
+        "mensual": {
+          "rec_curr": 2134,
+          "rec_prev": 2319,
+          "rec_ie": 99.7,
+          "units_curr": 11395,
+          "units_prev": 11439,
+          "units_ie": 91.8,
+          "int_curr": null,
+          "int_prev": null,
+          "int_ie": null
+        },
+        "ytd": {
+          "rec_curr": 9265,
+          "rec_prev": 9879,
+          "rec_ie": 99.6,
+          "units_curr": 48749,
+          "units_prev": 46389,
+          "units_ie": 97.0,
+          "int_curr": null,
+          "int_prev": null,
+          "int_ie": null
+        },
+        "trimestre": {
+          "rec_curr": 6718,
+          "rec_prev": 7358,
+          "rec_ie": 100.2,
+          "units_curr": 34742,
+          "units_prev": 33911,
+          "units_ie": 95.9,
+          "int_curr": null,
+          "int_prev": null,
+          "int_ie": null
+        },
+        "semestre": {
+          "rec_curr": 9265,
+          "rec_prev": 15133,
+          "rec_ie": 99.2,
+          "units_curr": 75861,
+          "units_prev": 70523,
+          "units_ie": 97.6,
+          "int_curr": null,
+          "int_prev": null,
+          "int_ie": null
+        },
+        "mat": {
+          "rec_curr": 9265,
+          "rec_prev": 29021,
+          "rec_ie": 100.2,
+          "units_curr": 153459,
+          "units_prev": 149489,
+          "units_ie": 95.6,
+          "int_curr": null,
+          "int_prev": null,
+          "int_ie": null
         }
       }
     },
@@ -3360,69 +3423,6 @@
           "units_ie": 97.7,
           "int_curr": 75626,
           "int_prev": 0,
-          "int_ie": null
-        }
-      }
-    },
-    {
-      "name": "MOMETAX (SIE)",
-      "line": "derma",
-      "lineName": "Dermatología",
-      "family": "MOMETASONE",
-      "periods": {
-        "mensual": {
-          "rec_curr": 2244,
-          "rec_prev": 2534,
-          "rec_ie": 100.4,
-          "units_curr": 11395,
-          "units_prev": 11439,
-          "units_ie": 91.8,
-          "int_curr": null,
-          "int_prev": null,
-          "int_ie": null
-        },
-        "ytd": {
-          "rec_curr": 7131,
-          "rec_prev": 7560,
-          "rec_ie": 99.5,
-          "units_curr": 48749,
-          "units_prev": 46389,
-          "units_ie": 97.0,
-          "int_curr": null,
-          "int_prev": null,
-          "int_ie": null
-        },
-        "trimestre": {
-          "rec_curr": 7131,
-          "rec_prev": 7560,
-          "rec_ie": 99.5,
-          "units_curr": 34742,
-          "units_prev": 33911,
-          "units_ie": 95.9,
-          "int_curr": null,
-          "int_prev": null,
-          "int_ie": null
-        },
-        "semestre": {
-          "rec_curr": 7131,
-          "rec_prev": 15279,
-          "rec_ie": 99.2,
-          "units_curr": 75861,
-          "units_prev": 70523,
-          "units_ie": 97.6,
-          "int_curr": null,
-          "int_prev": null,
-          "int_ie": null
-        },
-        "mat": {
-          "rec_curr": 9450,
-          "rec_prev": 29267,
-          "rec_ie": 100.5,
-          "units_curr": 153459,
-          "units_prev": 149489,
-          "units_ie": 95.6,
-          "int_curr": null,
-          "int_prev": null,
           "int_ie": null
         }
       }
@@ -3560,59 +3560,59 @@
       "family": "MUPIROCIN",
       "periods": {
         "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 1530,
-          "rec_ie": null,
+          "rec_curr": 1336,
+          "rec_prev": 1394,
+          "rec_ie": 91.6,
           "units_curr": 10723,
           "units_prev": 9662,
           "units_ie": 96.0,
-          "int_curr": 10114,
-          "int_prev": 9812,
-          "int_ie": 103.1
+          "int_curr": 11350,
+          "int_prev": 10577,
+          "int_ie": 107.3
         },
         "ytd": {
-          "rec_curr": 2687,
-          "rec_prev": 4619,
-          "rec_ie": 92.7,
+          "rec_curr": 4023,
+          "rec_prev": 6013,
+          "rec_ie": 92.1,
           "units_curr": 42197,
           "units_prev": 35550,
           "units_ie": 104.2,
-          "int_curr": 31681,
-          "int_prev": 28379,
-          "int_ie": 111.6
+          "int_curr": 43031,
+          "int_prev": 38956,
+          "int_ie": 110.5
         },
         "trimestre": {
-          "rec_curr": 2687,
-          "rec_prev": 4619,
-          "rec_ie": 92.7,
+          "rec_curr": 2662,
+          "rec_prev": 4495,
+          "rec_ie": 91.8,
           "units_curr": 31042,
           "units_prev": 27447,
           "units_ie": 103.1,
-          "int_curr": 31681,
-          "int_prev": 28379,
-          "int_ie": 111.6
+          "int_curr": 32308,
+          "int_prev": 28874,
+          "int_ie": 111.9
         },
         "semestre": {
-          "rec_curr": 6751,
-          "rec_prev": 9708,
+          "rec_curr": 6689,
+          "rec_prev": 9348,
           "rec_ie": 90.5,
           "units_curr": 61962,
           "units_prev": 51564,
           "units_ie": 106.4,
-          "int_curr": 59742,
-          "int_prev": 52775,
-          "int_ie": 113.2
+          "int_curr": 60430,
+          "int_prev": 53940,
+          "int_ie": 112.0
         },
         "mat": {
-          "rec_curr": 15203,
-          "rec_prev": 20345,
-          "rec_ie": 91.0,
+          "rec_curr": 15145,
+          "rec_prev": 19805,
+          "rec_ie": 91.1,
           "units_curr": 116533,
           "units_prev": 97413,
           "units_ie": 105.4,
-          "int_curr": 112118,
-          "int_prev": 100827,
-          "int_ie": 111.2
+          "int_curr": 112891,
+          "int_prev": 102944,
+          "int_ie": 109.7
         }
       }
     },
@@ -3686,59 +3686,59 @@
       "family": "MINOCYCLINE",
       "periods": {
         "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 160,
-          "rec_ie": null,
+          "rec_curr": 143,
+          "rec_prev": 167,
+          "rec_ie": 95.7,
           "units_curr": 11176,
           "units_prev": 12432,
           "units_ie": 95.1,
-          "int_curr": 1149,
-          "int_prev": 900,
-          "int_ie": 127.7
+          "int_curr": 913,
+          "int_prev": 1333,
+          "int_ie": 68.5
         },
         "ytd": {
-          "rec_curr": 310,
-          "rec_prev": 493,
-          "rec_ie": 97.4,
+          "rec_curr": 453,
+          "rec_prev": 660,
+          "rec_ie": 96.1,
           "units_curr": 38932,
           "units_prev": 41938,
           "units_ie": 95.1,
-          "int_curr": 3320,
-          "int_prev": 2799,
-          "int_ie": 118.6
+          "int_curr": 4233,
+          "int_prev": 4132,
+          "int_ie": 102.4
         },
         "trimestre": {
-          "rec_curr": 310,
-          "rec_prev": 493,
-          "rec_ie": 97.4,
+          "rec_curr": 296,
+          "rec_prev": 484,
+          "rec_ie": 96.9,
           "units_curr": 29593,
           "units_prev": 32538,
           "units_ie": 94.5,
-          "int_curr": 3320,
-          "int_prev": 2799,
-          "int_ie": 118.6
+          "int_curr": 3098,
+          "int_prev": 3312,
+          "int_ie": 93.5
         },
         "semestre": {
-          "rec_curr": 848,
-          "rec_prev": 1102,
-          "rec_ie": 93.1,
+          "rec_curr": 785,
+          "rec_prev": 1049,
+          "rec_ie": 93.5,
           "units_curr": 61583,
           "units_prev": 63063,
           "units_ie": 98.5,
-          "int_curr": 6482,
-          "int_prev": 5557,
-          "int_ie": 116.6
+          "int_curr": 6207,
+          "int_prev": 5875,
+          "int_ie": 105.7
         },
         "mat": {
-          "rec_curr": 2041,
-          "rec_prev": 2388,
-          "rec_ie": 93.1,
+          "rec_curr": 2017,
+          "rec_prev": 2362,
+          "rec_ie": 94.3,
           "units_curr": 143384,
           "units_prev": 144197,
           "units_ie": 99.8,
-          "int_curr": 14827,
-          "int_prev": 13415,
-          "int_ie": 110.5
+          "int_curr": 14407,
+          "int_prev": 13613,
+          "int_ie": 105.8
         }
       }
     },
@@ -3875,59 +3875,59 @@
       "family": "GENTAMICIN_HYDROCORTISONE_KETOCONAZOLE",
       "periods": {
         "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 795,
-          "rec_ie": null,
+          "rec_curr": 802,
+          "rec_prev": 851,
+          "rec_ie": 99.9,
           "units_curr": 7016,
           "units_prev": 7414,
           "units_ie": 96.8,
-          "int_curr": 6236,
-          "int_prev": 6249,
-          "int_ie": 99.8
+          "int_curr": 6566,
+          "int_prev": 7762,
+          "int_ie": 84.6
         },
         "ytd": {
-          "rec_curr": 1638,
-          "rec_prev": 2471,
-          "rec_ie": 102.3,
+          "rec_curr": 2440,
+          "rec_prev": 3322,
+          "rec_ie": 101.5,
           "units_curr": 28782,
           "units_prev": 28678,
           "units_ie": 99.3,
-          "int_curr": 21269,
-          "int_prev": 20337,
-          "int_ie": 104.6
+          "int_curr": 27835,
+          "int_prev": 28099,
+          "int_ie": 99.1
         },
         "trimestre": {
-          "rec_curr": 1638,
-          "rec_prev": 2471,
-          "rec_ie": 102.3,
+          "rec_curr": 1624,
+          "rec_prev": 2428,
+          "rec_ie": 101.6,
           "units_curr": 20442,
           "units_prev": 21553,
           "units_ie": 98.5,
-          "int_curr": 21269,
-          "int_prev": 20337,
-          "int_ie": 104.6
+          "int_curr": 19522,
+          "int_prev": 20261,
+          "int_ie": 96.4
         },
         "semestre": {
-          "rec_curr": 4215,
-          "rec_prev": 5299,
-          "rec_ie": 99.0,
+          "rec_curr": 4120,
+          "rec_prev": 5205,
+          "rec_ie": 99.7,
           "units_curr": 43999,
           "units_prev": 42853,
           "units_ie": 99.3,
-          "int_curr": 42015,
-          "int_prev": 39041,
-          "int_ie": 107.6
+          "int_curr": 40424,
+          "int_prev": 38125,
+          "int_ie": 106.0
         },
         "mat": {
-          "rec_curr": 9539,
-          "rec_prev": 10993,
-          "rec_ie": 98.0,
+          "rec_curr": 9490,
+          "rec_prev": 10991,
+          "rec_ie": 98.1,
           "units_curr": 90742,
           "units_prev": 90574,
           "units_ie": 97.3,
-          "int_curr": 86908,
-          "int_prev": 85868,
-          "int_ie": 101.2
+          "int_curr": 85712,
+          "int_prev": 84918,
+          "int_ie": 100.9
         }
       }
     },
@@ -4316,59 +4316,59 @@
       "family": "HYDROCORTISONE_MUPIROCIN",
       "periods": {
         "mensual": {
-          "rec_curr": 0,
-          "rec_prev": 823,
-          "rec_ie": null,
+          "rec_curr": 880,
+          "rec_prev": 779,
+          "rec_ie": 91.7,
           "units_curr": 4322,
           "units_prev": 3902,
           "units_ie": 100.0,
-          "int_curr": 3334,
-          "int_prev": 3518,
-          "int_ie": 94.8
+          "int_curr": 4010,
+          "int_prev": 3180,
+          "int_ie": 126.1
         },
         "ytd": {
-          "rec_curr": 1950,
-          "rec_prev": 2600,
-          "rec_ie": 93.3,
+          "rec_curr": 2830,
+          "rec_prev": 3379,
+          "rec_ie": 92.7,
           "units_curr": 17934,
           "units_prev": 16179,
           "units_ie": 95.3,
-          "int_curr": 15033,
-          "int_prev": 12254,
-          "int_ie": 122.7
+          "int_curr": 19043,
+          "int_prev": 15434,
+          "int_ie": 123.4
         },
         "trimestre": {
-          "rec_curr": 1950,
-          "rec_prev": 2600,
+          "rec_curr": 1830,
+          "rec_prev": 2482,
           "rec_ie": 93.3,
           "units_curr": 13122,
           "units_prev": 11910,
           "units_ie": 99.1,
-          "int_curr": 15033,
-          "int_prev": 12254,
-          "int_ie": 122.7
+          "int_curr": 12211,
+          "int_prev": 10728,
+          "int_ie": 113.8
         },
         "semestre": {
-          "rec_curr": 4902,
-          "rec_prev": 5149,
-          "rec_ie": 95.8,
+          "rec_curr": 4871,
+          "rec_prev": 5096,
+          "rec_ie": 95.2,
           "units_curr": 27593,
           "units_prev": 24259,
           "units_ie": 98.1,
-          "int_curr": 25969,
-          "int_prev": 23528,
-          "int_ie": 110.4
+          "int_curr": 25813,
+          "int_prev": 22541,
+          "int_ie": 114.5
         },
         "mat": {
-          "rec_curr": 9775,
-          "rec_prev": 9641,
-          "rec_ie": 94.4,
+          "rec_curr": 9876,
+          "rec_prev": 9692,
+          "rec_ie": 94.0,
           "units_curr": 53498,
           "units_prev": 46969,
           "units_ie": 98.6,
-          "int_curr": 49619,
-          "int_prev": 43131,
-          "int_ie": 115.0
+          "int_curr": 50449,
+          "int_prev": 43295,
+          "int_ie": 116.5
         }
       }
     },
