@@ -35,6 +35,34 @@
 
 ---
 
+## Dato MANUAL aparte · Comparativa de Precios (línea mujer)
+
+La sección **"Precios mercado" / Comparativa de Precios** de mujer **no** viene de
+IQVIA: es un **snapshot manual** del Excel `Comparativa de PRECIOS_DD.MM.AAAA.xlsx`
+(precio público y por unidad de cada presentación SIE vs sus competidores, con el
+% de diferencia).
+
+**Para refrescarlo** cuando llegue un Excel nuevo:
+
+```
+py shared/parse-comparativa-precios.py "<ruta al .xlsx>"
+py shared/audit-full.py        # debe dar 0 FAIL
+git add -A && git commit && git push
+```
+
+- Solo parsea las hojas de mujer (Isis, Trip, Gynoderm, Siderblut, Climatix,
+  Deltox, Calcio Base); el resto del Excel se ignora.
+- Inyecta `prec_comp` + `prec_comp_meta` en `mujer/index.html` (idempotente:
+  reemplaza la inyección anterior, no duplica).
+- La **fecha del snapshot** sale del nombre del archivo (DD.MM.AAAA) y se muestra
+  en la sección ("al DD/MM/AAAA").
+
+> Es el **único** dato del tablero que no se actualiza solo. Si nadie corre el
+> parser, la comparativa queda con la fecha vieja — por eso la fecha va siempre
+> visible. Detalle de claves en `04-diccionario.md` (`prec_comp`).
+
+---
+
 ## Paso a paso por tipo de dato
 
 ### A) IQVIA (Mercado) — el corazón, define `mol_perf`
