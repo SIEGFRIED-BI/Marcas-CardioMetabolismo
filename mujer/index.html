@@ -559,7 +559,10 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
     <div class="card">
       <div class="ctrl-row" style="justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
         <div class="pill-group" id="pc-pills"></div>
-        <span style="font-size:9px;color:#6b7280;line-height:1.4;">vs SIE · <b style="color:#16a34a;">▲ verde</b>: competidor más caro (SIE más barato) · <b style="color:#dc2626;">▼ rojo</b>: competidor más barato</span>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <span style="font-size:9px;color:#6b7280;line-height:1.4;">vs SIE · <b style="color:#16a34a;">▲ verde</b>: competidor más caro (SIE más barato) · <b style="color:#dc2626;">▼ rojo</b>: competidor más barato</span>
+          <button onclick="exportPComp()" title="Descargar toda la comparativa en CSV (abre en Excel)" style="font-size:10px;font-weight:600;padding:5px 11px;border:1px solid #b01e1e;background:#fff;color:#b01e1e;border-radius:6px;cursor:pointer;white-space:nowrap;font-family:'IBM Plex Sans',sans-serif;">⤓ Exportar CSV</button>
+        </div>
       </div>
       <div id="pc-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;"></div>
     </div>
@@ -2376,6 +2379,28 @@ document.addEventListener('DOMContentLoaded',()=>{
     el.innerHTML = groups.map(g=>`<button class="pill ${g===window.pcGroup?'on':''}" onclick="setPCGroup('${g.replace(/'/g,"\\'")}')" style="${g===window.pcGroup?`color:${COLORS[g]||'#b01e1e'};border-color:${COLORS[g]||'#b01e1e'}`:''}"><span class="dot" style="background:${COLORS[g]||'#b01e1e'}"></span>${g}</button>`).join('');
   }
   window.setPCGroup = function(g){ window.pcGroup=g; renderPCompPills(); renderPComp(); };
+  window.exportPComp = function(){
+    // Exporta TODA la comparativa (7 marcas) a CSV. es-AR: separador ';', decimal ',',
+    // BOM UTF-8 para acentos. Abre directo en Excel. Sin dependencias.
+    var PC = D.prec_comp||{}, meta = D.prec_comp_meta||{}, SEP = ';';
+    var esc = function(s){ s=(s==null?'':String(s)); return /[";\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+    var na  = function(n){ return n==null ? '' : (Math.round(n*100)/100).toFixed(2).replace('.',','); };
+    var out = [['Marca','Presentación','Droga','Producto','Laboratorio','P. Público','P. Unitario','% vs SIE','Es SIE','Fecha'].join(SEP)];
+    Object.keys(PC).forEach(function(g){
+      (PC[g].pres||[]).forEach(function(blk){
+        (blk.rows||[]).forEach(function(r){
+          var gap = r.sie ? 'SIE' : (r.gap==null ? '' : (r.gap>0?'+':'')+(r.gap*100).toFixed(1).replace('.',',')+'%');
+          out.push([esc(g),esc(blk.label),esc(blk.droga),esc(r.prod),esc(r.lab),na(r.pub),na(r.unit),esc(gap),(r.sie?'SI':'NO'),esc(meta.fecha||'')].join(SEP));
+        });
+      });
+    });
+    var csv = String.fromCharCode(0xFEFF) + out.join('\r\n');  // BOM UTF-8 (acentos en Excel)
+    var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = 'comparativa-precios-mujer-' + ((meta.fecha||'export').replace(/\//g,'-')) + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  };
   function renderPComp(){
     const grid = document.getElementById('pc-grid'); if(!grid) return;
     const meta = D.prec_comp_meta||{}; const fe = document.getElementById('pc-fecha');
