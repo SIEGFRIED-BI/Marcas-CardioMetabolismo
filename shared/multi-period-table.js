@@ -374,8 +374,11 @@
       var caret = hasComps ? '<span class="mp-caret">▶</span>' : '<span class="mp-caret mp-caret-empty"></span>';
       var clickAttr = hasComps ? ' data-fam-idx="'+idx+'" role="button" tabindex="0"' : '';
       var trClass = hasComps ? 'mp-fam-row mp-expandable' : 'mp-fam-row';
+      // Etiqueta de display opcional por linea (mujer define window.FAM_LABEL); el resto
+      // de las lineas no lo define -> identidad (sin cambios). Solo mapea la fila familia.
+      var famLbl = (typeof window !== 'undefined' && window.FAM_LABEL && window.FAM_LABEL[f.family]) || f.family;
       return '<tr class="' + trClass + '"' + clickAttr + '>'
-        + '<td class="mp-fam" title="' + escapeHtml(f.family) + '">' + caret + escapeHtml(f.family) + '</td>'
+        + '<td class="mp-fam" title="' + escapeHtml(famLbl) + '">' + caret + escapeHtml(famLbl) + '</td>'
         + periodCells(f.periods.mat,       false, true)
         + periodCells(f.periods.ytd,       false, true)
         + periodCells(f.periods.mes,       false, true)

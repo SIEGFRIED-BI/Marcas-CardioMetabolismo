@@ -580,6 +580,27 @@ const BUD_IQVIA = {"SIN ESTROGENO": "ISIS FREE S/ESTROG (SIE)", "ALTA DOSIS": "I
 const MONTH_ORDER_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const PROD_ORDER=['SIN ESTROGENO','ALTA DOSIS','BAJA DOSIS 21+7','BAJA DOSIS 24','COMPLEX','SOLO','D3','D3 PLUS','MAGNESIO','45','DELTROX','BASE','BASE D','CLIMATIX'];
 const orderedProdKeys = obj => PROD_ORDER.filter(k => obj && Object.prototype.hasOwnProperty.call(obj, k));
+// ── Etiquetas de DISPLAY de las familias/agrupaciones (pedido usuario, jun-2026) ──
+// Solo cambia lo que se MUESTRA. Las claves de datos (mol_perf/budget/recetas/rec_ms/
+// precios/convenios/stock) y los mapeos (PROD_ORDER, BUD_IQVIA, sieMolMap, FAM_TO_CANAL)
+// SIGUEN con los nombres originales. NO renombrar claves: rompe rebuild-mujer-45, el
+// merge de venta interna y los checks. FL(k) = label o la clave tal cual si no esta mapeada.
+const FAM_LABEL = {
+  'SIN ESTROGENO':'ISIS FREE',
+  'ALTA DOSIS':'ISIS ALTA DOSIS',
+  'BAJA DOSIS 21+7':'ISIS BAJA DOSIS 21+7',
+  'BAJA DOSIS 24':'ISIS BAJA DOSIS 24',
+  'COMPLEX':'SIDERBLUT COMPLEX',
+  'SOLO':'HIERROS SOLO',
+  'D3':'TRIP D3',
+  'D3 PLUS':'TRIP D3 PLUS',
+  'MAGNESIO':'TRIP MAGNESIO',
+  '45':'TRIP 45',
+  'BASE':'CALCIO BASE',
+  'BASE D':'CALCIO BASE D',
+};
+const FL = k => (FAM_LABEL[k] || k);
+try { window.FAM_LABEL = FAM_LABEL; } catch(e){}
 
 function getIQVIAReal2026(budProd){
   const sieName = BUD_IQVIA[budProd]; if(!sieName) return null;
@@ -632,7 +653,7 @@ function renderGlobalPills(){
   el.innerHTML = orderedProdKeys(PROD_MAP).map(p=>`
     <button class="pill ${p===activeBrand?'on':''}" onclick="setGlobalFilter('${p}')"
       style="${p===activeBrand?`color:${COLORS[p]||'#38bdf8'};border-color:${COLORS[p]||'#38bdf8'}`:''}">
-      <span class="dot" style="background:${COLORS[p]||'#555'}"></span>${p}
+      <span class="dot" style="background:${COLORS[p]||'#555'}"></span>${FL(p)}
     </button>`).join('');
 }
 
@@ -735,7 +756,7 @@ function renderBrandKpis(){
   const periodPrev = isYtd ? `YTD ${meta.prevShort||"Mar'25"}` : `MAT ${meta.prevShort||"Mar'25"}`;
 
   // Label
-  document.getElementById('brand-kpi-label').textContent = brand;
+  document.getElementById('brand-kpi-label').textContent = FL(brand);
   document.getElementById('brand-kpi-label').style.color = color;
   document.getElementById('brand-kpi-period-label').textContent = '· ' + period;
 
@@ -854,7 +875,7 @@ function renderBrandKpis(){
   }
 
   if(!items.length){
-    document.getElementById('s-brand-kpi').innerHTML=`<div style="color:#4b5563;font-size:12px;grid-column:1/-1;">Sin datos disponibles para ${brand}</div>`;
+    document.getElementById('s-brand-kpi').innerHTML=`<div style="color:#4b5563;font-size:12px;grid-column:1/-1;">Sin datos disponibles para ${FL(brand)}</div>`;
     return;
   }
 
@@ -985,7 +1006,7 @@ function renderBudget(){
       var color = isOn ? '#b01e1e' : '#9ca3af';
       var bg = isOn ? '#fef2f2' : '#f9fafb';
       var weight = isOn ? '700' : '500';
-      return '<button onclick="setBudFilter(\''+p.replace(/'/g,"\\'")+'\')" style="font-size:9px;font-weight:'+weight+';padding:3px 8px;border:1px solid '+color+';background:'+bg+';border-radius:4px;color:'+color+';cursor:pointer;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;">'+p+'</button>';
+      return '<button onclick="setBudFilter(\''+p.replace(/'/g,"\\'")+'\')" style="font-size:9px;font-weight:'+weight+';padding:3px 8px;border:1px solid '+color+';background:'+bg+';border-radius:4px;color:'+color+';cursor:pointer;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;">'+FL(p)+'</button>';
     }).join('');
   }
   var MESES_L = (typeof MESES!=='undefined' && MESES.length===12) ? MESES : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -1063,7 +1084,7 @@ function renderBudget(){
       var rowBorderTop = idx===0 ? '' : 'border-top:1px solid #e5e7eb;';
       // Row 1: Venta
       html += '<tr style="'+rowBorderTop+'">';
-      html += '<td rowspan="3" title="'+r.prod+'" style="padding:5px 6px;font-weight:700;font-size:10px;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.prod+'</td>';
+      html += '<td rowspan="3" title="'+FL(r.prod)+'" style="padding:5px 6px;font-weight:700;font-size:10px;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+FL(r.prod)+'</td>';
       html += '<td style="padding:2px 3px;font-size:8px;font-weight:700;color:#b01e1e;letter-spacing:.03em;text-transform:uppercase;">Venta</td>';
       r.real.forEach(function(v){
         html += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(v))+'</td>';
@@ -1142,7 +1163,7 @@ function renderBudget(){
 // ── PERFORMANCE (MS% + UNITS only) ────────────────────────────────────
 let pChart=null, pMol='SIN ESTROGENO', pPeriod='ytd', pMetric='ms', pYears=new Set(); // empty = todos
 
-const MOL_LABELS = {"SIN ESTROGENO": "SIN ESTROGENO", "ALTA DOSIS": "ALTA DOSIS", "BAJA DOSIS 21+7": "BAJA DOSIS 21+7", "BAJA DOSIS 24": "BAJA DOSIS 24", "COMPLEX": "COMPLEX", "SOLO": "SOLO", "D3": "D3", "D3 PLUS": "D3 PLUS", "45": "45", "MAGNESIO": "MAGNESIO", "DELTROX": "DELTROX", "BASE": "BASE", "BASE D": "BASE D", "CLIMATIX": "CLIMATIX"};
+const MOL_LABELS = FAM_LABEL;  // display labels de familias (ver FAM_LABEL arriba); claves de datos intactas
 
 
 function renderPerfMolGrid(){
@@ -1442,7 +1463,7 @@ function renderRecPills(){
   document.getElementById('rec-pills').innerHTML=REC_PRODS.map(p=>`
     <button class="pill ${p===rProd?'on':''}" onclick="setRP('${p}')"
       style="${p===rProd?`color:${COLORS[p]||'#38bdf8'};border-color:${COLORS[p]||'#38bdf8'}`:''}">
-      <span class="dot" style="background:${COLORS[p]||'#666'}"></span>${p}
+      <span class="dot" style="background:${COLORS[p]||'#666'}"></span>${FL(p)}
     </button>`).join('');
 }
 function bindRecCtrls(){
@@ -1830,7 +1851,7 @@ function renderCanQuartPills(){
   pills.innerHTML = prods.map(p=>`
     <button class="pill ${p===cqProd?'on':''}" onclick="setCQ('${p.replace(/'/g,"\\'")}')"
       style="${p===cqProd?`color:${(typeof COLORS!=='undefined'&&COLORS[p])||'#b01e1e'};border-color:${(typeof COLORS!=='undefined'&&COLORS[p])||'#b01e1e'}`:''}">
-      <span class="dot" style="background:${(typeof COLORS!=='undefined'&&COLORS[p])||'#555'}"></span>${p}
+      <span class="dot" style="background:${(typeof COLORS!=='undefined'&&COLORS[p])||'#555'}"></span>${FL(p)}
     </button>`).join('');
 }
 function setCQ(p){
@@ -1890,7 +1911,7 @@ function renderConvPills(){
   document.getElementById('conv-pills').innerHTML=CONV_PRODS.map(p=>`
     <button class="pill ${p===cvProd?'on':''}" onclick="setCvP('${p}')"
       style="${p===cvProd?`color:${COLORS[p]||'#38bdf8'};border-color:${COLORS[p]||'#38bdf8'}`:''}">
-      ${p}
+      ${FL(p)}
     </button>`).join('');
 }
 function setCvP(p){cvProd=p;renderConvPills();renderConv();if(!_filterLock&&PROD_MAP[p])setGlobalFilter(p);}
@@ -1927,7 +1948,7 @@ function renderPrecPills(){
   document.getElementById('prec-pills').innerHTML=PREC_PRODS.map(p=>`
     <button class="pill ${p===prProd?'on':''}" onclick="setPrP('${p}')"
       style="${p===prProd?`color:${COLORS[p]||'#38bdf8'};border-color:${COLORS[p]||'#38bdf8'}`:''}">
-      <span class="dot" style="background:${COLORS[p]||'#555'}"></span>${p}
+      <span class="dot" style="background:${COLORS[p]||'#555'}"></span>${FL(p)}
     </button>`).join('');
 }
 
@@ -2033,7 +2054,7 @@ function renderStockPills(){
   document.getElementById('stock-pills').innerHTML=STOCK_PRODS.map(p=>`
     <button class="pill ${p===stProd?'on':''}" onclick="setSP('${p}')"
       style="${p===stProd?`color:${COLORS[p]||'#e02525'};border-color:${COLORS[p]||'#e02525'}`:''}">
-      <span class="dot" style="background:${COLORS[p]||'#666'}"></span>${p}
+      <span class="dot" style="background:${COLORS[p]||'#666'}"></span>${FL(p)}
     </button>`).join('');
 }
 function renderStockYr(){
@@ -2426,7 +2447,7 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
 })();
 
 </script>
-<script src="../shared/multi-period-table.js?v=8996cf216f"></script>
+<script src="../shared/multi-period-table.js?v=d9c563a454"></script>
 <script>
 // Multi-period summary tables (added by patch-multi-period-sections.py).
 // Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.
