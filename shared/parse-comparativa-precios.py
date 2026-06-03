@@ -261,8 +261,10 @@ def main():
     fecha = args.fecha or (snapshot_date(args.prices) if args.prices else '') or snapshot_date(xlsx)
     meta = {'fecha': fecha, 'fuente': 'Comparativa de Precios (Manual Farmacéutico)'}
 
-    block = ('"prec_comp":' + json.dumps(prec_comp, ensure_ascii=False, separators=(',', ':'))
-             + ',"prec_comp_meta":' + json.dumps(meta, ensure_ascii=False, separators=(',', ':')) + ',')
+    # Formato default (con espacios) para que coincida con el resto de const D y con
+    # cualquier re-serializacion posterior (p.ej. merge-stock-month.py), evitando churn.
+    block = ('"prec_comp":' + json.dumps(prec_comp, ensure_ascii=False)
+             + ',"prec_comp_meta":' + json.dumps(meta, ensure_ascii=False) + ',')
     # Marcadores como CLAVES JSON validas (NO comentarios /* */): asi const D sigue siendo
     # JSON parseable por las herramientas (audit-full.py y los checks del pre-commit).
     payload = '"_pcomp":1,' + block + '"_pcompEnd":1,'
@@ -275,9 +277,9 @@ def main():
         return 1
     # Limpiar cualquier inyeccion previa (markers viejos de comentario o sentinel keys) e insertar fresco.
     n_old = (len(re.findall(r'/\*PCOMP_START\*/.*?/\*PCOMP_END\*/', html, flags=re.DOTALL))
-             + len(re.findall(r'"_pcomp":1,.*?"_pcompEnd":1,', html, flags=re.DOTALL)))
+             + len(re.findall(r'"_pcomp"\s*:\s*1\s*,.*?"_pcompEnd"\s*:\s*1\s*,', html, flags=re.DOTALL)))
     html = re.sub(r'/\*PCOMP_START\*/.*?/\*PCOMP_END\*/', '', html, flags=re.DOTALL)
-    html = re.sub(r'"_pcomp":1,.*?"_pcompEnd":1,', '', html, flags=re.DOTALL)
+    html = re.sub(r'"_pcomp"\s*:\s*1\s*,.*?"_pcompEnd"\s*:\s*1\s*,', '', html, flags=re.DOTALL)
     html2 = html.replace('const D = {', 'const D = {' + payload, 1)
     mode = 'reemplazado' if n_old else 'insertado'
     if html2 == html:

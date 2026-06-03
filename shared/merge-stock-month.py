@@ -37,12 +37,33 @@ MES_ES = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',
 MES_ES_TO_NUM = {v:k for k,v in MES_ES.items()}
 MES_EN_TO_NUM = {v:k for k,v in MES_EN.items()}
 
+
+def month_sort_value(mk_en):
+    parts = str(mk_en).split()
+    if len(parts) != 2: return 0
+    return int(parts[1]) * 100 + MES_EN_TO_NUM.get(parts[0], 0)
+
+
 LINES_DATAJS = ['cardio', 'ATB', 'OTC', 'respiratorio']
 LINES_INLINE = {
     'mujer': 'mujer/index.html',
     'SNC': 'SNC/index.html',
     'dermatologia': 'dermatologia/dermato_dashboard.html',
 }
+
+# Lineas cuyo CHART (D.stock) NO se keyea por las familias del pivot SAP y por lo
+# tanto NO se debe tocar con este script (se rompe / queda a medias). En mujer el
+# chart esta keyeado por SEGMENTOS (SIN ESTROGENO, D3, ...) y lo alimenta el flujo
+# de venta interna, no el pivot. Para esas lineas solo se actualiza la COBERTURA
+# (stock_alerts/stock_pres/coverage_labels, que si matchean por nombre comercial).
+CHART_SKIP_LINES = {'mujer'}
+
+# Lineas cuya COBERTURA (labels + alertas + pres) NO se puede actualizar con el pivot
+# porque sus labels son HARDCODEADOS (SNC: COV_LABELS literal en el HTML) o usan un
+# array DECOY que no es el que renderiza (dermato: tiene stock_pres_months pero la
+# cobertura se dibuja desde coverage_labels). Para estas lineas solo se toca el CHART
+# (D.stock); su cobertura se deja como esta para no desalinear los arrays.
+COBERTURA_SKIP_LINES = {'SNC', 'dermatologia'}
 
 
 def cov_label_es(year, month):
@@ -190,7 +211,7 @@ def recompute_alerts(entry, target_window_len=None):
     entry['worst_status'] = worst
 
 
-def update_line(line_name, path_rel, is_datajs, fam_data, prod_data, product_to_fam, target_cov_label):
+def update_line(line_name, path_rel, is_datajs, fam_data, prod_data, product_to_fam, target_cov_label, new_mk_en, dry_run=False):
     p = REPO / path_rel
     text = p.read_text(encoding='utf-8-sig' if is_datajs else 'utf-8', errors='replace')
     pos = find_d_block(text, is_datajs)
@@ -200,7 +221,7 @@ def update_line(line_name, path_rel, is_datajs, fam_data, prod_data, product_to_
 
     # ===== STEP 1: Update D.stock with all 4 months from pivot =====
     stock = D.setdefault('stock', {})
-    stock_brands = set(stock.keys())
+    stock_brands = set() if line_name in CHART_SKIP_LINES else set(stock.keys())
     n_stock_updated = 0
     for fam in stock_brands:
         fam_upper = fam.strip().upper()
@@ -221,15 +242,24 @@ def update_line(line_name, path_rel, is_datajs, fam_data, prod_data, product_to_
             }
             n_stock_updated += 1
 
+    if line_name in COBERTURA_SKIP_LINES:
+        # Solo chart (STEP 1); su cobertura usa labels hardcodeados/decoy -> no tocar.
+        if not dry_run and n_stock_updated:
+            new_text = text[:obj_start] + json.dumps(D, ensure_ascii=False) + text[abs_end:]
+            p.write_text(new_text, encoding='utf-8', newline='')
+        tag = ' (DRY)' if dry_run else ''
+        print(f'  [{line_name}]{tag} stock={n_stock_updated} entries (cobertura SKIP: labels hardcodeados/decoy)')
+        return
+
     # ===== STEP 2: Update coverage_labels (or stock_pres_months for SNC) =====
     use_cov_key = 'coverage_labels'
     if 'stock_pres_months' in D and D.get('stock_pres_months'):
         use_cov_key = 'stock_pres_months'
     cov_labels = D.get(use_cov_key, [])
 
-    target_label = target_cov_label  # 'Abr 26' for ES, 'Apr 2026' for EN
+    target_label = target_cov_label  # ES corto (e.g. 'May 26') para coverage_labels
     if use_cov_key == 'stock_pres_months':
-        target_label = 'Apr 2026'
+        target_label = new_mk_en  # SNC usa el key EN completo (e.g. 'May 2026')
 
     cov_was_appended = False
     target_idx = None  # index of target month in cov_labels (for refresh or append)
@@ -267,7 +297,7 @@ def update_line(line_name, path_rel, is_datajs, fam_data, prod_data, product_to_
             for k in fam_data:
                 if k.replace(' ','') == fam_upper.replace(' ',''):
                     pdata = fam_data[k]; break
-        new_mk = 'Apr 2026'
+        new_mk = new_mk_en
         if pdata and new_mk in pdata:
             v = pdata[new_mk]
             ventas_v = v.get('ventas', 0) or 0
@@ -308,7 +338,7 @@ def update_line(line_name, path_rel, is_datajs, fam_data, prod_data, product_to_
         if not candidates:
             candidates = xlsx_products  # fallback
         match = fuzzy_match_product(prod_name, candidates, fam_hint)
-        new_mk = 'Apr 2026'
+        new_mk = new_mk_en
         if match and new_mk in prod_data[match]:
             v = prod_data[match][new_mk]
             ventas_v = v.get('ventas', 0) or 0
@@ -335,27 +365,47 @@ def update_line(line_name, path_rel, is_datajs, fam_data, prod_data, product_to_
         recompute_alerts(entry, target_len)
         n_pres_updated += 1
 
-    # ===== Write back =====
-    new_text = text[:obj_start] + json.dumps(D, ensure_ascii=False) + text[abs_end:]
-    p.write_text(new_text, encoding='utf-8', newline='')
-    print(f'  [{line_name}] stock={n_stock_updated} entries, cov_appended={cov_was_appended}, alerts={n_alerts_updated}, pres={n_pres_updated} ({p.stat().st_size:,} bytes)')
+    # ===== Write back ===== (re-serializa D; las otras claves quedan igual salvo
+    # espaciado JSON, cosmetico y semanticamente identico)
+    if not dry_run:
+        new_text = text[:obj_start] + json.dumps(D, ensure_ascii=False) + text[abs_end:]
+        p.write_text(new_text, encoding='utf-8', newline='')
+    tag = ' (DRY)' if dry_run else ''
+    print(f'  [{line_name}]{tag} stock={n_stock_updated} entries, cov_appended={cov_was_appended}, alerts={n_alerts_updated}, pres={n_pres_updated}')
 
 
 def main():
-    if not PIVOT.is_file():
-        print(f'ERROR: pivot no existe: {PIVOT}', file=sys.stderr); return 2
+    import argparse
+    ap = argparse.ArgumentParser(description='Agrega el mes mas reciente del pivot de stock a TODAS las lineas (chart + cobertura + alertas).')
+    ap.add_argument('--pivot', default=str(PIVOT), help='Pivot "Laboratorio - Familia - Producto - <fecha>.xlsx"')
+    ap.add_argument('--dry-run', action='store_true')
+    args = ap.parse_args()
 
-    print(f'Leyendo pivot: {PIVOT.name}')
-    fam_data, prod_data, prod_to_fam, months = parse_pivot(PIVOT)
-    print(f'  Meses: {months}')
+    pivot = Path(args.pivot)
+    if not pivot.is_file():
+        print(f'ERROR: pivot no existe: {pivot}', file=sys.stderr); return 2
+
+    print(f'Leyendo pivot: {pivot.name}')
+    fam_data, prod_data, prod_to_fam, months = parse_pivot(pivot)
+    if not months:
+        print('ERROR: no se detectaron columnas de meses en el pivot', file=sys.stderr); return 2
+
+    # Mes NUEVO = el mas reciente del pivot. STEP 1 agrega TODOS los meses del pivot al
+    # chart stock[fam]; STEP 2-4 (coverage/alertas/pres) agregan solo el mes nuevo.
+    new_mk_en = max(months, key=month_sort_value)
+    parts = new_mk_en.split()
+    target_cov_label = cov_label_es(int(parts[1]), MES_EN_TO_NUM[parts[0]])  # e.g. 'May 26'
+    print(f'  Meses pivot: {months}  ->  mes nuevo: {new_mk_en} (label cobertura "{target_cov_label}")')
     print(f'  Familias: {len(fam_data)}, productos: {len(prod_data)}')
     print()
 
     for line in LINES_DATAJS:
-        update_line(line, f'{line}/data.js', True, fam_data, prod_data, prod_to_fam, 'Abr 26')
+        update_line(line, f'{line}/data.js', True, fam_data, prod_data, prod_to_fam, target_cov_label, new_mk_en, args.dry_run)
     for line, rel in LINES_INLINE.items():
-        update_line(line, rel, False, fam_data, prod_data, prod_to_fam, 'Abr 26')
+        update_line(line, rel, False, fam_data, prod_data, prod_to_fam, target_cov_label, new_mk_en, args.dry_run)
 
+    if args.dry_run:
+        print('\nDRY RUN: nada se escribio.')
     return 0
 
 

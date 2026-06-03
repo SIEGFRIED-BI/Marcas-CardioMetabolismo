@@ -137,6 +137,26 @@ bajo) es pista de venta sin mapear por granularidad.
 
 ---
 
+## ❌ Bug 9 — Stock: dos representaciones por línea, claves distintas
+
+**Síntoma (potencial):** al agregar un mes de stock, la cobertura de algunas líneas
+quedaba desalineada (arrays de `stock_alerts`/`stock_pres` más largos que los labels).
+**Causa:** el stock tiene DOS vistas por línea con claves distintas:
+- **chart** `stock[fam][mes]`: en data.js/SNC/dermato por familia SAP; en **mujer por
+  SEGMENTO** (SIN ESTROGENO, D3…), alimentado por venta interna, NO por el pivot.
+- **cobertura** (`coverage_labels` + `stock_alerts` + `stock_pres`): por nombre
+  comercial. Pero el label array que se RENDERIZA varía: data.js/mujer/dermato usan
+  `coverage_labels`; **SNC lo tiene HARDCODEADO** en el HTML; **dermato además tiene un
+  `stock_pres_months` DECOY** que no se renderiza.
+**Fix:** `merge-stock-month.py` solo toca lo que cada línea puede recibir del pivot:
+`CHART_SKIP_LINES={'mujer'}` (chart segment-keyed) y
+`COBERTURA_SKIP_LINES={'SNC','dermatologia'}` (labels hardcodeados/decoy).
+**Regla:** **antes de escribir stock, confirmar qué clave usa el chart y qué array de
+labels renderiza la cobertura de esa línea** (`const COV_LABELS = D.<algo>`). No asumir
+que `stock_pres_months` es el que se muestra. Correr `--dry-run` y chequear largos.
+
+---
+
 ## ✅ Reglas de oro (resumen)
 
 1. **`?v=<hash>` siempre fresco** — automático (build-all + pre-commit). Nunca

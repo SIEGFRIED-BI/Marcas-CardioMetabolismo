@@ -171,11 +171,29 @@ con MS%/IE/Var pp calculados.
 
 ### E) Stock / Cobertura — define `stock`, `stock_pres`, `stock_alerts`
 
-**Fuente:** pivot SAP `Laboratorio - Familia - Producto - <fecha>.xlsx`.
+**Fuente:** pivot SAP `Laboratorio - Familia - Producto - <fecha>.xlsx` (Laboratorio,
+Familia, Producto + por mes: Stock final, Ventas, Facturación, Días de Stock).
+
+**Recomendado — actualización mensual COMPLETA (todas las líneas):**
 ```
-py shared/merge-stock.py <pivot.xlsx>          # genérico
-py shared/merge-stock-april.py                 # variante usada para el corte de abril
+py shared/merge-stock-month.py --pivot "<pivot.xlsx>" [--dry-run]
 ```
+Deriva el mes nuevo del pivot y, por línea, actualiza:
+- **chart** `stock[fam][mes]` y **cobertura** (`coverage_labels` + `stock_alerts` +
+  `stock_pres`) en cardio/ATB/OTC/respiratorio.
+- **mujer:** solo cobertura. Su chart está keyeado por SEGMENTOS (lo alimenta venta
+  interna, no el pivot) → `CHART_SKIP_LINES`.
+- **SNC / dermatologia:** solo chart. Su cobertura usa labels hardcodeados (SNC) o un
+  array decoy `stock_pres_months` que NO es el que renderiza (dermato usa
+  `coverage_labels`) → `COBERTURA_SKIP_LINES`. (Si hay que actualizar esa cobertura,
+  es a mano; ojo de no desalinear largos de arrays.)
+
+Correr siempre `--dry-run` primero. `merge-stock.py` (incremental, solo chart de las
+4 data.js) queda como alternativa mínima.
+
+> **Por qué tanto skip:** el stock tiene DOS representaciones por línea (chart por
+> familia vs cobertura por presentación) con claves distintas; mezclarlas rompe la
+> alineación de los arrays de cobertura. Ver `07-lecciones` (Bug 9).
 
 ---
 
