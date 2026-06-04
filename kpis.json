@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-04T12:15:50",
+  "generated_at": "2026-06-04T12:41:58",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -729,12 +729,12 @@
           },
           "ms_units": {
             "curr": 7.44,
-            "prev": 7.7
+            "prev": 7.36
           },
           "mercado_units": {
             "curr": 1239650,
-            "prev": 1236402,
-            "ie": 100.3
+            "prev": 1293495,
+            "ie": 95.8
           },
           "venta_interna": {
             "curr": 96771,
@@ -763,13 +763,13 @@
             "ie": 101.7
           },
           "ms_units": {
-            "curr": 7.55,
-            "prev": 7.76
+            "curr": 7.28,
+            "prev": 7.42
           },
           "mercado_units": {
-            "curr": 4847746,
-            "prev": 4636453,
-            "ie": 104.6
+            "curr": 5026299,
+            "prev": 4851207,
+            "ie": 103.6
           },
           "venta_interna": {
             "curr": 433135,
@@ -798,13 +798,13 @@
             "ie": 98.3
           },
           "ms_units": {
-            "curr": 7.39,
-            "prev": 7.71
+            "curr": 7.15,
+            "prev": 7.37
           },
           "mercado_units": {
-            "curr": 3580663,
-            "prev": 3488815,
-            "ie": 102.6
+            "curr": 3697755,
+            "prev": 3650036,
+            "ie": 101.3
           },
           "venta_interna": {
             "curr": 302530,
@@ -833,13 +833,13 @@
             "ie": 97.0
           },
           "ms_units": {
-            "curr": 7.27,
-            "prev": 7.8
+            "curr": 6.98,
+            "prev": 7.45
           },
           "mercado_units": {
-            "curr": 7315073,
-            "prev": 7025568,
-            "ie": 104.1
+            "curr": 7616635,
+            "prev": 7351238,
+            "ie": 103.6
           },
           "venta_interna": {
             "curr": 595401,
@@ -868,12 +868,12 @@
             "ie": 96.0
           },
           "ms_units": {
-            "curr": 7.4,
-            "prev": 7.84
+            "curr": 7.09,
+            "prev": 7.5
           },
           "mercado_units": {
-            "curr": 14699256,
-            "prev": 14461697,
+            "curr": 15356343,
+            "prev": 15108149,
             "ie": 101.6
           },
           "venta_interna": {
@@ -5627,6 +5627,69 @@
           "units_prev": 2236,
           "units_ie": 123.7,
           "int_curr": 2071,
+          "int_prev": 0,
+          "int_ie": null
+        }
+      }
+    },
+    {
+      "name": "BREXIL (SIE)",
+      "line": "snc",
+      "lineName": "S.N.C.",
+      "family": "Aripiprazol / Brexpiprazol",
+      "periods": {
+        "mensual": {
+          "rec_curr": 0,
+          "rec_prev": 0,
+          "rec_ie": null,
+          "units_curr": 0,
+          "units_prev": 0,
+          "units_ie": null,
+          "int_curr": 558,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "ytd": {
+          "rec_curr": 0,
+          "rec_prev": 0,
+          "rec_ie": null,
+          "units_curr": 0,
+          "units_prev": 0,
+          "units_ie": null,
+          "int_curr": 558,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "trimestre": {
+          "rec_curr": 0,
+          "rec_prev": 0,
+          "rec_ie": null,
+          "units_curr": 0,
+          "units_prev": 0,
+          "units_ie": null,
+          "int_curr": 558,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "semestre": {
+          "rec_curr": 0,
+          "rec_prev": 0,
+          "rec_ie": null,
+          "units_curr": 0,
+          "units_prev": 0,
+          "units_ie": null,
+          "int_curr": 558,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "mat": {
+          "rec_curr": 0,
+          "rec_prev": 0,
+          "rec_ie": null,
+          "units_curr": 0,
+          "units_prev": 0,
+          "units_ie": null,
+          "int_curr": 558,
           "int_prev": 0,
           "int_ie": null
         }
