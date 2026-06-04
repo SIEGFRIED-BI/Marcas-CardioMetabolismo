@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-03T12:19:21",
+  "generated_at": "2026-06-04T11:50:37",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -737,9 +737,9 @@
             "ie": 100.3
           },
           "venta_interna": {
-            "curr": 96213,
+            "curr": 96771,
             "prev": 102671,
-            "ie": 93.7
+            "ie": 94.3
           }
         },
         "ytd": {
@@ -772,9 +772,9 @@
             "ie": 104.6
           },
           "venta_interna": {
-            "curr": 432577,
+            "curr": 433135,
             "prev": 406221,
-            "ie": 106.5
+            "ie": 106.6
           }
         },
         "trimestre": {
@@ -807,9 +807,9 @@
             "ie": 102.6
           },
           "venta_interna": {
-            "curr": 301972,
+            "curr": 302530,
             "prev": 291997,
-            "ie": 103.4
+            "ie": 103.6
           }
         },
         "semestre": {
@@ -842,9 +842,9 @@
             "ie": 104.1
           },
           "venta_interna": {
-            "curr": 594843,
+            "curr": 595401,
             "prev": 605874,
-            "ie": 98.2
+            "ie": 98.3
           }
         },
         "mat": {
@@ -877,9 +877,9 @@
             "ie": 101.6
           },
           "venta_interna": {
-            "curr": 1195863,
+            "curr": 1196421,
             "prev": 1259685,
-            "ie": 94.9
+            "ie": 95.0
           }
         }
       }
