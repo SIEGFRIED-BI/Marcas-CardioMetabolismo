@@ -786,7 +786,7 @@ function renderBrandKpis(){
   });
 
   // MS%
-  if(ms!==null){
+  if(ms!=null){
     items.push({
       lbl:`MS% · ${period}`, accent:'var(--blue)', cls:'b',
       num: ms.toFixed(1)+'%',
@@ -796,7 +796,7 @@ function renderBrandKpis(){
   }
 
   // Unidades
-  if(units!==null){
+  if(units!=null){
     const uStr = units>=1e6?(units/1e6).toFixed(2)+'M':units>=1e3?(units/1e3).toFixed(1)+'k':fmt(units);
     items.push({
       lbl:`Unidades IQVIA · ${period}`, accent:'var(--cyan)', cls:'b',
@@ -834,7 +834,7 @@ function renderBrandKpis(){
   }
 
   // Recetas MS%
-  if(msRec!==null){
+  if(msRec!=null){
     items.push({
       lbl:`MS% Recetas · ${lastRecMo}`, accent:'var(--purple)', cls:'p',
       num: msRec.toFixed(1)+'%',
