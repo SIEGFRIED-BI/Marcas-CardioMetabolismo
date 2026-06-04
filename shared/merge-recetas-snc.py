@@ -45,7 +45,7 @@ MARKET_TO_OWNERS = {
     'QUETIAPINAS (QTP)':         ['QTP SIE'],
     # Posibles markets futuros:
     'ANTIDEPRESIVOS (VALQUIR)':  ['VALQUIR SIE'],
-    'BREXIPIPAZOL-ARIPIPRAZOL (BREXIL)': [],  # no SIE owner
+    'BREXIPIPAZOL-ARIPIPRAZOL (BREXIL)': ['BREXIL SIE'],  # mercado BREXIL (SIE aun en 0; muestra el contexto competitivo)
 }
 
 SNC_HTMLS = ['SNC/index.html', 'SNC/psq_dashboard.html']

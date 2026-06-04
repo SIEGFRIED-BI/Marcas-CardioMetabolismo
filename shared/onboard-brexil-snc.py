@@ -23,7 +23,9 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 HTML = REPO / 'SNC' / 'index.html'
 
-BREXIL_REAL_2026 = [0, 0, 0, 558, 682, 0, 0, 0, 0, 0, 0, 0]   # Ene..Dic; Abr/May
+BREXIL_REAL_2026 = [0, 0, 0, 558, 682, 0, 0, 0, 0, 0, 0, 0]   # Ene..Dic; venta interna Abr/May
+# Estimado de ventas (curva de lanzamiento, suma de las 4 presentaciones 1/2/3/4 mg)
+BREXIL_BUDGET_2026 = [0, 0, 0, 300, 350, 380, 390, 400, 410, 420, 430, 456]
 BREXIL_STOCK = {'May 2026': {'stock': 624, 'ventas': 466, 'facturacion': 682, 'dias': round(624 / 466 * 30)}}
 BREXIL_COLOR = '#be123c'
 
@@ -37,7 +39,7 @@ def main():
     D, end = json.JSONDecoder().raw_decode(text[ob:])
 
     D.setdefault('budget', {})['BREXIL'] = {
-        '2026': {'budget': [0] * 12, 'real': list(BREXIL_REAL_2026)},
+        '2026': {'budget': list(BREXIL_BUDGET_2026), 'real': list(BREXIL_REAL_2026)},
     }
     D.setdefault('stock', {})['BREXIL'] = dict(BREXIL_STOCK)
     D.setdefault('colors', {})['BREXIL'] = BREXIL_COLOR
