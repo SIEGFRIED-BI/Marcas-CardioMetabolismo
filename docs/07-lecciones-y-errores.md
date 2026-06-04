@@ -168,10 +168,18 @@ recomputa** `días = round(stock/ventas×30)` en `parse_pivot` (ignora la column
 guardrail para que no se repita.
 **Causa 2 (escala, PRE-EXISTENTE):** el histórico de stock ATB tiene stock y ventas **~10x
 inflados** vs la realidad — venta interna ACANTEX ≈ 24k/mes, el pivot histórico decía ≈ 234k.
-El pivot de mayo (≈ 22k, correcto) coincide con venta interna → el chart muestra un
-"acantilado" falso en may-2026. **Los días NO se afectan** (son un ratio). Re-escalar el
-histórico (factor ~9-10x, no limpio) queda pendiente; requiere la fuente histórica en las
-unidades nuevas.
+El pivot de mayo (≈ 22k, correcto) coincide con venta interna → el chart mostraba un
+"acantilado" falso en may-2026. **Los días NO se afectan** (son un ratio).
+**Fix 2 (jun-2026):** el factor NO era constante (ratio 2.8x→9.7x: el "ventas" histórico
+era otra métrica, no ventas mensuales). Como **días es invariante a la métrica**
+(`stock/ventas` del mismo origen = ratio real de cobertura), se reconstruyó con
+`shared/rescale-atb-stock.py`: `ventas = D.budget[fam][YYYY].real` (venta interna real) y
+`stock = round(días/30 × ventas)`, preservando los días EXACTOS. Resultado: serie suave en
+unidades reales, sin acantilado; `ventas == venta interna` y `días == stock/ventas×30` (0
+inconsistencias). Se escalaron también las `ventas` de `stock_alerts`/`stock_pres`.
+**Regla:** si el stock viene en una métrica inconsistente, **NO escalar por un factor a ojo**;
+reconstruir `stock = días/30 × venta_interna` (días es invariante; venta interna es la fuente
+real de ventas que el tablero ya tiene en `budget.real`).
 **Regla:** **días = stock/ventas×30 SIEMPRE** (no confiar en la columna del pivot). Al
 agregar un mes de stock, **cruzar el stock/ventas absoluto contra la venta interna** para
 detectar saltos de unidad/escala.
