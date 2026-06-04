@@ -143,6 +143,16 @@ def parse_pivot(path):
             if vf is None: continue
             product_data[prod_key][mk][metric] = int(round(vf))
 
+    # Guardrail dias: la columna 'Dias de Stock' del pivot a veces viene CORRUPTA en el
+    # ultimo mes (p.ej. ATB Abr 2026 dio dias=6 en vez de ~25). Recomputamos
+    # dias = round(stock/ventas*30) -> la convencion del tablero (todos los demas meses
+    # ya cumplen eso). Asi 'dias' SIEMPRE cuadra con el stock/ventas mostrado.
+    for _dd in (family_data, product_data):
+        for _mks in _dd.values():
+            for _vals in _mks.values():
+                _s = _vals.get('stock'); _v = _vals.get('ventas')
+                if isinstance(_s, (int, float)) and isinstance(_v, (int, float)) and _v > 0:
+                    _vals['dias'] = int(round(_s / _v * 30))
     wb.close()
     return dict(family_data), dict(product_data), product_to_fam, months_in_pivot
 

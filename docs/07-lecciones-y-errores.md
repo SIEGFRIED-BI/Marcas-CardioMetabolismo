@@ -157,6 +157,27 @@ que `stock_pres_months` es el que se muestra. Correr `--dry-run` y chequear larg
 
 ---
 
+## ❌ Bug 10 — Stock ATB: días corrupto (pivot) + escala histórica inflada
+
+**Síntoma:** los "días de stock" de ATB no cuadraban — Abr 2026 mostraba **6 días** en las 6
+familias con stock alto (debía ser ~25).
+**Causa 1 (días):** la columna "Días de Stock" del pivot SAP vino **corrupta** para Abr 2026.
+El tablero define **días = stock/ventas×30** (todos los demás meses lo cumplen exacto).
+**Fix 1:** recomputado Abr 2026 en `D.stock`; y `merge-stock-month.py` ahora **SIEMPRE
+recomputa** `días = round(stock/ventas×30)` en `parse_pivot` (ignora la columna del pivot) →
+guardrail para que no se repita.
+**Causa 2 (escala, PRE-EXISTENTE):** el histórico de stock ATB tiene stock y ventas **~10x
+inflados** vs la realidad — venta interna ACANTEX ≈ 24k/mes, el pivot histórico decía ≈ 234k.
+El pivot de mayo (≈ 22k, correcto) coincide con venta interna → el chart muestra un
+"acantilado" falso en may-2026. **Los días NO se afectan** (son un ratio). Re-escalar el
+histórico (factor ~9-10x, no limpio) queda pendiente; requiere la fuente histórica en las
+unidades nuevas.
+**Regla:** **días = stock/ventas×30 SIEMPRE** (no confiar en la columna del pivot). Al
+agregar un mes de stock, **cruzar el stock/ventas absoluto contra la venta interna** para
+detectar saltos de unidad/escala.
+
+---
+
 ## ✅ Reglas de oro (resumen)
 
 1. **`?v=<hash>` siempre fresco** — automático (build-all + pre-commit). Nunca
