@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-04",
+  "generated_at": "2026-06-09",
   "as_of_month": "Apr 2026",
   "as_of_short": "Abr 2026",
   "period_labels": {
@@ -1141,57 +1141,6 @@
           "ms_prev": 89.6,
           "ie": 99.0,
           "var_pp": -0.8
-        }
-      }
-    },
-    {
-      "family": "PREGABALIN",
-      "display": "PREGABALIN",
-      "line": "snc",
-      "lineName": "SNC",
-      "sie_brands": [
-        "PGB (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 226653,
-          "market_prev": 225015,
-          "sie_curr": 6107,
-          "sie_prev": 5996,
-          "ms_curr": 2.7,
-          "ms_prev": 2.7,
-          "ie": 101.0,
-          "var_pp": 0.0
-        },
-        "ytd": {
-          "market_curr": 901970,
-          "market_prev": 863148,
-          "sie_curr": 24371,
-          "sie_prev": 22964,
-          "ms_curr": 2.7,
-          "ms_prev": 2.7,
-          "ie": 102.0,
-          "var_pp": 0.0
-        },
-        "trimestre": {
-          "market_curr": 666790,
-          "market_prev": 645904,
-          "sie_curr": 17814,
-          "sie_prev": 16842,
-          "ms_curr": 2.7,
-          "ms_prev": 2.6,
-          "ie": 102.0,
-          "var_pp": 0.1
-        },
-        "mat": {
-          "market_curr": 2744550,
-          "market_prev": 2703234,
-          "sie_curr": 75051,
-          "sie_prev": 80598,
-          "ms_curr": 2.7,
-          "ms_prev": 3.0,
-          "ie": 92.0,
-          "var_pp": -0.3
         }
       }
     },
@@ -2375,6 +2324,57 @@
           "ms_prev": 23.6,
           "ie": 109.0,
           "var_pp": 2.0
+        }
+      }
+    },
+    {
+      "family": "PREGABALIN",
+      "display": "PREGABALIN",
+      "line": "snc",
+      "lineName": "SNC",
+      "sie_brands": [
+        "PGB (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 0,
+          "market_prev": 106721,
+          "sie_curr": 0,
+          "sie_prev": 5275,
+          "ms_curr": null,
+          "ms_prev": 4.9,
+          "ie": null,
+          "var_pp": null
+        },
+        "ytd": {
+          "market_curr": 332753,
+          "market_prev": 406954,
+          "sie_curr": 16111,
+          "sie_prev": 19998,
+          "ms_curr": 4.8,
+          "ms_prev": 4.9,
+          "ie": 99.0,
+          "var_pp": -0.1
+        },
+        "trimestre": {
+          "market_curr": 216426,
+          "market_prev": 305049,
+          "sie_curr": 10253,
+          "sie_prev": 14649,
+          "ms_curr": 4.7,
+          "ms_prev": 4.8,
+          "ie": 99.0,
+          "var_pp": -0.1
+        },
+        "mat": {
+          "market_curr": 1231809,
+          "market_prev": 1257978,
+          "sie_curr": 60876,
+          "sie_prev": 71194,
+          "ms_curr": 4.9,
+          "ms_prev": 5.7,
+          "ie": 87.0,
+          "var_pp": -0.8
         }
       }
     },
