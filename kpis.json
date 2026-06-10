@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T15:20:34",
+  "generated_at": "2026-06-10T15:59:40",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -679,18 +679,18 @@
       "venta_through": "May 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
-        95148,
+        95149,
         91071,
         99329,
         90353,
-        83671,
-        92247,
+        83673,
+        92248,
         79305,
-        84962,
-        100951,
+        84963,
+        100952,
         79574,
-        91201,
-        86262
+        91205,
+        91591
       ],
       "sparkline_months": [
         "May 2025",
@@ -723,18 +723,18 @@
             "ie": 104.7
           },
           "units_sie": {
-            "curr": 86262,
+            "curr": 91591,
             "prev": 94462,
-            "ie": 91.3
+            "ie": 97.0
           },
           "ms_units": {
-            "curr": 8.47,
+            "curr": 8.1,
             "prev": 8.41
           },
           "mercado_units": {
-            "curr": 1018302,
-            "prev": 1122574,
-            "ie": 90.7
+            "curr": 1131335,
+            "prev": 1122558,
+            "ie": 100.8
           },
           "venta_interna": {
             "curr": 96771,
@@ -758,18 +758,18 @@
             "ie": 105.0
           },
           "units_sie": {
-            "curr": 357988,
+            "curr": 363322,
             "prev": 357052,
-            "ie": 100.3
+            "ie": 101.8
           },
           "ms_units": {
-            "curr": 8.33,
+            "curr": 8.24,
             "prev": 8.51
           },
           "mercado_units": {
-            "curr": 4296819,
-            "prev": 4197208,
-            "ie": 102.4
+            "curr": 4409994,
+            "prev": 4197097,
+            "ie": 105.1
           },
           "venta_interna": {
             "curr": 433135,
@@ -793,18 +793,18 @@
             "ie": 105.6
           },
           "units_sie": {
-            "curr": 257037,
+            "curr": 262370,
             "prev": 266819,
-            "ie": 96.3
+            "ie": 98.3
           },
           "ms_units": {
-            "curr": 8.18,
+            "curr": 8.06,
             "prev": 8.44
           },
           "mercado_units": {
-            "curr": 3143844,
-            "prev": 3160496,
-            "ie": 99.5
+            "curr": 3256957,
+            "prev": 3160425,
+            "ie": 103.1
           },
           "venta_interna": {
             "curr": 302530,
@@ -828,18 +828,18 @@
             "ie": null
           },
           "units_sie": {
-            "curr": 522255,
+            "curr": 527590,
             "prev": 543355,
-            "ie": 96.1
+            "ie": 97.1
           },
           "ms_units": {
-            "curr": 7.99,
+            "curr": 7.93,
             "prev": 8.54
           },
           "mercado_units": {
-            "curr": 6537197,
-            "prev": 6362979,
-            "ie": 102.7
+            "curr": 6650442,
+            "prev": 6362816,
+            "ie": 104.5
           },
           "venta_interna": {
             "curr": 595401,
@@ -863,18 +863,18 @@
             "ie": null
           },
           "units_sie": {
-            "curr": 1074074,
-            "prev": 1124412,
-            "ie": 95.5
+            "curr": 1079413,
+            "prev": 1124414,
+            "ie": 96.0
           },
           "ms_units": {
-            "curr": 8.11,
+            "curr": 8.08,
             "prev": 8.6
           },
           "mercado_units": {
-            "curr": 13239246,
-            "prev": 13068054,
-            "ie": 101.3
+            "curr": 13352427,
+            "prev": 13067733,
+            "ie": 102.2
           },
           "venta_interna": {
             "curr": 1196421,
@@ -4058,6 +4058,69 @@
       }
     },
     {
+      "name": "PGB (SIE)",
+      "line": "snc",
+      "lineName": "S.N.C.",
+      "family": "Pregabalina Multidosis",
+      "periods": {
+        "mensual": {
+          "rec_curr": 1228,
+          "rec_prev": 1276,
+          "rec_ie": 89.8,
+          "units_curr": 5329,
+          "units_prev": 5275,
+          "units_ie": 95.4,
+          "int_curr": 7002,
+          "int_prev": 6814,
+          "int_ie": 102.8
+        },
+        "ytd": {
+          "rec_curr": 4963,
+          "rec_prev": 5114,
+          "rec_ie": 89.5,
+          "units_curr": 21445,
+          "units_prev": 19998,
+          "units_ie": 97.8,
+          "int_curr": 27078,
+          "int_prev": 25732,
+          "int_ie": 105.2
+        },
+        "trimestre": {
+          "rec_curr": 3694,
+          "rec_prev": 3792,
+          "rec_ie": 89.8,
+          "units_curr": 15586,
+          "units_prev": 14649,
+          "units_ie": 98.5,
+          "int_curr": 21620,
+          "int_prev": 17836,
+          "int_ie": 121.2
+        },
+        "semestre": {
+          "rec_curr": 7480,
+          "rec_prev": 5114,
+          "rec_ie": 90.5,
+          "units_curr": 32685,
+          "units_prev": 30940,
+          "units_ie": 95.4,
+          "int_curr": 41989,
+          "int_prev": 39759,
+          "int_ie": 105.6
+        },
+        "mat": {
+          "rec_curr": 15231,
+          "rec_prev": 5114,
+          "rec_ie": 94.2,
+          "units_curr": 66215,
+          "units_prev": 71196,
+          "units_ie": 87.0,
+          "int_curr": 83625,
+          "int_prev": 84630,
+          "int_ie": 98.8
+        }
+      }
+    },
+    {
       "name": "ROXOLAN PLUS (SIE)",
       "line": "cardio",
       "lineName": "CardioMetabólica",
@@ -4243,69 +4306,6 @@
           "int_curr": 59786,
           "int_prev": 55906,
           "int_ie": 106.9
-        }
-      }
-    },
-    {
-      "name": "PGB (SIE)",
-      "line": "snc",
-      "lineName": "S.N.C.",
-      "family": "Pregabalina Multidosis",
-      "periods": {
-        "mensual": {
-          "rec_curr": 1228,
-          "rec_prev": 1276,
-          "rec_ie": 89.8,
-          "units_curr": 0,
-          "units_prev": 5275,
-          "units_ie": null,
-          "int_curr": 7002,
-          "int_prev": 6814,
-          "int_ie": 102.8
-        },
-        "ytd": {
-          "rec_curr": 4963,
-          "rec_prev": 5114,
-          "rec_ie": 89.5,
-          "units_curr": 16111,
-          "units_prev": 19998,
-          "units_ie": 98.5,
-          "int_curr": 27078,
-          "int_prev": 25732,
-          "int_ie": 105.2
-        },
-        "trimestre": {
-          "rec_curr": 3694,
-          "rec_prev": 3792,
-          "rec_ie": 89.8,
-          "units_curr": 10253,
-          "units_prev": 14649,
-          "units_ie": 98.7,
-          "int_curr": 21620,
-          "int_prev": 17836,
-          "int_ie": 121.2
-        },
-        "semestre": {
-          "rec_curr": 7480,
-          "rec_prev": 5114,
-          "rec_ie": 90.5,
-          "units_curr": 27350,
-          "units_prev": 30940,
-          "units_ie": 96.0,
-          "int_curr": 41989,
-          "int_prev": 39759,
-          "int_ie": 105.6
-        },
-        "mat": {
-          "rec_curr": 15231,
-          "rec_prev": 5114,
-          "rec_ie": 94.2,
-          "units_curr": 60876,
-          "units_prev": 71194,
-          "units_ie": 87.3,
-          "int_curr": 83625,
-          "int_prev": 84630,
-          "int_ie": 98.8
         }
       }
     },

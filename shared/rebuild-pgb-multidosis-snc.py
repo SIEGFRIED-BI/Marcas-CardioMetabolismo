@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
-"""Reconstruye mol_perf['PREGABALIN'] de SNC como el MERCADO MULTIDOSIS.
+"""Reconstruye mol_perf['PREGABALIN'] de SNC = MERCADO MULTIDOSIS (hasta Abr-2026).
 
-Pedido (Juan): en el mercado de PGB ver SOLO multidosis. IQVIA clasifica dos
-mercados de pregabalina: "PGB Capsulas" y "PGB Multidosis". El multidosis son
-las presentaciones en tableta divisible (no capsulas) de 13 marcas:
-  PGB, PLENICA, NEURISTAN, KABIAN, LINPREL, GAVIN, LUNEL, PREBIEN, PRINCIPIA,
-  AXUAL, PREBICTAL, DOLONEUTIN, SERIPRAN
-Excluye LYRICA, MYSTIKA, PREGABALINA RICHET, GAVANEURAL, etc. (capsulas/no md).
+Juan pidio ver solo multidosis en el mercado de PGB. IQVIA define el mercado
+"PGB Multidosis" = presentaciones en TABLETA divisible (no capsulas, no grageas).
 
-Filtro desde el master nacional AR_PM (misma fuente/escala que el resto de SNC):
-  Molecules Long == PREGABALIN  AND  pack SIN 'CAPS'  AND
-  primer-token(Product) en MULTI_BRANDS.
-Validado: total Mar2026 nacional=116006 ~ regional "PGB Multidosis"=108153
-(la dif es panel PM vs CUP; se usa el nacional por consistencia de escala).
+Definicion: las 13 marcas del mercado oficial IQVIA "PGB Multidosis" (set
+validado contra el regional CUP: mismas marcas en Mar-2026) en presentacion
+NO capsula -> se excluye Ph.Forms 'ACA - CAPSULAS', se conservan TABLETAS y
+GRAGEAS (LINPREL es gragea divisible = multidosis; por eso NO alcanza filtrar
+solo TABLETAS, que lo dejaba afuera). Mar-2026 = 116k (panel PM) ~ oficial CUP
+108k. Usa la col 'Ph. Forms III' para separar capsulas (mas limpio que el pack).
 
-Historico hasta Mar-2026 (ultimo corte pack-level disponible). Las otras 10
-moleculas siguen en Abr-2026; el check de history es a nivel LINEA (union de
-meses), asi que no se pierde Abr. renderBrandKpis ya lee el ultimo mes POR
-familia, asi que PGB muestra "Mar 2026".
-
-NO toca otras familias. kpis se recomputan aparte (build-kpis + build-families
-+ sync-kpistrip). Uso: py shared/rebuild-pgb-multidosis-snc.py [--dry-run]
+Fuente: AR_PM_FV_Standard_Jun-10-2026 (pack-level, llega a Abr-2026; el master
+de abril cerraba en marzo). is_sie = manufacturer == SIEGFRIED. Las otras
+moleculas de SNC ya estan en abril -> no se tocan. Recalcular kpis aparte
+(build-kpis + build-families + sync-kpistrip).
+Uso: py shared/rebuild-pgb-multidosis-snc.py [--dry-run]
 """
 from __future__ import annotations
 import argparse, json, re, sys
@@ -30,17 +25,21 @@ import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
 HTML = REPO / 'SNC' / 'index.html'
-MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\AR_PM_FV_Standard_Apr-27-2026.xlsx')
+MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\AR_PM_FV_Standard_Jun-10-2026.xlsx')
 
 FAM_KEY = 'PREGABALIN'
 FAM_LABEL = 'Pregabalina Multidosis'
-MULTI_BRANDS = {'AXUAL', 'DOLONEUTIN', 'GAVIN', 'KABIAN', 'LINPREL', 'LUNEL',
-                'NEURISTAN', 'PGB', 'PLENICA', 'PREBICTAL', 'PREBIEN',
-                'PRINCIPIA', 'SERIPRAN'}
+CAPSULE_FORM = 'ACA'              # Ph. Forms III: 'ACA - ORAL S.ORD.CAPSULAS' (se EXCLUYE)
+# Set oficial del mercado IQVIA "PGB Multidosis" (validado contra el regional CUP,
+# Mar-2026 = mismas 13 marcas). Multidosis = estas marcas en presentacion NO capsula
+# (tabletas divisibles + grageas; p.ej. LINPREL es gragea pero divisible -> multidosis).
+MULTI_BRANDS = {'AXUAL','DOLONEUTIN','GAVIN','KABIAN','LINPREL','LUNEL','NEURISTAN',
+                'PGB','PLENICA','PREBICTAL','PREBIEN','PRINCIPIA','SERIPRAN'}
 
 MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
            'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}
 NUM2 = {v:k for k,v in MES_INV.items()}
+MONTH_RE = re.compile(r'^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$')
 
 
 def msort(mk):
@@ -77,54 +76,42 @@ def agg_mat(monthly, cierre):
 
 
 def load_multidosis(path):
-    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
-    ws = wb.active
-    row1 = list(next(ws.iter_rows(min_row=1, max_row=1, values_only=True)))
-    col_manuf=col_prod=col_pack=col_mol=None; month_cols=[]
-    for i,h in enumerate(row1):
-        if not h: continue
-        s=str(h).strip(); sn=s.replace('\n',' ').strip().lower()
-        if sn.startswith('manufacturer'): col_manuf=i
-        elif sn.startswith('product'): col_prod=i
-        elif sn.startswith('pack'): col_pack=i
-        elif sn.startswith('molecules'): col_mol=i
-        if s.startswith('Units') and '\n' in s:
-            after=s.split('\n',1)[-1].strip()
-            if after.upper().startswith(('MAT','YTD')): continue
-            m=re.match(r'(\w+)\s+(\d{4})$', after)
-            if m and m.group(1) in MES_INV: month_cols.append((i, f'{m.group(1)} {m.group(2)}'))
-    if col_manuf is None: col_manuf=0
-    if col_prod is None: col_prod=1
-    if col_pack is None: col_pack=2
-    if col_mol is None: col_mol=5
-    prods = defaultdict(lambda: {'manuf':None,'monthly':defaultdict(float)})
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True); ws = wb.active
+    r1 = list(next(ws.iter_rows(min_row=1, max_row=1, values_only=True)))
+    ci = {}
+    for i,h in enumerate(r1):
+        s = str(h or '').strip().lower()
+        if s.startswith('manufacturer'): ci['man'] = i
+        elif s.startswith('ph. forms'): ci['phf'] = i
+        elif s.startswith('product'): ci['prod'] = i
+        elif s.startswith('molecules'): ci['mol'] = i
+    def lab(h): return str(h).split('\n')[-1].strip()
+    mcols = [(i, lab(h)) for i,h in enumerate(r1)
+             if h and str(h).startswith('Units') and MONTH_RE.match(lab(h))]
+    prods = defaultdict(lambda: {'manuf': None, 'monthly': defaultdict(float)})
     for row in ws.iter_rows(min_row=2, values_only=True):
-        if not row or len(row)<=col_mol: continue
-        if str(row[col_mol] or '').strip().upper()!='PREGABALIN': continue
-        prod = row[col_prod] if col_prod<len(row) else None
-        pack = str(row[col_pack] or '') if col_pack<len(row) else ''
-        if not prod: continue
-        if 'CAPS' in pack.upper(): continue                       # excluir capsulas
-        if str(prod).split(' ')[0].upper() not in MULTI_BRANDS: continue  # solo marcas multidosis
-        b = prods[prod]; b['manuf'] = row[col_manuf] if col_manuf<len(row) else None
-        for ci,mk in month_cols:
-            if ci>=len(row): continue
-            v = row[ci]
-            if v is None: continue
-            try: b['monthly'][mk]+=float(v)
-            except (ValueError,TypeError): pass
+        if ci['mol'] >= len(row) or str(row[ci['mol']] or '').strip().upper() != FAM_KEY: continue
+        phf = str(row[ci['phf']] or '').strip() if ci['phf'] < len(row) else ''
+        if phf.upper().startswith(CAPSULE_FORM): continue               # excluir capsulas
+        prod = str(row[ci['prod']] or '')
+        if not prod or prod.split(' ')[0].upper() not in MULTI_BRANDS: continue  # solo marcas multidosis
+        b = prods[prod]; b['manuf'] = row[ci['man']] if ci['man'] < len(row) else None
+        for cidx, mk in mcols:
+            if cidx < len(row) and row[cidx] is not None:
+                try: b['monthly'][mk] += float(row[cidx])
+                except (ValueError, TypeError): pass
     wb.close()
-    months = [mk for _,mk in sorted(month_cols, key=lambda x: msort(x[1]))]
-    return months, {p:{'manuf':i['manuf'],'monthly':{mk:int(round(v)) for mk,v in i['monthly'].items()}}
+    months = [mk for _,mk in sorted(mcols, key=lambda x: msort(x[1]))]
+    return months, {p: {'manuf': i['manuf'], 'monthly': {mk: int(round(v)) for mk,v in i['monthly'].items() if v}}
                     for p,i in prods.items()}
 
 
 def build_family(prods):
-    fam_monthly = defaultdict(int); plist=[]
+    fam_monthly = defaultdict(int); plist = []
     for name,info in prods.items():
         mv = info['monthly']
-        for mk,v in mv.items(): fam_monthly[mk]+=v
-        is_sie = str(name).split(' ')[0].upper()=='PGB'
+        for mk,v in mv.items(): fam_monthly[mk] += v
+        is_sie = str(info.get('manuf') or '').strip().upper() == 'SIEGFRIED'
         plist.append({'prod':name,'manuf':info.get('manuf') or '','is_sie':is_sie,'monthly_vals':mv})
     fam_monthly = dict(fam_monthly)
     cierre = MES_INV.get(max(fam_monthly,key=msort).split()[0],12) if fam_monthly else 12
@@ -147,7 +134,7 @@ def main():
     months,prods=load_multidosis(MASTER)
     fam=build_family(prods)
     last=max(fam['monthly'],key=msort)
-    print(f'Multidosis: {len(months)} meses ({months[0]}..{months[-1]}), {len(fam["products"])} productos')
+    print(f'Multidosis (13 marcas, no-capsula): {len(months)} meses ({months[0]}..{months[-1]}), {len(fam["products"])} productos')
     print(f'  mercado {last} = {fam["monthly"][last]:,} u')
     for p in fam['products']:
         print(f'    {"SIE " if p["is_sie"] else "    "}{p["monthly_vals"].get(last,0):>7} {p["prod"]}')
@@ -156,10 +143,9 @@ def main():
     m=re.search(r'const\s+D\s*=\s*',text); ob=text.index('{',m.end())
     D,end=json.JSONDecoder().raw_decode(text[ob:])
     old=D['mol_perf'].get(FAM_KEY,{})
-    print(f'\nPREGABALIN actual: {len(old.get("products",[]))} productos, ultimo mes {max(old.get("monthly",{}),key=msort,default="?")}')
+    print(f'\nPREGABALIN actual: ultimo mes {max(old.get("monthly",{}),key=msort,default="?")}')
     D['mol_perf'][FAM_KEY]=fam
-    print(f'PREGABALIN nuevo (multidosis): {len(fam["products"])} productos, ultimo mes {last}')
-
+    print(f'PREGABALIN nuevo (multidosis): ultimo mes {last}')
     if a.dry_run:
         print('\nDRY RUN: nada escrito.'); return 0
     HTML.write_text(text[:ob]+json.dumps(D,ensure_ascii=False)+text[ob+end:], encoding='utf-8', newline='')
