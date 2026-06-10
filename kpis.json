@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-09T15:56:45",
+  "generated_at": "2026-06-10T14:47:04",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -729,12 +729,12 @@
           },
           "ms_units": {
             "curr": 8.51,
-            "prev": 8.04
+            "prev": 8.41
           },
           "mercado_units": {
             "curr": 1012997,
-            "prev": 1175201,
-            "ie": 86.2
+            "prev": 1122580,
+            "ie": 90.2
           },
           "venta_interna": {
             "curr": 96771,
@@ -763,13 +763,13 @@
             "ie": 100.2
           },
           "ms_units": {
-            "curr": 8.03,
-            "prev": 8.12
+            "curr": 8.34,
+            "prev": 8.51
           },
           "mercado_units": {
-            "curr": 4457082,
-            "prev": 4395013,
-            "ie": 101.4
+            "curr": 4291514,
+            "prev": 4197220,
+            "ie": 102.2
           },
           "venta_interna": {
             "curr": 433135,
@@ -798,13 +798,13 @@
             "ie": 96.3
           },
           "ms_units": {
-            "curr": 7.91,
-            "prev": 8.06
+            "curr": 8.19,
+            "prev": 8.44
           },
           "mercado_units": {
-            "curr": 3247391,
-            "prev": 3309181,
-            "ie": 98.1
+            "curr": 3138539,
+            "prev": 3160504,
+            "ie": 99.3
           },
           "venta_interna": {
             "curr": 302530,
@@ -833,13 +833,13 @@
             "ie": 96.1
           },
           "ms_units": {
-            "curr": 7.66,
-            "prev": 8.15
+            "curr": 7.99,
+            "prev": 8.54
           },
           "mercado_units": {
-            "curr": 6813336,
-            "prev": 6662918,
-            "ie": 102.3
+            "curr": 6531892,
+            "prev": 6362991,
+            "ie": 102.7
           },
           "venta_interna": {
             "curr": 595401,
@@ -868,12 +868,12 @@
             "ie": 95.5
           },
           "ms_units": {
-            "curr": 7.76,
-            "prev": 8.23
+            "curr": 8.12,
+            "prev": 8.6
           },
           "mercado_units": {
-            "curr": 13843602,
-            "prev": 13662893,
+            "curr": 13233946,
+            "prev": 13068078,
             "ie": 101.3
           },
           "venta_interna": {
@@ -5636,7 +5636,7 @@
       "name": "BREXIL (SIE)",
       "line": "snc",
       "lineName": "S.N.C.",
-      "family": "Aripiprazol / Brexpiprazol",
+      "family": "Brexpiprazol",
       "periods": {
         "mensual": {
           "rec_curr": 0,

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-09",
+  "generated_at": "2026-06-10",
   "as_of_month": "Apr 2026",
   "as_of_short": "Abr 2026",
   "period_labels": {
@@ -3098,57 +3098,6 @@
       }
     },
     {
-      "family": "ARIPIPRAZOLE",
-      "display": "ARIPIPRAZOLE",
-      "line": "snc",
-      "lineName": "SNC",
-      "sie_brands": [
-        "BREXIL (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 0,
-          "market_prev": 57093,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": null,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": null
-        },
-        "ytd": {
-          "market_curr": 178553,
-          "market_prev": 214754,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": 0.0,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 0.0
-        },
-        "trimestre": {
-          "market_curr": 117092,
-          "market_prev": 161221,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": 0.0,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 0.0
-        },
-        "mat": {
-          "market_curr": 657087,
-          "market_prev": 646452,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": 0.0,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 0.0
-        }
-      }
-    },
-    {
       "family": "MUPIROCIN",
       "display": "MUPIROCIN",
       "line": "derma",
@@ -4321,6 +4270,57 @@
           "ms_prev": 0.0,
           "ie": null,
           "var_pp": 19.1
+        }
+      }
+    },
+    {
+      "family": "BREXPIPRAZOLE",
+      "display": "BREXPIPRAZOLE",
+      "line": "snc",
+      "lineName": "SNC",
+      "sie_brands": [
+        "BREXIL (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 0,
+          "market_prev": 4472,
+          "sie_curr": 0,
+          "sie_prev": 0,
+          "ms_curr": null,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": null
+        },
+        "ytd": {
+          "market_curr": 12985,
+          "market_prev": 16961,
+          "sie_curr": 0,
+          "sie_prev": 0,
+          "ms_curr": 0.0,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 0.0
+        },
+        "trimestre": {
+          "market_curr": 8240,
+          "market_prev": 12544,
+          "sie_curr": 0,
+          "sie_prev": 0,
+          "ms_curr": 0.0,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 0.0
+        },
+        "mat": {
+          "market_curr": 47431,
+          "market_prev": 51637,
+          "sie_curr": 0,
+          "sie_prev": 0,
+          "ms_curr": 0.0,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 0.0
         }
       }
     },
