@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T14:47:04",
+  "generated_at": "2026-06-10T15:20:34",
   "as_of_month": "Apr 2026",
   "periods": [
     "mensual",
@@ -690,7 +690,7 @@
         100951,
         79574,
         91201,
-        86158
+        86262
       ],
       "sparkline_months": [
         "May 2025",
@@ -723,18 +723,18 @@
             "ie": 104.7
           },
           "units_sie": {
-            "curr": 86158,
+            "curr": 86262,
             "prev": 94462,
-            "ie": 91.2
+            "ie": 91.3
           },
           "ms_units": {
-            "curr": 8.51,
+            "curr": 8.47,
             "prev": 8.41
           },
           "mercado_units": {
-            "curr": 1012997,
-            "prev": 1122580,
-            "ie": 90.2
+            "curr": 1018302,
+            "prev": 1122574,
+            "ie": 90.7
           },
           "venta_interna": {
             "curr": 96771,
@@ -758,18 +758,18 @@
             "ie": 105.0
           },
           "units_sie": {
-            "curr": 357884,
+            "curr": 357988,
             "prev": 357052,
-            "ie": 100.2
+            "ie": 100.3
           },
           "ms_units": {
-            "curr": 8.34,
+            "curr": 8.33,
             "prev": 8.51
           },
           "mercado_units": {
-            "curr": 4291514,
-            "prev": 4197220,
-            "ie": 102.2
+            "curr": 4296819,
+            "prev": 4197208,
+            "ie": 102.4
           },
           "venta_interna": {
             "curr": 433135,
@@ -793,18 +793,18 @@
             "ie": 105.6
           },
           "units_sie": {
-            "curr": 256933,
+            "curr": 257037,
             "prev": 266819,
             "ie": 96.3
           },
           "ms_units": {
-            "curr": 8.19,
+            "curr": 8.18,
             "prev": 8.44
           },
           "mercado_units": {
-            "curr": 3138539,
-            "prev": 3160504,
-            "ie": 99.3
+            "curr": 3143844,
+            "prev": 3160496,
+            "ie": 99.5
           },
           "venta_interna": {
             "curr": 302530,
@@ -828,7 +828,7 @@
             "ie": null
           },
           "units_sie": {
-            "curr": 522151,
+            "curr": 522255,
             "prev": 543355,
             "ie": 96.1
           },
@@ -837,8 +837,8 @@
             "prev": 8.54
           },
           "mercado_units": {
-            "curr": 6531892,
-            "prev": 6362991,
+            "curr": 6537197,
+            "prev": 6362979,
             "ie": 102.7
           },
           "venta_interna": {
@@ -863,17 +863,17 @@
             "ie": null
           },
           "units_sie": {
-            "curr": 1073970,
+            "curr": 1074074,
             "prev": 1124412,
             "ie": 95.5
           },
           "ms_units": {
-            "curr": 8.12,
+            "curr": 8.11,
             "prev": 8.6
           },
           "mercado_units": {
-            "curr": 13233946,
-            "prev": 13068078,
+            "curr": 13239246,
+            "prev": 13068054,
             "ie": 101.3
           },
           "venta_interna": {
@@ -5642,7 +5642,7 @@
           "rec_curr": 0,
           "rec_prev": 0,
           "rec_ie": null,
-          "units_curr": 0,
+          "units_curr": 104,
           "units_prev": 0,
           "units_ie": null,
           "int_curr": 558,
@@ -5653,7 +5653,7 @@
           "rec_curr": 0,
           "rec_prev": 0,
           "rec_ie": null,
-          "units_curr": 0,
+          "units_curr": 104,
           "units_prev": 0,
           "units_ie": null,
           "int_curr": 558,
@@ -5664,7 +5664,7 @@
           "rec_curr": 0,
           "rec_prev": 0,
           "rec_ie": null,
-          "units_curr": 0,
+          "units_curr": 104,
           "units_prev": 0,
           "units_ie": null,
           "int_curr": 558,
@@ -5675,7 +5675,7 @@
           "rec_curr": 0,
           "rec_prev": 0,
           "rec_ie": null,
-          "units_curr": 0,
+          "units_curr": 104,
           "units_prev": 0,
           "units_ie": null,
           "int_curr": 558,
@@ -5686,7 +5686,7 @@
           "rec_curr": 0,
           "rec_prev": 0,
           "rec_ie": null,
-          "units_curr": 0,
+          "units_curr": 104,
           "units_prev": 0,
           "units_ie": null,
           "int_curr": 558,

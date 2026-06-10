@@ -4121,6 +4121,57 @@
       }
     },
     {
+      "family": "BREXPIPRAZOLE",
+      "display": "BREXPIPRAZOLE",
+      "line": "snc",
+      "lineName": "SNC",
+      "sie_brands": [
+        "BREXIL (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 5305,
+          "market_prev": 4466,
+          "sie_curr": 104,
+          "sie_prev": 0,
+          "ms_curr": 2.0,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 2.0
+        },
+        "ytd": {
+          "market_curr": 18290,
+          "market_prev": 16949,
+          "sie_curr": 104,
+          "sie_prev": 0,
+          "ms_curr": 0.6,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 0.6
+        },
+        "trimestre": {
+          "market_curr": 13545,
+          "market_prev": 12536,
+          "sie_curr": 104,
+          "sie_prev": 0,
+          "ms_curr": 0.8,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 0.8
+        },
+        "mat": {
+          "market_curr": 52731,
+          "market_prev": 51613,
+          "sie_curr": 104,
+          "sie_prev": 0,
+          "ms_curr": 0.2,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 0.2
+        }
+      }
+    },
+    {
       "family": "EMPAX MET",
       "display": "EMPAX MET",
       "line": "cardio",
@@ -4270,57 +4321,6 @@
           "ms_prev": 0.0,
           "ie": null,
           "var_pp": 19.1
-        }
-      }
-    },
-    {
-      "family": "BREXPIPRAZOLE",
-      "display": "BREXPIPRAZOLE",
-      "line": "snc",
-      "lineName": "SNC",
-      "sie_brands": [
-        "BREXIL (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 0,
-          "market_prev": 4472,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": null,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": null
-        },
-        "ytd": {
-          "market_curr": 12985,
-          "market_prev": 16961,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": 0.0,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 0.0
-        },
-        "trimestre": {
-          "market_curr": 8240,
-          "market_prev": 12544,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": 0.0,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 0.0
-        },
-        "mat": {
-          "market_curr": 47431,
-          "market_prev": 51637,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": 0.0,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 0.0
         }
       }
     },
