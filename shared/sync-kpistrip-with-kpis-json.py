@@ -67,6 +67,8 @@ def patch_line(key, path_rel, is_inline):
     ks['mkt_mat26'] = k_mat['mercado_units']['curr']
     if k_ytd.get('ms_recetas', {}).get('curr') is not None:
         ks['ms_rec'] = k_ytd['ms_recetas']['curr']
+        ks['sie_rec'] = k_ytd.get('recetas_sie', {}).get('curr')
+        ks['tot_rec'] = k_ytd.get('mercado_recetas', {}).get('curr')
     after = json.dumps(ks)
     if before == after:
         return 'no changes'

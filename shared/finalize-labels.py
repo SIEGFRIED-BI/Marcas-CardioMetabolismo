@@ -81,9 +81,10 @@ def last_recetas(obj):
 
 
 def set_label(text, key, value):
-    """Reemplaza el valor de "key": "..." en TODAS sus apariciones. value sin comillas."""
-    pat = re.compile(r'("' + re.escape(key) + r'":\s*")[^"]*(")')
-    return pat.subn(lambda m: m.group(1) + value + m.group(2), text)
+    """Setea "key": "value" en TODAS sus apariciones, ya sea que el valor actual
+    sea string ("...") o null. value sin comillas."""
+    pat = re.compile(r'("' + re.escape(key) + r'":\s*)(?:"[^"]*"|null)')
+    return pat.subn(lambda m: m.group(1) + '"' + value + '"', text)
 
 
 def main():
