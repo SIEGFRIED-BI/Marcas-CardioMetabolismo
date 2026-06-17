@@ -24,23 +24,37 @@ import openpyxl
 REPO = Path(__file__).resolve().parent.parent
 INPUTS = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs')
 
-# (line, xlsx_path, out_data_js)
-LINES = [
-    ('ATB',          INPUTS / 'ATB/2026-04/fuentes-originales/Producto-Molécula-ATC-provincia - 13 de mayo de 2026 (5).xlsx',
-                                                                                                              REPO / 'ATB/DDD/competidores-data.js'),
-    ('respiratorio', INPUTS / 'respiratorio/2026-04/fuentes-originales/Producto-Molécula-ATC-provincia - 13 de mayo de 2026 (1).xlsx',
-                                                                                                              REPO / 'respiratorio/DDD/competidores-data.js'),
-    ('OTC',          INPUTS / 'OTC/2026-04/fuentes-originales/Producto-Molécula-ATC-provincia - 12 de mayo de 2026.xlsx',
-                                                                                                              REPO / 'OTC/DDD/competidores-data.js'),
-    ('dermato',      INPUTS / 'dermato/2026-04/fuentes-originales/Producto-Molécula-ATC-provincia - 12 de mayo de 2026 (2).xlsx',
-                                                                                                              REPO / 'dermatologia/competidores-data.js'),
-    ('cardio',       INPUTS / 'cardio/2026-04/fuentes-originales/Producto-Molécula-ATC-provincia - 12 de mayo de 2026 (4).xlsx',
-                                                                                                              REPO / 'cardio/DDD/competidores-data.js'),
-    ('mujer',        INPUTS / 'linea-mujer/2026-04/fuentes-originales/Producto-Molécula-ATC-provincia - 13 de mayo de 2026.xlsx',
-                                                                                                              REPO / 'mujer/DDD/competidores-data.js'),
-    ('SNC',          INPUTS / 'PSQ/2026-04/fuentes-originales/Producto-Molécula-ATC-provincia - 13 de mayo de 2026 (3).xlsx',
-                                                                                                              REPO / 'SNC/DDD/competidores-data.js'),
+# (line, hub_subfolder, out_data_js). El xlsx regional se resuelve por glob del
+# mes (Producto-Molecula-ATC-provincia*.xlsx, el mas reciente) -> month-agnostico.
+LINE_CFG = [
+    ('ATB',          'ATB',         'ATB/DDD/competidores-data.js'),
+    ('respiratorio', 'respiratorio','respiratorio/DDD/competidores-data.js'),
+    ('OTC',          'OTC',         'OTC/DDD/competidores-data.js'),
+    ('dermato',      'dermato',     'dermatologia/competidores-data.js'),
+    ('cardio',       'cardio',      'cardio/DDD/competidores-data.js'),
+    ('mujer',        'linea-mujer', 'mujer/DDD/competidores-data.js'),
+    ('SNC',          'PSQ',         'SNC/DDD/competidores-data.js'),
 ]
+
+def resolve_regional_xlsx(hub_sub, month):
+    """Glob del Producto-Molecula-ATC-provincia*.xlsx mas reciente del mes."""
+    base = INPUTS / hub_sub / month
+    cands = []
+    for sub in ('fuentes-originales', 'ddd', ''):
+        d = base / sub if sub else base
+        if d.is_dir():
+            cands += [p for p in d.glob('Producto-Mol*provincia*.xlsx') if not p.name.startswith('~$')]
+    return max(cands, key=lambda p: p.stat().st_mtime) if cands else None
+
+def resolve_lines(month):
+    out = []
+    for line, hub, rel in LINE_CFG:
+        xlsx = resolve_regional_xlsx(hub, month)
+        if xlsx is None:
+            print(f'  [WARN] {line}: sin regional Producto-Mol*provincia en {hub}/{month} -> skip')
+            continue
+        out.append((line, xlsx, REPO / rel))
+    return out
 
 MONTH_ORDER = {'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,
                'Jul':7,'Ago':8,'Sep':9,'Oct':10,'Nov':11,'Dic':12}
@@ -234,7 +248,12 @@ def patch_html_loader(line: str, html_path: Path):
 
 
 def main():
-    print('Build Shape A competidores-data.js...\n')
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--month', default='2026-04', help='Carpeta de mes en Hub-Marcas-Inputs (YYYY-MM)')
+    a = ap.parse_args()
+    LINES = resolve_lines(a.month)
+    print(f'Build Shape A competidores-data.js (mes {a.month}, {len(LINES)} lineas)...\n')
     for line, xlsx, out in LINES:
         print(build_one(line, xlsx, out))
 
