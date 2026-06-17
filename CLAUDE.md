@@ -55,6 +55,31 @@ Si algo falla, NO usar `--no-verify`. Investigar y arreglar.
 Chequeos manuales extra: `shared/check-mercados-fuente.py` (familias que mezclan
 mercados) y `shared/bump-cache-busters.py --check`.
 
+## Cierre mensual — 1 comando
+
+Dejar las bases nuevas y correr **un** comando (Windows PowerShell **5.1**, NO pwsh 7):
+
+```
+powershell.exe -File shared\update-all.ps1 -Month AAAA-MM
+```
+
+Qué hace (en orden) y **frena antes de pushear** (revisás el `git diff` y pusheás vos):
+1. `build-all.ps1` → cardio/ATB/OTC/mujer/respiratorio (PM + DDD + venta).
+2. `sync-snc-pm.py` / `sync-dermato-pm.py --master` → SNC y derma. **Re-aplica
+   SIEMPRE** `rebuild-pgb-multidosis-snc.py` y `rebuild-brexpiprazole-ateneo-snc.py`
+   (el sync de SNC los pisaría: deja PREGABALIN completo y borra BREXPIPRAZOLE).
+3. `build-competidores-shape-a.py --month` (regional, glob por mes).
+4. `build-kpis.py` + `build-families-perf.py` + `sync-kpistrip-with-kpis-json.py`.
+5. `finalize-labels.py` → **todas** las etiquetas desde el dato real + "Datos al"
+   = fecha de hoy (última modificación). NO editar etiquetas a mano.
+6. `bump-cache-busters.py` + gates (audit/sintaxis/history).
+
+**Bases que se dejan:** PM IQVIA en `_iqvia-master/AAAA-MM/AR_PM*.xlsx`; recetas/
+venta/regionales en `fuentes-originales` de cada línea. `-SkipBuildAll` saltea el
+rebuild de las 5 (útil si solo cambió SNC/derma/recetas).
+
+**No tocar:** `window.OTC_DATA` (lo usan las páginas de competidores Shape B).
+
 ## Líneas y archivos
 
 | Línea | Path | Estructura datos |

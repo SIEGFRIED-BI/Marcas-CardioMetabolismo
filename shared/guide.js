@@ -118,7 +118,7 @@
     gSec.appendChild(gl);
     body.appendChild(gSec);
 
-    var foot = el('div', 'guide-foot', 'Cada sección indica su fuente y mes de corte. IQVIA (mercado) puede tener un corte distinto a Venta interna o Recetas.');
+    var foot = el('div', 'guide-foot', 'Actualización: el tablero se regenera cada mes desde una base IQVIA única (un solo proceso para todas las líneas). "Datos al…" = última actualización; cada sección muestra su propio corte (IQVIA, venta y recetas pueden diferir).');
 
     drawer.appendChild(head); drawer.appendChild(body); drawer.appendChild(foot);
     document.body.appendChild(overlay); document.body.appendChild(drawer);
