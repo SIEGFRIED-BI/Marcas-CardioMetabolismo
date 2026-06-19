@@ -273,6 +273,28 @@ def update_budget(budget, pairs, by_col0, years_seen, line_key):
     return updated, unmatched
 
 
+def cap_post_cutoff(budget, cutoff):
+    """Mayo cerrado: pone en None la venta real POSTERIOR al mes de corte en
+    TODAS las familias (matcheen o no). El --cutoff evita ESCRIBIR meses
+    parciales, pero un valor viejo (p.ej. un junio cargado antes) queda; esto
+    lo limpia. Asi ninguna linea muestra venta mas alla del cierre. Devuelve
+    cuantos valores limpio."""
+    cy, cm = cutoff
+    n = 0
+    for fam, yrs in budget.items():
+        if not isinstance(yrs, dict): continue
+        for yk, yobj in yrs.items():
+            if not isinstance(yobj, dict): continue
+            try: y = int(yk)
+            except (ValueError, TypeError): continue
+            real = yobj.get('real')
+            if not isinstance(real, list): continue
+            for i in range(len(real)):
+                if ((y > cy) or (y == cy and i > cm)) and real[i] not in (None, 0):
+                    real[i] = None; n += 1
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--file', default=str(DEFAULT_FILE))
@@ -313,9 +335,10 @@ def main():
                 budget = D['budget']
 
             updated, unmatched = update_budget(budget, pairs, by_col0, years_seen, line['key'])
+            capped = cap_post_cutoff(budget, cutoff) if cutoff else 0
 
             if args.dry_run:
-                print(f'  [{line["key"]}] DRY: actualizaria {updated} familias, sin match: {len(unmatched)}'.encode('ascii','replace').decode())
+                print(f'  [{line["key"]}] DRY: actualizaria {updated} familias, sin match: {len(unmatched)}, limpiaria {capped} valores post-cierre'.encode('ascii','replace').decode())
                 continue
 
             if line['kind'] == 'data.js':
@@ -323,7 +346,7 @@ def main():
             else:
                 new_text = write_inline(text, D, abs_start, abs_end)
             path.write_text(new_text, encoding='utf-8', newline='')
-            print(f'  [{line["key"]}] OK: {updated} familias actualizadas, {len(unmatched)} sin match'.encode('ascii','replace').decode())
+            print(f'  [{line["key"]}] OK: {updated} familias actualizadas, {len(unmatched)} sin match, {capped} valores post-cierre limpiados'.encode('ascii','replace').decode())
             if unmatched and len(unmatched) <= 5:
                 print(f'    sin match: {unmatched}')
         except Exception as e:
