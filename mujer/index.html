@@ -798,14 +798,20 @@ function renderBrandKpis(){
   const ieColor   = !ie?'b':ie>=100?'g':ie>=90?'y':'r';
   const ieAccent  = !ie?'var(--blue)':ie>=100?'var(--green)':ie>=90?'var(--yellow)':'var(--red)';
 
-  // ── Budget data ──
-  let budPct=null, budReal=null, budTarget=null;
+  // ── Budget data (ultimo mes con real cargado, por marca) ──
+  let budPct=null, budReal=null, budTarget=null, budMo=null;
   const budKey = pm.bud;
   if(budKey && D.budget[budKey]?.['2026']){
     const b26 = D.budget[budKey]['2026'];
-    budTarget = b26.budget?.[2] || null;
-    budReal   = b26.real?.[2] || null;
-    if(budTarget && budReal) budPct = Math.round(budReal/budTarget*100);
+    const real = b26.real||[];
+    let bi=-1;
+    for(let i=0;i<real.length;i++){ if(real[i]!=null && real[i]!==0) bi=i; }
+    if(bi>=0){
+      budTarget = b26.budget?.[bi] || null;
+      budReal   = real[bi] || null;
+      if(budTarget && budReal) budPct = Math.round(budReal/budTarget*100);
+      budMo = (D.meses[bi]||'')+"'26";
+    }
   }
   const budColor  = !budPct?'b':budPct>=100?'g':budPct>=85?'y':'r';
   const budAccent = !budPct?'var(--blue)':budPct>=100?'var(--green)':budPct>=85?'var(--yellow)':'var(--red)';
@@ -870,15 +876,15 @@ function renderBrandKpis(){
   // Budget
   if(budPct!==null){
     items.push({
-      lbl:"Estimado · Mar'26", accent:budAccent, cls:budColor,
+      lbl:"Estimado · "+(budMo||''), accent:budAccent, cls:budColor,
       num: budPct+'%',
       sub: `${fmt(budReal)} de ${fmt(budTarget)} u.`,
       sub2: budPct>=100?'✓ Objetivo alcanzado':`Δ ${fmt(budReal-budTarget)} u.`,
     });
   } else if(budKey){
     items.push({
-      lbl:"Estimado · Mar'26", accent:'var(--blue)', cls:'b',
-      num:'—', sub:'Sin dato real Apr 2026', sub2:'',
+      lbl:"Estimado · "+(budMo||(D.meta?.budget_label||'')), accent:'var(--blue)', cls:'b',
+      num:'—', sub:'Sin dato real', sub2:'',
     });
   }
 
