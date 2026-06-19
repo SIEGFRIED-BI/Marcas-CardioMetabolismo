@@ -162,7 +162,13 @@ LINES = [
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--cierre', help="Mes de cierre FIJO 'YYYY-MM' o num 1-12. Si se omite, se "
+                    "autodetecta del ultimo mes presente (comportamiento historico). Pinearlo "
+                    "evita que un mes parcial colado achique MAT/YTD.")
     args = ap.parse_args()
+    cierre_override = None
+    if args.cierre:
+        cierre_override = int(args.cierre.split('-')[1]) if '-' in args.cierre else int(args.cierre)
 
     for line, path, var in LINES:
         p = REPO / path
@@ -187,7 +193,7 @@ def main():
             for pp in v.get('products', []):
                 if isinstance(pp, dict):
                     all_months.update((pp.get('monthly_vals') or {}).keys())
-        cierre = detect_cierre_month({m: 0 for m in all_months}) or 12
+        cierre = cierre_override or detect_cierre_month({m: 0 for m in all_months}) or 12
 
         total_updated = 0
         for fam_key, fam_obj in mol.items():

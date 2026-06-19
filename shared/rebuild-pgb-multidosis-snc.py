@@ -41,6 +41,16 @@ MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
 NUM2 = {v:k for k,v in MES_INV.items()}
 MONTH_RE = re.compile(r'^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$')
 
+# Reglas PGB multidosis: fuente real shared/close-manifest.json (seg pgb_multidosis).
+# Las constantes de arriba (MULTI_BRANDS/CAPSULE_FORM/FAM_LABEL) quedan como fallback.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import manifest as _mf
+except Exception:
+    _mf = None
+def _seg(name, key, default):
+    return _mf.seg_get(name, key, default) if _mf else default
+
 
 def msort(mk):
     p = mk.split(); return int(p[1])*100 + MES_INV.get(p[0],0) if len(p)==2 else 0
@@ -128,10 +138,19 @@ def build_family(prods):
 
 
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--dry-run',action='store_true'); a=ap.parse_args()
+    ap=argparse.ArgumentParser()
+    ap.add_argument('--master', default=str(MASTER), help='AR_PM master (default=constante actual)')
+    ap.add_argument('--cierre', help='(compat orquestador; el cierre se autodetecta del master)')
+    ap.add_argument('--dry-run',action='store_true')
+    a=ap.parse_args()
     if hasattr(sys.stdout,'reconfigure'): sys.stdout.reconfigure(encoding='utf-8')
-    if not MASTER.is_file(): print('ERROR master no existe:',MASTER); return 2
-    months,prods=load_multidosis(MASTER)
+    global MULTI_BRANDS, CAPSULE_FORM, FAM_LABEL
+    MULTI_BRANDS = set(_seg('pgb_multidosis','brands', list(MULTI_BRANDS)))
+    CAPSULE_FORM = _seg('pgb_multidosis','excludeForm', CAPSULE_FORM)
+    FAM_LABEL    = _seg('pgb_multidosis','familyLabel', FAM_LABEL)
+    master = Path(a.master)
+    if not master.is_file(): print('ERROR master no existe:',master); return 2
+    months,prods=load_multidosis(master)
     fam=build_family(prods)
     last=max(fam['monthly'],key=msort)
     print(f'Multidosis (13 marcas, no-capsula): {len(months)} meses ({months[0]}..{months[-1]}), {len(fam["products"])} productos')

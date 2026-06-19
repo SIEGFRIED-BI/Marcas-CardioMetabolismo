@@ -34,6 +34,15 @@ MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
 NUM2 = {v:k for k,v in MES_INV.items()}
 MONTH_RE = re.compile(r'^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}$')
 
+# Reglas brexpiprazol: fuente real shared/close-manifest.json (seg brexpiprazole).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import manifest as _mf
+except Exception:
+    _mf = None
+def _seg(name, key, default):
+    return _mf.seg_get(name, key, default) if _mf else default
+
 
 def msort(mk):
     p = mk.split(); return int(p[1])*100 + MES_INV.get(p[0],0) if len(p)==2 else 0
@@ -117,19 +126,27 @@ def build_family(prods):
 
 
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--dry-run',action='store_true'); a=ap.parse_args()
+    ap=argparse.ArgumentParser()
+    ap.add_argument('--source', default=str(ATENEO), help='fuente Ateneo/AR_PM (default=constante actual)')
+    ap.add_argument('--cierre', help='(compat orquestador; el cierre se autodetecta de la fuente)')
+    ap.add_argument('--dry-run',action='store_true')
+    a=ap.parse_args()
     if hasattr(sys.stdout,'reconfigure'): sys.stdout.reconfigure(encoding='utf-8')
-    if not ATENEO.is_file(): print('ERROR Ateneo no existe:',ATENEO); return 2
-    months,prods=load_brexpiprazole(ATENEO)
+    global FAM_LABEL
+    FAM_LABEL = _seg('brexpiprazole','familyLabel', FAM_LABEL)
+    backfill = _seg('brexpiprazole','backfillFirstMonth','Apr 2021')
+    source = Path(a.source)
+    if not source.is_file(): print('ERROR fuente no existe:',source); return 2
+    months,prods=load_brexpiprazole(source)
 
     text=HTML.read_text(encoding='utf-8',errors='replace')
     m=re.search(r'const\s+D\s*=\s*',text); ob=text.index('{',m.end())
     D,end=json.JSONDecoder().raw_decode(text[ob:])
-    # backfill Apr 2021 de REXULTI desde la familia actual (Ateneo arranca May 2021)
+    # backfill primer mes de REXULTI desde la familia actual (Ateneo arranca despues)
     cur=D['mol_perf'].get(FAM,{})
     for p in cur.get('products',[]):
-        if p['prod'] in prods and 'Apr 2021' in p.get('monthly_vals',{}):
-            prods[p['prod']]['monthly'].setdefault('Apr 2021', p['monthly_vals']['Apr 2021'])
+        if p['prod'] in prods and backfill in p.get('monthly_vals',{}):
+            prods[p['prod']]['monthly'].setdefault(backfill, p['monthly_vals'][backfill])
 
     fam=build_family(prods)
     last=max(fam['monthly'],key=msort)
