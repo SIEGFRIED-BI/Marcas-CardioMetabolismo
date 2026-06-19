@@ -36,7 +36,8 @@ def msort(mk):
 
 
 def find_live_obj(text):
-    """Devuelve el primer objeto parseable que tenga mol_perf no vacio."""
+    """Devuelve (objeto, posicion_de_su_'{') del primer objeto parseable con
+    mol_perf no vacio. La posicion permite insertar claves en SU meta."""
     for anc in ANCHORS:
         for m in re.finditer(anc, text):
             try:
@@ -45,8 +46,8 @@ def find_live_obj(text):
             except (ValueError, json.JSONDecodeError):
                 continue
             if isinstance(obj, dict) and obj.get('mol_perf'):
-                return obj
-    return None
+                return obj, ob
+    return None, -1
 
 
 def last_iqvia(obj):
@@ -87,6 +88,22 @@ def set_label(text, key, value):
     return pat.subn(lambda m: m.group(1) + '"' + value + '"', text)
 
 
+def ensure_label(text, key, value, obj_start):
+    """Como set_label, pero si la clave NO existe la INSERTA en el meta del
+    objeto vivo (despues de "meta":{). Fix del bug: set_label solo actualizaba
+    claves existentes, asi que rec_label faltante (SNC/mujer) nunca se seteaba y
+    el render caia al label IQVIA (mes equivocado)."""
+    text2, n = set_label(text, key, value)
+    if n or obj_start < 0:
+        return text2, n
+    mm = re.search(r'"meta"\s*:\s*\{', text[obj_start:])
+    if not mm:
+        return text, 0
+    brace = obj_start + mm.end()                 # justo despues del '{' de meta
+    sep = '' if text[brace:].lstrip().startswith('}') else ','
+    return text[:brace] + f'"{key}":"{value}"' + sep + text[brace:], 1
+
+
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--date'); a = ap.parse_args()
     if hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(encoding='utf-8')
@@ -98,8 +115,9 @@ def main():
         p = REPO / rel
         if not p.is_file(): print('  (skip)', rel); continue
         text = p.read_text(encoding='utf-8', errors='replace'); orig = text
-        obj = find_live_obj(text)
+        obj, obj_start = find_live_obj(text)
         labels = {'footer_date': today}
+        new_im = None
         if obj:
             iq = last_iqvia(obj)
             if iq:
@@ -108,14 +126,26 @@ def main():
                 labels['kpi_ytd_prev_label'] = f"YTD {ES[mm]}'{yy-1}"
                 labels['kpi_mat_label'] = f"MAT {ES[mm]}'{yy}"
                 labels['kpi_mat_prev_label'] = f"MAT {ES[mm]}'{yy-1}"
+                # iqviaMeta (solo mujer): objeto anidado con el corte IQVIA.
+                # Sus cards LEEN datos por latestKey -> si queda viejo, muestran
+                # el mes anterior aunque mol_perf este al dia. Regenerar completo.
+                if obj.get('iqviaMeta') is not None:
+                    en = {v: k for k, v in MES_INV.items()}
+                    new_im = {'latestYear': yy, 'latestMonth': mm,
+                              'latestKey': f'{en[mm]} {yy}', 'prevKey': f'{en[mm]} {yy-1}',
+                              'latestShort': f"{ES[mm]}'{str(yy)[2:]}", 'prevShort': f"{ES[mm]}'{str(yy-1)[2:]}"}
             bu = last_budget(obj)
             if bu: labels['budget_label'] = f"{ES[bu[0]]}'{str(bu[1])[2:]}"
             rc = last_recetas(obj)
             if rc: labels['rec_label'] = f"{ES[rc[0]]}'{str(rc[1])[2:]}"
         changed = []
         for key, val in labels.items():
-            text, n = set_label(text, key, val)
+            text, n = ensure_label(text, key, val, obj_start)
             if n: changed.append(f'{key}={val}({n})')
+        if new_im:
+            text, n = re.subn(r'"iqviaMeta"\s*:\s*\{[^{}]*\}',
+                              '"iqviaMeta":' + json.dumps(new_im, ensure_ascii=False), text)
+            if n: changed.append(f'iqviaMeta={new_im["latestKey"]}({n})')
         if has_footer:
             text, n = re.subn(r'(Datos al )\d{2}/\d{2}/\d{4}', r'\g<1>' + today, text)
             if n: changed.append(f'footer-text({n})')
