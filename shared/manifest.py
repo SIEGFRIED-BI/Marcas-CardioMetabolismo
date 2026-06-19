@@ -105,6 +105,20 @@ def segmentation(name):
     return _g('segmentations', name)
 
 
+def seg_get(name, key, default=None):
+    """Devuelve segmentations[name][key] del manifiesto, o `default` si falta o si
+    algo falla (nunca lanza). Patron para que los scripts lean la regla del manifiesto
+    con su constante actual como fallback -> single-source sin romper si el manifiesto
+    no esta. La fuente real de la regla es shared/close-manifest.json."""
+    try:
+        s = segmentation(name)
+        if isinstance(s, dict) and key in s:
+            return s[key]
+    except Exception:
+        pass
+    return default
+
+
 def line(name):
     return _g('lines', name)
 

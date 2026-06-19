@@ -23,6 +23,19 @@ import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / 'OTC' / 'data.js'
+
+# Reglas MAGNUS: fuente real shared/close-manifest.json (seg magnus_split).
+# Los defaults son la red de seguridad si el manifiesto no esta/falla.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import manifest as _mf
+except Exception:
+    _mf = None
+def _seg(name, key, default):
+    return _mf.seg_get(name, key, default) if _mf else default
+KEY_BASE    = _seg('magnus_split', 'keyBase', 'MAGNUS')
+KEY_TADA    = _seg('magnus_split', 'keyTada', 'MAGNUS 36')
+PRES_MARKER = _seg('magnus_split', 'presentacionMarker', 'MAGNUS 36')
 DEFAULT_FILE = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\Planilla de Ventas - 2 de junio de 2026.xlsx')
 
 MES_ES = {'ene':0,'feb':1,'mar':2,'abr':3,'may':4,'jun':5,
@@ -48,9 +61,9 @@ def parse_magnus(path, cutoff=None):
     sin36 = defaultdict(int); con36 = defaultdict(int)
     for row in ws.iter_rows(min_row=2, values_only=True):
         if not row or not row[0]: continue
-        if str(row[0]).strip() != 'MAGNUS': continue
+        if str(row[0]).strip() != KEY_BASE: continue
         pres = str(row[3]).strip() if len(row) > 3 and row[3] else ''
-        tgt = con36 if 'MAGNUS 36' in pres.upper() else sin36
+        tgt = con36 if PRES_MARKER.upper() in pres.upper() else sin36
         for ci, ym in col_to_ym.items():
             if ci >= len(row): continue
             v = row[ci]
@@ -108,8 +121,8 @@ def main():
 
     # MAGNUS = sin36 (reemplaza el combinado en los meses de la planilla);
     # los meses fuera de la planilla quedan con su valor historico.
-    write_key('MAGNUS', sin36)
-    write_key('MAGNUS 36', con36)
+    write_key(KEY_BASE, sin36)
+    write_key(KEY_TADA, con36)
 
     if args.dry_run:
         print('DRY RUN: no se escribio.'); return 0

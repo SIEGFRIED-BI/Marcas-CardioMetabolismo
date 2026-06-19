@@ -23,8 +23,22 @@ REPO = Path(__file__).resolve().parent.parent
 DATA = REPO / 'OTC' / 'data.js'
 
 MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}
-TADA_KW = ['CIALIS','DROTAQ','EQUITONE','INVICTUS','JAST','LEVAL','MOMENTUM','PERDURAL',
+_TADA_KW_FALLBACK = ['CIALIS','DROTAQ','EQUITONE','INVICTUS','JAST','LEVAL','MOMENTUM','PERDURAL',
            'PLACET','QUARTIER','TADALAFILO','TADAL','TALIS','ROSPOWER','H36']
+_TADA_EXTRA_FALLBACK = ['VIRIPOTENS MAX','VIRILON']
+
+# Reglas tadalafil: fuente real shared/close-manifest.json (seg magnus_split).
+# Los _FALLBACK de arriba son la red de seguridad si el manifiesto no esta/falla.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import manifest as _mf
+except Exception:
+    _mf = None
+def _seg(name, key, default):
+    return _mf.seg_get(name, key, default) if _mf else default
+TADA_KW    = _seg('magnus_split', 'tadalafilKeywords', _TADA_KW_FALLBACK)
+TADA_EXTRA = _seg('magnus_split', 'tadalafilExtra', _TADA_EXTRA_FALLBACK)
+MARKER36   = _seg('magnus_split', 'marker36', '36')
 
 
 def norm(b):
@@ -35,8 +49,8 @@ def norm(b):
 def is_tada(brand):
     """True = tadalafil (MAGNUS 36); False = sildenafil (MAGNUS)."""
     s = norm(brand)
-    if '36' in s: return True
-    if 'VIRIPOTENS MAX' in s or 'VIRILON' in s: return True
+    if MARKER36 in s: return True
+    if any(e in s for e in TADA_EXTRA): return True
     toks = ' ' + s + ' '
     for kw in TADA_KW:
         if s.startswith(kw) or (' ' + kw + ' ') in toks or s == kw:

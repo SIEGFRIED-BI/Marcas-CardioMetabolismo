@@ -50,7 +50,7 @@ LINES = [
 
 # Mapeo de segmento (mujer inline D) -> familia(s) del Excel
 # El budget de mujer inline D suma todos los brands del segmento.
-MUJER_SEGMENT_TO_FAMS = {
+_MUJER_SEGMENT_TO_FAMS_FALLBACK = {
     'SIN ESTROGENO':   ['ISIS FREE'],
     'ALTA DOSIS':      ['ISIS'],
     'BAJA DOSIS 21+7': ['ISIS MINI'],
@@ -77,9 +77,21 @@ MUJER_SEGMENT_TO_FAMS = {
 
 # Aliases: budget keys cuyo nombre difiere de la 'Familia' en la planilla.
 # Formato: { budget_key_en_data : nombre_familia_en_planilla }
-KEY_ALIASES = {
+_KEY_ALIASES_FALLBACK = {
     'HEXALER BRONQUIAL DU': 'HEXALER BRONQUIAL DUO',   # a la key le falta la 'O'
 }
+
+# Fuente real de estas reglas: shared/close-manifest.json (seg mujer_venta_segments).
+# Los _FALLBACK de arriba son la red de seguridad si el manifiesto no esta/falla.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    import manifest as _mf
+except Exception:
+    _mf = None
+def _seg(name, key, default):
+    return _mf.seg_get(name, key, default) if _mf else default
+MUJER_SEGMENT_TO_FAMS = _seg('mujer_venta_segments', 'segmentToFams', _MUJER_SEGMENT_TO_FAMS_FALLBACK)
+KEY_ALIASES         = _seg('mujer_venta_segments', 'keyAliases',   _KEY_ALIASES_FALLBACK)
 
 
 def parse_xlsx(path, cutoff=None):
