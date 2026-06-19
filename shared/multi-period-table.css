@@ -208,6 +208,18 @@
 .mp-table tbody tr.mp-comp-total:hover td { background: #e5eaf0; }
 .mp-total-count { color: #6b7280; font-weight: 600; font-size: 8.5px; }
 
+/* Competidor excluido (destildado): se oculta de la lista. El toggle de la fila
+   Total puede revelarlos atenuados para volver a tildarlos. */
+.mp-table tbody tr.mp-comp-off { display: none; }
+.mp-table tbody tr.mp-comp-off.mp-reveal { display: table-row; opacity: .45; }
+.mp-table tbody tr.mp-comp-off.mp-reveal td { background: #fcfcfd; font-style: italic; }
+.mp-reveal-toggle {
+  margin-left: 8px; font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 8.5px; font-weight: 600; color: #2563eb;
+  text-decoration: underline; cursor: pointer;
+}
+.mp-reveal-toggle:hover { color: #1d4ed8; }
+
 /* Breakpoints: progressively more compact */
 @media (max-width: 1280px) {
   .mp-table { font-size: 10px; }

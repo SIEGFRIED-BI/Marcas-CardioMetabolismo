@@ -512,14 +512,26 @@
       + '</table>'
       + '</div>';
 
+    // Primera celda de la fila Total: contador + toggle para mostrar/ocultar
+    // los competidores excluidos (los destildados se ocultan de la lista).
+    function totalFirstCell(selSize, n, revealMode) {
+      var hidden = n - selSize;
+      var html = 'Σ Total seleccionados <span class="mp-total-count">(' + selSize + '/' + n + ')</span>';
+      if (hidden > 0) {
+        html += ' <a href="javascript:void(0)" class="mp-reveal-toggle" title="Mostrar/ocultar los competidores excluidos para volver a incluirlos">'
+              + (revealMode ? 'ocultar ' + hidden + ' excluido' + (hidden > 1 ? 's' : '')
+                            : '+' + hidden + ' excluido' + (hidden > 1 ? 's' : '') + ' (mostrar)')
+              + '</a>';
+      }
+      return '<td class="mp-fam mp-comp-fam mp-total-fam" title="Total de los competidores tildados; el MS%/IE del SIE se recalcula contra ese universo">' + html + '</td>';
+    }
+
     // Fila "Total seleccionados" para una familia dado un set de indices tildados.
     function totalRowHtml(family, idx, sel) {
       var tot = computeSelectedTotal(family, sel);
       var n = (family.competitors || []).length;
       return '<tr class="mp-comp-row mp-comp-total" data-total-for="' + idx + '">'
-        + '<td class="mp-fam mp-comp-fam mp-total-fam" title="Total de los competidores tildados; el MS%/IE del SIE se recalcula contra ese universo">'
-          + 'Σ Total seleccionados <span class="mp-total-count">(' + sel.size + '/' + n + ')</span>'
-        + '</td>'
+        + totalFirstCell(sel.size, n, false)
         + periodCells(tot.mat,       false, false)
         + periodCells(tot.ytd,       false, false)
         + periodCells(tot.mes,       false, false)
@@ -552,28 +564,50 @@
       return rowsHtml + totalRowHtml(family, idx, all);
     }
 
-    // Recalcula la fila "Total seleccionados" segun los checkboxes tildados.
-    function recomputeTotal(famTr) {
+    // Aplica la seleccion: oculta de la lista los competidores destildados
+    // (clase mp-comp-off), recalcula la fila Total contra los tildados, y
+    // re-renderiza el toggle "mostrar/ocultar excluidos". Si el modo "revelar"
+    // esta activo, los excluidos se muestran atenuados para poder re-tildarlos.
+    function applySelection(famTr) {
       var idx = parseInt(famTr.getAttribute('data-fam-idx'), 10);
       var family = data.families[idx];
       if (!family) return;
-      var sel = new Set(), totalRow = null;
+      var revealMode = famTr.getAttribute('data-reveal') === '1';
+      var sel = new Set(), totalRow = null, n = 0;
       var node = famTr.nextElementSibling;
       while (node && node.classList.contains('mp-comp-row')) {
         if (node.classList.contains('mp-comp-total')) {
           totalRow = node;
         } else {
+          n++;
           var chk = node.querySelector('.mp-comp-chk');
-          if (chk && chk.checked) sel.add(parseInt(chk.getAttribute('data-comp-idx'), 10));
+          if (chk && chk.checked) {
+            sel.add(parseInt(chk.getAttribute('data-comp-idx'), 10));
+            node.classList.remove('mp-comp-off', 'mp-reveal');
+          } else {
+            node.classList.add('mp-comp-off');
+            if (revealMode) node.classList.add('mp-reveal');
+            else node.classList.remove('mp-reveal');
+          }
         }
         node = node.nextElementSibling;
       }
-      if (totalRow) {
-        var tmp = document.createElement('tbody');
-        tmp.innerHTML = totalRowHtml(family, idx, sel);
-        var tr = tmp.querySelector('tr');
-        if (tr) totalRow.innerHTML = tr.innerHTML;
-      }
+      if (!totalRow) return;
+      var tot = computeSelectedTotal(family, sel);
+      var tmp = document.createElement('tbody');
+      tmp.innerHTML = '<tr>' + totalFirstCell(sel.size, n, revealMode)
+        + periodCells(tot.mat,       false, false)
+        + periodCells(tot.ytd,       false, false)
+        + periodCells(tot.mes,       false, false)
+        + periodCells(tot.trimestre, true,  false) + '</tr>';
+      var tr = tmp.querySelector('tr');
+      if (tr) totalRow.innerHTML = tr.innerHTML;
+      var tg = totalRow.querySelector('.mp-reveal-toggle');
+      if (tg) tg.addEventListener('click', function(e){
+        e.stopPropagation();
+        famTr.setAttribute('data-reveal', revealMode ? '0' : '1');
+        applySelection(famTr);
+      });
     }
 
     function toggleExpand(famTr) {
@@ -596,15 +630,16 @@
       } else {
         famTr.insertAdjacentHTML('afterend', buildCompRows(family, idx));
         famTr.classList.add('mp-expanded');
+        famTr.setAttribute('data-reveal', '0');
         var caret2 = famTr.querySelector('.mp-caret');
         if (caret2) caret2.textContent = '▼';
-        // Conectar los checkboxes -> recalcular Total (sin colapsar la fila)
+        // Conectar los checkboxes -> ocultar/recalcular (sin colapsar la fila)
         var node = famTr.nextElementSibling;
         while (node && node.classList.contains('mp-comp-row')) {
           var chk = node.querySelector('.mp-comp-chk');
           if (chk) {
             chk.addEventListener('click', function(e){ e.stopPropagation(); });
-            chk.addEventListener('change', function(){ recomputeTotal(famTr); });
+            chk.addEventListener('change', function(){ applySelection(famTr); });
           }
           node = node.nextElementSibling;
         }
