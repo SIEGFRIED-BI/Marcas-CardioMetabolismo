@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "_docs": "Fuente UNICA de configuracion del cierre mensual. La unica perilla normal es global.closeMonth (corte real de datos IQVIA/venta). cycleFolder = nombre de carpeta legacy donde hoy viven los inputs (puede diferir de closeMonth). Las rutas con ${OneDrive} se expanden con la env var. Los scripts leen segmentaciones de aca (antes duplicadas). Ver shared/manifest.py.",
+
+  "global": {
+    "closeMonth": "2026-05",
+    "closeYear": 2026,
+    "cycleFolder": "2026-04",
+    "hubRoot": "${OneDrive}\\Documentos\\Hub-Marcas-Inputs",
+    "inboxSubfolder": "_inbox",
+    "footerDateMode": "today"
+  },
+
+  "sources": {
+    "iqvia_master": {
+      "glob": "AR_PM*.xlsx",
+      "kind": "iqvia-pm",
+      "consumedBy": ["cardio", "ATB", "OTC", "respiratorio", "mujer", "SNC", "dermato"],
+      "cutPolicy": "iqvia-native",
+      "sliceFor": ["mujer"],
+      "legacyDir": "_iqvia-master\\{cycleFolder}"
+    },
+    "venta_interna": {
+      "glob": "Planilla de Ventas*.xlsx",
+      "kind": "venta-sap",
+      "consumedBy": ["cardio", "ATB", "OTC", "respiratorio", "mujer", "SNC", "dermato"],
+      "cutPolicy": "cutoff-close",
+      "legacyDir": ""
+    },
+    "ateneo_mat": {
+      "glob": "AR_PM*.xlsx",
+      "kind": "iqvia-ateneo",
+      "consumedBy": ["SNC"],
+      "cutPolicy": "iqvia-native",
+      "legacyDir": "_iqvia-master\\{cycleFolder}"
+    }
+  },
+
+  "lines": {
+    "cardio": {
+      "structure": "data.js", "file": "cardio\\data.js", "anchor": "window.OTC_DASHBOARD",
+      "buildScript": "cardio\\build-data.ps1", "syncScript": null,
+      "hubFolder": "cardio", "fuentesSub": "fuentes-originales",
+      "useCentralIqvia": true, "useSlicedIqvia": false, "overrideBaseDir": null,
+      "segmentations": []
+    },
+    "ATB": {
+      "structure": "data.js", "file": "ATB\\data.js", "anchor": "window.OTC_DASHBOARD",
+      "buildScript": "ATB\\build-data.ps1", "syncScript": null,
+      "hubFolder": "ATB", "fuentesSub": "fuentes-originales",
+      "useCentralIqvia": true, "useSlicedIqvia": false, "overrideBaseDir": null,
+      "segmentations": []
+    },
+    "OTC": {
+      "structure": "data.js", "file": "OTC\\data.js", "anchor": "window.OTC_DASHBOARD",
+      "buildScript": "OTC\\build-data.ps1", "syncScript": null,
+      "hubFolder": "OTC", "fuentesSub": "fuentes-originales",
+      "useCentralIqvia": true, "useSlicedIqvia": false,
+      "overrideBaseDir": "${OneDrive}\\Documentos\\Actualizaciones-Marcas",
+      "segmentations": ["magnus_split"]
+    },
+    "respiratorio": {
+      "structure": "data.js", "file": "respiratorio\\data.js", "anchor": "window.OTC_DASHBOARD",
+      "buildScript": "respiratorio\\build-data.ps1", "syncScript": null,
+      "hubFolder": "respiratorio", "fuentesSub": "",
+      "useCentralIqvia": true, "useSlicedIqvia": false, "overrideBaseDir": null,
+      "segmentations": []
+    },
+    "mujer": {
+      "structure": "inline", "file": "mujer\\index.html", "anchor": "const D",
+      "buildScript": "mujer\\build-data.ps1", "syncScript": "shared\\sync-mujer-pm.py",
+      "hubFolder": "linea-mujer", "fuentesSub": "fuentes-originales",
+      "useCentralIqvia": true, "useSlicedIqvia": true, "overrideBaseDir": null,
+      "segmentations": ["mujer_venta_segments", "mujer_trip"]
+    },
+    "SNC": {
+      "structure": "inline", "file": "SNC\\index.html", "anchor": "const D",
+      "buildScript": null, "syncScript": "shared\\sync-snc-pm.py",
+      "hubFolder": null, "fuentesSub": null,
+      "useCentralIqvia": true, "useSlicedIqvia": false, "overrideBaseDir": null,
+      "segmentations": ["pgb_multidosis", "brexpiprazole"]
+    },
+    "dermato": {
+      "structure": "inline", "file": "dermatologia\\dermato_dashboard.html", "anchor": "const D",
+      "buildScript": null, "syncScript": "shared\\sync-dermato-pm.py",
+      "hubFolder": null, "fuentesSub": null,
+      "useCentralIqvia": true, "useSlicedIqvia": false, "overrideBaseDir": null,
+      "segmentations": []
+    }
+  },
+
+  "segmentations": {
+    "magnus_split": {
+      "line": "OTC",
+      "appliesTo": ["venta", "iqvia", "recetas"],
+      "keyBase": "MAGNUS",
+      "keyTada": "MAGNUS 36",
+      "marker36": "36",
+      "presentacionMarker": "MAGNUS 36",
+      "tadalafilKeywords": ["CIALIS", "DROTAQ", "EQUITONE", "INVICTUS", "JAST", "LEVAL",
+        "MOMENTUM", "PERDURAL", "PLACET", "QUARTIER", "TADALAFILO", "TADAL", "TALIS",
+        "ROSPOWER", "H36"],
+      "tadalafilExtra": ["VIRIPOTENS MAX", "VIRILON"]
+    },
+    "pgb_multidosis": {
+      "line": "SNC",
+      "family": "PREGABALIN",
+      "familyLabel": "Pregabalina Multidosis",
+      "source": "iqvia_master",
+      "excludeForm": "ACA",
+      "brands": ["AXUAL", "DOLONEUTIN", "GAVIN", "KABIAN", "LINPREL", "LUNEL", "NEURISTAN",
+        "PGB", "PLENICA", "PREBICTAL", "PREBIEN", "PRINCIPIA", "SERIPRAN"]
+    },
+    "brexpiprazole": {
+      "line": "SNC",
+      "family": "BREXPIPRAZOLE",
+      "familyLabel": "Brexpiprazol",
+      "source": "ateneo_mat",
+      "backfillFirstMonth": "Apr 2021",
+      "brands": ["REXULTI", "BREMIDAN", "LAPLEX", "BREXIL"]
+    },
+    "mujer_venta_segments": {
+      "line": "mujer",
+      "matchBy": "familia-col1",
+      "segmentToFams": {
+        "SIN ESTROGENO": ["ISIS FREE"],
+        "ALTA DOSIS": ["ISIS"],
+        "BAJA DOSIS 21+7": ["ISIS MINI"],
+        "BAJA DOSIS 24": ["ISIS MINI 24"],
+        "COMPLEX": ["SIDERBLUT COMPLEX", "SIDERBLUT FOLIC"],
+        "SOLO": ["SIDERBLUT", "SIDERBLUT POLI", "FERINSOL"],
+        "D3": [],
+        "D3 PLUS": [],
+        "45": [],
+        "MAGNESIO": [],
+        "DELTROX": ["DELTROX"],
+        "BASE": ["CALCIO BASE DUPOMAR"],
+        "BASE D": ["CALCIO BASE DUPOMAR D", "CALCIO BASE DUPOMAR D3", "CALCIO CITRATO DUPOMAR D3"],
+        "CLIMATIX": ["CLIMATIX"]
+      },
+      "keyAliases": { "HEXALER BRONQUIAL DU": "HEXALER BRONQUIAL DUO" }
+    },
+    "mujer_trip": {
+      "line": "mujer",
+      "splitBy": "presentacion",
+      "fixScript": "shared\\fix-mujer-trip-venta.py",
+      "note": "TRIP D3/D3 PLUS/45/MAGNESIO comparten Familia='TRIP'; se separan por Presentacion (col3). El merge las saltea ([] arriba) y este corrector las arma."
+    }
+  }
+}
