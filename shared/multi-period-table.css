@@ -175,6 +175,39 @@
 .mp-table .mp-arrow.up { color: #15803d; }
 .mp-table .mp-arrow.down { color: #b01e1e; }
 
+/* Toolbar + boton de exportacion a Excel */
+.mp-toolbar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px; }
+.mp-export-btn {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px; font-weight: 700; letter-spacing: .03em;
+  color: #15803d; background: #fff;
+  border: 1px solid #15803d; border-radius: 6px;
+  padding: 5px 12px; cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.mp-export-btn:hover { background: #15803d; color: #fff; }
+.mp-export-btn:focus { outline: 2px solid #15803d; outline-offset: 2px; }
+
+/* Checkbox por competidor (selector de "quienes compiten") */
+.mp-comp-chk {
+  margin-right: 6px; vertical-align: middle; cursor: pointer;
+  width: 12px; height: 12px; accent-color: #b01e1e;
+}
+
+/* Fila Total seleccionados */
+.mp-table tbody tr.mp-comp-total td {
+  background: #eef2f7;
+  font-weight: 700;
+  border-top: 1px solid #cbd5e1;
+  border-bottom: 1px solid #cbd5e1;
+}
+.mp-table tbody tr.mp-comp-total td.mp-total-fam {
+  font-family: 'IBM Plex Sans', sans-serif;
+  color: #1f2937; background: #e5eaf0; padding-left: 12px;
+}
+.mp-table tbody tr.mp-comp-total:hover td { background: #e5eaf0; }
+.mp-total-count { color: #6b7280; font-weight: 600; font-size: 8.5px; }
+
 /* Breakpoints: progressively more compact */
 @media (max-width: 1280px) {
   .mp-table { font-size: 10px; }

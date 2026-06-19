@@ -107,6 +107,90 @@
     return { y: Math.floor(latest/100), m: latest%100 };
   }
 
+  // ── Total seleccionados: recalcula el universo competitivo con SOLO los
+  //    competidores tildados. Reusa los sub-totales por periodo ya computados
+  //    de cada competidor (periods[pk].market_curr = sus propias unidades).
+  //    El SIE (is_sie) se mide contra ese mercado reducido. ──
+  function computeSelectedTotal(family, sel) {
+    var out = {};
+    ['mat','ytd','mes','trimestre'].forEach(function(pk){
+      var selCurr = 0, selPrev = 0, sieCurr = 0, siePrev = 0;
+      (family.competitors || []).forEach(function(c, i){
+        if (!sel.has(i)) return;
+        var p = c.periods[pk] || {};
+        selCurr += p.market_curr || 0; selPrev += p.market_prev || 0;
+        if (c.is_sie) { sieCurr += p.market_curr || 0; siePrev += p.market_prev || 0; }
+      });
+      var ms_curr = selCurr > 0 ? +(sieCurr / selCurr * 100).toFixed(1) : null;
+      var ms_prev = selPrev > 0 ? +(siePrev / selPrev * 100).toFixed(1) : null;
+      var ie = null;
+      if (siePrev > 0 && selCurr > 0 && selPrev > 0) {
+        var sg = sieCurr / siePrev, mg = selCurr / selPrev;
+        if (sg < 5 && mg > 0.2 && mg < 5) ie = Math.round(sg / mg * 100);  // mismos caps que computeFamily
+      }
+      var var_pp = (ms_curr != null && ms_prev != null) ? +(ms_curr - ms_prev).toFixed(2) : null;
+      out[pk] = { market_curr: Math.round(selCurr), market_prev: Math.round(selPrev),
+                  sie_curr: Math.round(sieCurr), sie_prev: Math.round(siePrev),
+                  ms_curr: ms_curr, ms_prev: ms_prev, ie: ie, var_pp: var_pp };
+    });
+    return out;
+  }
+
+  // ── Carga xlsx-js-style (mismo CDN que usan los demas exports). Reutiliza
+  //    window.XLSX si ya esta, o el loader de SfExportCommon. Self-contained:
+  //    no depende de que export-common.js este incluido en la pagina. ──
+  function loadXlsx() {
+    if (global.XLSX) return Promise.resolve(global.XLSX);
+    if (global.SfExportCommon && typeof global.SfExportCommon.ensureStyledXlsx === 'function') {
+      return global.SfExportCommon.ensureStyledXlsx();
+    }
+    if (global.__sfStyledXlsxReady) return global.__sfStyledXlsxReady;
+    global.__sfStyledXlsxReady = new Promise(function(resolve, reject){
+      if (typeof document === 'undefined') { reject(new Error('Sin document')); return; }
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+      s.onload = function(){ global.XLSX ? resolve(global.XLSX) : reject(new Error('XLSX no disponible')); };
+      s.onerror = function(){ reject(new Error('No se pudo cargar la libreria Excel (CDN)')); };
+      document.head.appendChild(s);
+    });
+    return global.__sfStyledXlsxReady;
+  }
+
+  // ── Exporta la tabla (mercados + competidores) a .xlsx. Numeros crudos
+  //    (sin formato K/M) para que sean usables en Excel. ──
+  function exportXlsx(data, opts, btn) {
+    var sourceLabel = (opts && opts.source === 'recetas') ? 'Recetas' : 'Mercado IQVIA';
+    var prev = btn ? btn.textContent : '';
+    if (btn) { btn.textContent = 'Generando…'; btn.style.pointerEvents = 'none'; btn.style.opacity = '0.7'; }
+    function famLbl(f){ return (typeof window !== 'undefined' && window.FAM_LABEL && window.FAM_LABEL[f]) || f; }
+    return loadXlsx().then(function(XLSX){
+      var periods = [['mat','MAT'],['ytd','YTD'],['mes','MES'],['trimestre','TRIM']];
+      var header = ['Mercado','Detalle'];
+      periods.forEach(function(p){ header.push(p[1]+' U Ant', p[1]+' U Act', p[1]+' MS% Ant', p[1]+' MS% Act', p[1]+' IE', p[1]+' Var pp'); });
+      var aoa = [header];
+      (data.families || []).forEach(function(f){
+        var r = [famLbl(f.family), 'Mercado (SIE)'];
+        periods.forEach(function(p){ var pp = f.periods[p[0]] || {}; r.push(pp.sie_prev, pp.sie_curr, pp.ms_prev, pp.ms_curr, pp.ie, pp.var_pp); });
+        aoa.push(r);
+        (f.competitors || []).forEach(function(c){
+          var rc = [famLbl(f.family), c.brand + (c.is_sie ? ' (SIE)' : '')];
+          periods.forEach(function(p){ var pp = c.periods[p[0]] || {}; rc.push(pp.market_prev, pp.market_curr, pp.ms_prev, pp.ms_curr, pp.ie, pp.var_pp); });
+          aoa.push(rc);
+        });
+      });
+      var ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols'] = header.map(function(h, i){ return { wch: i === 0 ? 22 : (i === 1 ? 26 : 9) }; });
+      var wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, sourceLabel.slice(0, 31));
+      var corte = (data.latest && data.latest.label) ? data.latest.label.replace(/\s+/g,'-') : '';
+      XLSX.writeFile(wb, sourceLabel.replace(/\s+/g,'-') + '_' + corte + '.xlsx');
+    }).catch(function(err){
+      try { alert('No se pudo generar el Excel: ' + (err && err.message || err)); } catch(e){}
+    }).then(function(){
+      if (btn) { btn.textContent = prev; btn.style.pointerEvents = 'auto'; btn.style.opacity = '1'; }
+    });
+  }
+
   function computeFamily(marketMonthly, sieMonthly, windowKeys) {
     var market_curr = sumWindow(marketMonthly, windowKeys.curr);
     var market_prev = sumWindow(marketMonthly, windowKeys.prev);
@@ -395,6 +479,9 @@
     }).join('');
 
     container.innerHTML = ''
+      + '<div class="mp-toolbar">'
+      +   '<button type="button" class="mp-export-btn" title="Descargar esta tabla en Excel (.xlsx)">↓ Exportar Excel</button>'
+      + '</div>'
       + '<div class="mp-wrap">'
       + '<table class="mp-table">'
       + '<colgroup>'
@@ -425,14 +512,30 @@
       + '</table>'
       + '</div>';
 
-    // Wire up expand/collapse on family rows
-    function buildCompRows(family) {
+    // Fila "Total seleccionados" para una familia dado un set de indices tildados.
+    function totalRowHtml(family, idx, sel) {
+      var tot = computeSelectedTotal(family, sel);
+      var n = (family.competitors || []).length;
+      return '<tr class="mp-comp-row mp-comp-total" data-total-for="' + idx + '">'
+        + '<td class="mp-fam mp-comp-fam mp-total-fam" title="Total de los competidores tildados; el MS%/IE del SIE se recalcula contra ese universo">'
+          + 'Σ Total seleccionados <span class="mp-total-count">(' + sel.size + '/' + n + ')</span>'
+        + '</td>'
+        + periodCells(tot.mat,       false, false)
+        + periodCells(tot.ytd,       false, false)
+        + periodCells(tot.mes,       false, false)
+        + periodCells(tot.trimestre, true,  false)
+        + '</tr>';
+    }
+
+    // Filas de competidores (con checkbox) + fila de Total seleccionados.
+    function buildCompRows(family, idx) {
       var comps = family.competitors || [];
-      return comps.map(function(c, i){
+      var rowsHtml = comps.map(function(c, i){
         var sieCls = c.is_sie ? ' mp-comp-sie' : '';
         var rank = '#' + (i + 1);
         return '<tr class="mp-comp-row' + sieCls + '">'
           + '<td class="mp-fam mp-comp-fam" title="' + escapeHtml(c.brand) + '">'
+            + '<input type="checkbox" class="mp-comp-chk" data-comp-idx="' + i + '" checked title="Incluir en el total y en el mercado recalculado">'
             + '<span class="mp-comp-indent"></span>'
             + '<span class="mp-rank">' + rank + '</span>'
             + escapeHtml(c.brand)
@@ -444,6 +547,33 @@
           + periodCells(c.periods.trimestre, true)
           + '</tr>';
       }).join('');
+      var all = new Set();
+      for (var i = 0; i < comps.length; i++) all.add(i);
+      return rowsHtml + totalRowHtml(family, idx, all);
+    }
+
+    // Recalcula la fila "Total seleccionados" segun los checkboxes tildados.
+    function recomputeTotal(famTr) {
+      var idx = parseInt(famTr.getAttribute('data-fam-idx'), 10);
+      var family = data.families[idx];
+      if (!family) return;
+      var sel = new Set(), totalRow = null;
+      var node = famTr.nextElementSibling;
+      while (node && node.classList.contains('mp-comp-row')) {
+        if (node.classList.contains('mp-comp-total')) {
+          totalRow = node;
+        } else {
+          var chk = node.querySelector('.mp-comp-chk');
+          if (chk && chk.checked) sel.add(parseInt(chk.getAttribute('data-comp-idx'), 10));
+        }
+        node = node.nextElementSibling;
+      }
+      if (totalRow) {
+        var tmp = document.createElement('tbody');
+        tmp.innerHTML = totalRowHtml(family, idx, sel);
+        var tr = tmp.querySelector('tr');
+        if (tr) totalRow.innerHTML = tr.innerHTML;
+      }
     }
 
     function toggleExpand(famTr) {
@@ -453,7 +583,7 @@
       if (!family || !family.competitors || !family.competitors.length) return;
       var expanded = famTr.classList.contains('mp-expanded');
       if (expanded) {
-        // Remove competitor rows that follow
+        // Remove competitor + total rows that follow
         var next = famTr.nextElementSibling;
         while (next && next.classList.contains('mp-comp-row')) {
           var toRemove = next;
@@ -464,10 +594,20 @@
         var caret = famTr.querySelector('.mp-caret');
         if (caret) caret.textContent = '▶';
       } else {
-        famTr.insertAdjacentHTML('afterend', buildCompRows(family));
+        famTr.insertAdjacentHTML('afterend', buildCompRows(family, idx));
         famTr.classList.add('mp-expanded');
         var caret2 = famTr.querySelector('.mp-caret');
         if (caret2) caret2.textContent = '▼';
+        // Conectar los checkboxes -> recalcular Total (sin colapsar la fila)
+        var node = famTr.nextElementSibling;
+        while (node && node.classList.contains('mp-comp-row')) {
+          var chk = node.querySelector('.mp-comp-chk');
+          if (chk) {
+            chk.addEventListener('click', function(e){ e.stopPropagation(); });
+            chk.addEventListener('change', function(){ recomputeTotal(famTr); });
+          }
+          node = node.nextElementSibling;
+        }
       }
     }
 
@@ -477,6 +617,10 @@
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(tr); }
       });
     });
+
+    // Boton de exportacion a Excel (.xlsx) de esta tabla.
+    var expBtn = container.querySelector('.mp-export-btn');
+    if (expBtn) expBtn.addEventListener('click', function(){ exportXlsx(data, opts, expBtn); });
   }
 
   function renderMultiPeriodTable(containerId, opts) {
