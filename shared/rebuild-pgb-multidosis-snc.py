@@ -25,7 +25,7 @@ import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
 HTML = REPO / 'SNC' / 'index.html'
-MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\AR_PM_FV_Standard_Jun-10-2026.xlsx')
+MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\AR_PM_FV_Standard_Jun-12-2026.xlsx')
 
 FAM_KEY = 'PREGABALIN'
 FAM_LABEL = 'Pregabalina Multidosis'

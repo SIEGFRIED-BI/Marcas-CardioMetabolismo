@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-05-19T13:06:21",
+  "generatedAt": "2026-06-19T08:57:56",
   "lines": [
     {
       "hasData": true,
-      "generatedAt": "2026-05-19 11:58",
+      "generatedAt": "2026-06-18 20:54",
       "budgetCut": "Mar-2026",
       "rxCut": null,
       "stockCut": "Mar-2026",
@@ -20,7 +20,7 @@
     },
     {
       "hasData": true,
-      "generatedAt": "2026-05-19 12:17",
+      "generatedAt": "2026-06-18 20:59",
       "budgetCut": "Mar-2026",
       "rxCut": null,
       "stockCut": "Abr-2026",
@@ -37,7 +37,7 @@
     },
     {
       "hasData": true,
-      "generatedAt": "2026-05-19 12:22",
+      "generatedAt": "2026-06-18 22:07",
       "budgetCut": "Mar-2026",
       "rxCut": "Feb-2026",
       "stockCut": "Feb-2026",
@@ -47,7 +47,7 @@
       "latestMonth": "Mar-2026",
       "latestActual": 117709,
       "familiesCount": 9,
-      "familiesWithPm": 8,
+      "familiesWithPm": 9,
       "key": "OTC",
       "label": "OTC",
       "href": "OTC/"
@@ -71,7 +71,7 @@
     },
     {
       "hasData": true,
-      "generatedAt": "2026-05-19 12:52",
+      "generatedAt": "2026-06-19 08:57",
       "budgetCut": "Abr-2026",
       "rxCut": "Feb-2026",
       "stockCut": "Abr-2026",
