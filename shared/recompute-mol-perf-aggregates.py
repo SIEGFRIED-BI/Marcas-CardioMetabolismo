@@ -194,7 +194,27 @@ def main():
             n = recompute_family(fam_obj, cierre_month=cierre)
             total_updated += n
 
-        print(f'{line:8s}: cierre_month={cierre}, products updated={total_updated}')
+        # Regenerar meta.ytd_keys / mat_keys (el eje anual que consume el chart de
+        # Mercado IQVIA) desde los agregados recomputados. Bug que arregla: el sync
+        # movia la data a un mes nuevo (p.ej. Abr->May) pero estas listas quedaban
+        # viejas -> el chart buscaba ms_ytd/ms_mat con keys inexistentes ("Sin datos
+        # para este filtro" en MAT/YTD). Asi el eje SIEMPRE matchea la data.
+        meta = D.get('meta')
+        meta_changed = ''
+        if isinstance(meta, dict):
+            yk, mk = set(), set()
+            for fam_obj in mol.values():
+                if isinstance(fam_obj, dict):
+                    yk |= set((fam_obj.get('ytd') or {}).keys())
+                    mk |= set((fam_obj.get('mat') or {}).keys())
+            if yk and 'ytd_keys' in meta:
+                meta['ytd_keys'] = sorted(yk, key=msort)
+            if mk and 'mat_keys' in meta:
+                meta['mat_keys'] = sorted(mk, key=msort)
+            if yk or mk:
+                meta_changed = f" | ytd_keys={len(meta.get('ytd_keys',[]))} mat_keys={len(meta.get('mat_keys',[]))}"
+
+        print(f'{line:8s}: cierre_month={cierre}, products updated={total_updated}{meta_changed}')
 
         if not args.dry_run:
             new_t = t[:ob] + json.dumps(D, ensure_ascii=False) + t[ob + end:]
