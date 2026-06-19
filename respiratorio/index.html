@@ -1370,17 +1370,38 @@ function renderPerf(){
       }}
   });
 
+  // Mercado = TOTAL de la molecula (suma de todos los productos), no la suma de
+  // las marcas mostradas. Base del IE relativo y de la fila TOTAL MERCADO.
+  const getUnits=(p,k)=>{
+    if(pPeriod==='quarterly') return (p.quarterly_vals||{})[k];
+    return (pPeriod==='monthly'?p.monthly_vals:pPeriod==='ytd'?p.ytd:p.mat)?.[k];
+  };
+  const _mktProds=(molData&&molData.products)||[];
+  const mktNow=_mktProds.reduce((s,p)=>s+(getUnits(p,lastPK)||0),0);
+  const mktPrev=_mktProds.reduce((s,p)=>s+(getUnits(p,prevPK)||0),0);
+  const mktDelta=mktPrev>0?((mktNow/mktPrev-1)*100):null;
+  const mktDeltaStr=mktDelta!=null?(mktDelta>=0?'+':'')+mktDelta.toFixed(1)+'%':'—';
+  const mktDeltaColor=mktDelta==null?'var(--dim)':mktDelta>=0?'var(--green)':'var(--red)';
+  const totalRowHtml=`<tr style="background:#eef2f7;border-top:2px solid #cbd5e1;border-bottom:2px solid #cbd5e1;">
+    <td><span style="font-weight:800;color:#1f2937;">TOTAL MERCADO</span></td>
+    <td style="max-width:90px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;">${mktNow?fmt(mktNow)+'u':'—'}</span></td>
+    <td style="max-width:90px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);">${mktPrev?fmt(mktPrev)+'u':'—'}</span></td>
+    <td><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);" title="El mercado es la referencia del IE (=100)">—</span></td>
+    <td><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:${mktDeltaColor};" title="Crecimiento del mercado total YoY">${mktDeltaStr}</span></td>
+  </tr>`;
   let cIdx2=0;
   document.getElementById('perf-table').innerHTML=`<table class="pt">
     <thead><tr><th>Producto</th><th>${pMetric==='ms'?'MS% actual':'Unidades'}</th><th>${pMetric==='ms'?'MS% anterior':'Unidades ant.'}</th><th>IE 100</th><th>Δ vs año ant.</th></tr></thead>
-    <tbody>${sorted.map(p=>{
+    <tbody>${totalRowHtml}${sorted.map(p=>{
       const vNow=getVal(p,lastPK); const vPrev=getVal(p,prevPK);
       const color2=p.is_sie?'#ef4444':COMP_COLORS[cIdx2++%COMP_COLORS.length];
       const delta=(vNow!=null&&vPrev!=null&&vPrev>0)?((vNow/vPrev-1)*100):null;
       const barW=pMetric==='ms'&&vNow?Math.min(Math.round(vNow*2),80):0;
       const valStr=pMetric==='ms'?(vNow!=null?vNow.toFixed(1)+'%':'—'):(vNow!=null?fmt(vNow)+'u':'—');
       const valPrevStr=pMetric==='ms'?(vPrev!=null?vPrev.toFixed(1)+'%':'—'):(vPrev!=null?fmt(vPrev)+'u':'—');
-      const ie=(vNow!=null&&vPrev!=null&&vPrev>0)?(vNow/vPrev*100):null;
+      // IE RELATIVO AL MERCADO (canonico): (crec. propio / crec. mercado) x 100.
+      const ownNow=getUnits(p,lastPK); const ownPrev=getUnits(p,prevPK);
+      const ie=(ownNow!=null&&ownPrev>0&&mktNow>0&&mktPrev>0)?((ownNow/ownPrev)/(mktNow/mktPrev)*100):null;
       const ieStr=ie!=null?ie.toFixed(0):'—';
       const ieColor=ie==null?'var(--dim)':ie>=100?'var(--green)':'var(--red)';
       const deltaStr=delta!=null?(delta>=0?'+':'')+delta.toFixed(1)+'%':'—';
