@@ -503,7 +503,7 @@
       +   ['mat','ytd','mes','trim'].map(function(grp){
             return ['<th class="mp-sh mp-sh-'+grp+'" title="Unidades / Recetas período actual (con flecha vs anterior)">Units</th>',
                     '<th class="mp-sh mp-sh-'+grp+'" title="Market Share % período actual (con flecha vs anterior)">MS%</th>',
-                    '<th class="mp-sh mp-sh-'+grp+'" title="Índice de Evolución: (SIE growth / Market growth) × 100">IE</th>',
+                    '<th class="mp-sh mp-sh-'+grp+'" title="IE (Índice de Evolución): crecimiento de tu market share vs el del mercado, base 100. 100 = creciste igual que el mercado; arriba de 100 ganás share, abajo lo perdés.">IE</th>',
                     '<th class="mp-sh mp-sh-'+grp+' mp-sep" title="Variación en puntos porcentuales del MS% (Act - Ant)">Var pp</th>'].join('');
           }).join('')
       + '</tr>'

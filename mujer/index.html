@@ -910,7 +910,7 @@ function renderBrandKpis(){
       <div class="kpi-accent" style="background:${x.accent}"></div>${_kpiSrc(x.lbl)}
       <p class="kpi-lbl">${x.lbl}</p>
       <p class="kpi-num ${x.cls}">${x.num}</p>
-      <p class="kpi-sub">${x.sub}</p>
+      <p class="kpi-sub"${String(x.sub).indexOf('iEvol')===0?' title="IE (Índice de Evolución): crecimiento de tu market share vs el del mercado, base 100. 100 = creciste igual que el mercado; arriba de 100 ganás share, abajo lo perdés."':''}>${x.sub}</p>
       <p class="kpi-sub2">${x.sub2||''}</p>
     </div>`).join('');
 }
@@ -982,7 +982,7 @@ function renderKpis(){
       <div class="kpi-accent" style="background:${x.accent}"></div>${_kpiSrc(x.lbl)}
       <p class="kpi-lbl">${x.lbl}</p>
       <p class="kpi-num ${x.cls}">${x.num}</p>
-      <p class="kpi-sub">${x.sub}</p>
+      <p class="kpi-sub"${String(x.sub).indexOf('iEvol')===0?' title="IE (Índice de Evolución): crecimiento de tu market share vs el del mercado, base 100. 100 = creciste igual que el mercado; arriba de 100 ganás share, abajo lo perdés."':''}>${x.sub}</p>
       <p class="kpi-sub2">${x.sub2||''}</p>
     </div>`).join('');
 }
@@ -2369,7 +2369,7 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
 })();
 
 </script>
-<script src="../shared/multi-period-table.js?v=d17e3ad233"></script>
+<script src="../shared/multi-period-table.js?v=00db04d1bb"></script>
 <script>
 // Multi-period summary tables (added by patch-multi-period-sections.py).
 // Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.
