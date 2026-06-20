@@ -51,7 +51,7 @@ LINES = [
      'source':('data.js','ATB/data.js')},
     {'key':'mujer',   'name':'Línea Mujer',      'icon':'🌸', 'color':'#DB2777',
      'href':'mujer/',         'owner':'María Hernández',
-     'source':('inline','mujer/index.html')},
+     'source':('data.js','mujer/data.js')},
     {'key':'snc',     'name':'S.N.C.',           'icon':'🧠', 'color':'#7C3AED',
      'href':'SNC/',           'owner':'Juan Filidoro',
      'source':('data.js','SNC/data.js')},

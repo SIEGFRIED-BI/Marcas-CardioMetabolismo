@@ -32,7 +32,7 @@ LINES = [
     ('antibio', 'Antibióticos',     'ATB/data.js', False),
     ('otx',    'OTX',               'OTC/data.js', False),
     ('resp',   'Respiratoria',      'respiratorio/data.js', False),
-    ('mujer',  'Mujer',             'mujer/index.html', True),
+    ('mujer',  'Mujer',             'mujer/data.js', False),
     ('snc',    'SNC',               'SNC/data.js', False),
     ('derma',  'Dermatología',      'dermatologia/data.js', False),
 ]

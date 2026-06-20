@@ -21,7 +21,7 @@ ANCHORS = [r'window\.OTC_DASHBOARD\s*=\s*', r'const\s+D\s*=\s*']
 FILES = {
     'cardio': 'cardio/data.js', 'ATB': 'ATB/data.js', 'OTC': 'OTC/data.js',
     'respiratorio': 'respiratorio/data.js', 'SNC': 'SNC/data.js',
-    'derma': 'dermatologia/data.js', 'mujer': 'mujer/index.html',
+    'derma': 'dermatologia/data.js', 'mujer': 'mujer/data.js',
 }
 
 

@@ -67,7 +67,7 @@
       "segmentations": []
     },
     "mujer": {
-      "structure": "inline", "file": "mujer\\index.html", "anchor": "const D",
+      "structure": "data.js", "file": "mujer\\data.js", "anchor": "window.OTC_DASHBOARD",
       "buildScript": "mujer\\build-data.ps1", "syncScript": "shared\\sync-mujer-pm.py",
       "hubFolder": "linea-mujer", "fuentesSub": "fuentes-originales",
       "useCentralIqvia": true, "useSlicedIqvia": true, "overrideBaseDir": null,

@@ -23,7 +23,7 @@ MAP = {
     'antibio': ('antibio', 'ATB/data.js', False),
     'otx':     ('otx', 'OTC/data.js', False),
     'resp':    ('resp', 'respiratorio/data.js', False),
-    'mujer':   ('mujer', 'mujer/index.html', True),
+    'mujer':   ('mujer', 'mujer/data.js', False),
     'snc':     ('snc', 'SNC/data.js', False),
     'derma':   ('derma', 'dermatologia/data.js', False),
 }

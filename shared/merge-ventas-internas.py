@@ -44,7 +44,7 @@ LINES = [
     {'key':'OTC',     'kind':'data.js', 'path':'OTC/data.js'},
     {'key':'respi',   'kind':'data.js', 'path':'respiratorio/data.js'},
     {'key':'SNC',     'kind':'data.js', 'path':'SNC/data.js'},
-    {'key':'mujer',   'kind':'inline',  'path':'mujer/index.html'},
+    {'key':'mujer',   'kind':'data.js', 'path':'mujer/data.js'},
     {'key':'dermato', 'kind':'data.js', 'path':'dermatologia/data.js'},
 ]
 

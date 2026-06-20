@@ -34,7 +34,7 @@ from pathlib import Path
 import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
-HTML = REPO / 'mujer' / 'index.html'
+HTML = REPO / 'mujer' / 'data.js'  # F4: dato externo (window.OTC_DASHBOARD)
 DEFAULT_FILE = r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\Planilla de Ventas - 2 de junio de 2026.xlsx'
 TRIP_KEYS = ['45', 'D3', 'D3 PLUS', 'MAGNESIO']
 MESES = {'ENE': 0, 'FEB': 1, 'MAR': 2, 'ABR': 3, 'MAY': 4, 'JUN': 5,
@@ -95,7 +95,7 @@ def parse_planilla(path, cutoff):
 
 
 def load_D(text):
-    m = re.search(r'const D\s*=\s*\{', text)
+    m = re.search(r'(?:const D|window\.OTC_DASHBOARD)\s*=\s*\{', text)
     ob = m.end() - 1
     D, end = json.JSONDecoder().raw_decode(text[ob:])
     return D, ob, ob + end

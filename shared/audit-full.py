@@ -19,7 +19,7 @@ LINES = [
     ('antibio', 'ATB',          'ATB/data.js',    False),
     ('otx',     'OTC',          'OTC/data.js',    False),
     ('resp',    'respiratorio', 'respiratorio/data.js', False),
-    ('mujer',   'mujer',        'mujer/index.html', True),
+    ('mujer',   'mujer',        'mujer/data.js', False),
     ('snc',     'SNC',          'SNC/data.js',   False),
     ('derma',   'dermatologia', 'dermatologia/data.js', False),
 ]
