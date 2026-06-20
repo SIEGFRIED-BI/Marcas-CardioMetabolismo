@@ -136,6 +136,7 @@ foreach ($g in @(
     @{n='syntax';  s='check-syntax-and-consistency.py'; a=@()},
     @{n='parity';  s='check-cross-line-parity.py';      a=@()},
     @{n='render';  s='check-render-parity.py';          a=@()},
+    @{n='ddd';     s='check-ddd-health.py';             a=@()},
     @{n='labels';  s='audit-labels.py';                 a=@()},
     @{n='audit';   s='audit-full.py';                   a=@()},
     @{n='history'; s='verify-history-preserved.py';     a=@('--baseline','HEAD','--strict')}

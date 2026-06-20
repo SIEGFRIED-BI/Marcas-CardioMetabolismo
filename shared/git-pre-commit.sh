@@ -103,4 +103,18 @@ if git diff --cached --name-only | grep -qE '(index\.html|dermato_dashboard\.htm
         exit 1
     fi
 fi
+
+# Check 8: salud de las paginas DDD (mercados-molecula). Bloquea include roto
+# (app.js faltante) y mercados con region_data vacio (tabla regional en blanco).
+if git diff --cached --name-only | grep -qE '(DDD/.*\.(html|js)|dermato_ddd\.html|psq_ddd\.html|data\.js)$'; then
+    echo "Running DDD-health check..."
+    py shared/check-ddd-health.py
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "DDD-HEALTH FAILED -- commit bloqueado"
+        echo "Una pagina DDD tiene un include roto (app.js faltante) o un mercado con"
+        echo "region_data vacio (tabla regional en blanco). Revisar arriba."
+        exit 1
+    fi
+fi
 exit 0
