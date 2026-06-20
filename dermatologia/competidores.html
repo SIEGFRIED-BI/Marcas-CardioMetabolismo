@@ -1089,7 +1089,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
     if (!HEAT_MARKET) return;
     const period = periodIdxs();
     if (SHAPE==='A' && period){
-      const allRegs = getRegions();
+      const allRegs = getRawRegions();
       const allRanked = rankedBrandsA(HEAT_MARKET, allRegs, period);
       const visibleSet = getVisibleSet(HEAT_MARKET, allRanked);
       renderPills(HEAT_MARKET, allRanked, visibleSet);
