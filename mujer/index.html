@@ -770,8 +770,8 @@ function renderBrandKpis(){
   const pm    = PROD_MAP[brand] || {};
   const isYtd = kpiPeriod === 'ytd';
   const meta = D.iqviaMeta || {};
-  const period     = isYtd ? `YTD ${meta.latestShort||"Mar'26"}` : `MAT ${meta.latestShort||"Mar'26"}`;
-  const periodPrev = isYtd ? `YTD ${meta.prevShort||"Mar'25"}` : `MAT ${meta.prevShort||"Mar'25"}`;
+  const period     = isYtd ? `YTD ${meta.latestShort||""}` : `MAT ${meta.latestShort||""}`;
+  const periodPrev = isYtd ? `YTD ${meta.prevShort||""}` : `MAT ${meta.prevShort||""}`;
 
   // Label
   document.getElementById('brand-kpi-label').textContent = FL(brand);
@@ -924,8 +924,8 @@ function renderKpis(){
   const unitsPrev = isYtd ? (k.sie_ytd25||k.units_ytd25) : (k.sie_mat25||k.units_mat25);
   const mkt   = isYtd ? k.mkt_ytd26 : k.mkt_mat26;
   const meta = D.iqviaMeta || {};
-  const period = (isYtd ? `YTD ${meta.latestShort||"Mar'26"}` : `MAT ${meta.latestShort||"Mar'26"}`) + brandLabel;
-  const periodPrev = isYtd ? `YTD ${meta.prevShort||"Mar'25"}` : `MAT ${meta.prevShort||"Mar'25"}`;
+  const period = (isYtd ? `YTD ${meta.latestShort||""}` : `MAT ${meta.latestShort||""}`) + brandLabel;
+  const periodPrev = isYtd ? `YTD ${meta.prevShort||""}` : `MAT ${meta.prevShort||""}`;
 
   const ieColor = !ie ? 'b' : ie>=100 ? 'g' : ie>=90 ? 'y' : 'r';
   const ieAccent = !ie ? 'var(--blue)' : ie>=100 ? 'var(--green)' : ie>=90 ? 'var(--yellow)' : 'var(--red)';

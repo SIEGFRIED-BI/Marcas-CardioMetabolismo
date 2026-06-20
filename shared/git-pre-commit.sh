@@ -65,4 +65,28 @@ if git diff --cached --name-only | grep -qE '(data\.js|index\.html|dermato_dashb
         exit 1
     fi
 fi
+
+# Check 5: paridad entre lineas (mismo nucleo de keys/labels en las 7).
+if git diff --cached --name-only | grep -qE '(data\.js|index\.html|dermato_dashboard\.html)$'; then
+    echo "Running cross-line parity check..."
+    py shared/check-cross-line-parity.py
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "CROSS-LINE PARITY FAILED -- commit bloqueado"
+        echo "Alguna linea perdio una key/label del nucleo comun. Revisar arriba."
+        exit 1
+    fi
+fi
+
+# Check 6: etiquetas vs dato real (cada label = su fuente; atrapa rec_label/iqviaMeta stale).
+if git diff --cached --name-only | grep -qE '(data\.js|index\.html|dermato_dashboard\.html)$'; then
+    echo "Running labels-vs-data check..."
+    py shared/audit-labels.py
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "LABELS CHECK FAILED -- commit bloqueado"
+        echo "Una etiqueta de fecha no coincide con su fuente. Correr: py shared/finalize-labels.py"
+        exit 1
+    fi
+fi
 exit 0

@@ -720,7 +720,7 @@ function renderBrandKpis(){
   const pm    = PROD_MAP[brand] || {};
   const isYtd = kpiPeriod === 'ytd';
   const budIndex = Number.isInteger(D.meta?.budget_index) ? D.meta.budget_index : 2;
-  const budLabel = D.meta?.budget_label || "Mar'26";
+  const budLabel = D.meta?.budget_label || "";
   const period     = isYtd ? (D.meta?.kpi_ytd_label || "YTD") : (D.meta?.kpi_mat_label || "MAT");
   const periodPrev = isYtd ? (D.meta?.kpi_ytd_prev_label || "año ant.") : (D.meta?.kpi_mat_prev_label || "año ant.");
 
@@ -874,7 +874,7 @@ function renderKpis(){
   const units = isYtd ? k.units_ytd : k.units_mat;
   const unitsPrev = isYtd ? (k.sie_ytd25||k.units_ytd25) : (k.sie_mat25||k.units_mat25);
   const mkt   = isYtd ? k.mkt_ytd26 : k.mkt_mat26;
-  const budLabel = D.meta?.budget_label || "Mar'26";
+  const budLabel = D.meta?.budget_label || "";
   const period = (isYtd ? (D.meta?.kpi_ytd_label || "YTD") : (D.meta?.kpi_mat_label || "MAT")) + brandLabel;
   const periodPrev = isYtd ? (D.meta?.kpi_ytd_prev_label || "año ant.") : (D.meta?.kpi_mat_prev_label || "año ant.");
 

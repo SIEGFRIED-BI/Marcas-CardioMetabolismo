@@ -178,6 +178,39 @@ def check_ddd_hardcoded(t, label):
     return issues
 
 
+def check_date_literals_in_render(t, label):
+    """Detecta literales de fecha (mes-ES + apostrofe + AA, o 'YTD/MAT Mes'AA')
+    HARDCODEADOS en el codigo de render. Excluye el objeto de datos inline
+    (const D / window.*) -> ahi las fechas son legitimas (keys + meta labels).
+    Atrapa la clase de bug 'Dic'25'/'Mar'26' fijos en renderKpis/etc."""
+    issues = []
+    scan = t
+    # Blanquear los spans de objetos de datos (preservando \n para nro de linea)
+    for pat in [r'const D\s*=\s*\{', r'window\.OTC_DASHBOARD\s*=\s*\{',
+                r'window\.OTC_DATA\s*=\s*\{', r'window\.MUJER_DATA\s*=\s*\{',
+                r'window\.SFG_COMP_DATA\s*=\s*\{']:
+        m = re.search(pat, scan)
+        if not m:
+            continue
+        ob = scan.index('{', m.start())
+        try:
+            _, end = json.JSONDecoder().raw_decode(scan[ob:])
+        except Exception:
+            continue
+        span = scan[ob:ob + end]
+        scan = scan[:ob] + re.sub(r'[^\n]', ' ', span) + scan[ob + end:]
+    MES = r'(?:Ene|Feb|Mar|Abr|May|Jun|Jul|Ago|Sep|Oct|Nov|Dic)'
+    for pat, msg in [
+        (rf"{MES}'\d\d", "mes-ES'AA hardcodeado en render"),
+        (rf"(?:YTD|MAT)\s+[A-Z][a-z]{{2}}'\d", "label YTD/MAT con fecha hardcodeada en render"),
+    ]:
+        for mt in re.finditer(pat, scan):
+            line = scan[:mt.start()].count('\n') + 1
+            issues.append(f'{label}: DATE-LITERAL ({msg}): {mt.group(0)!r} ~linea {line} '
+                          f'-> derivar de D.meta (finalize-labels), no hardcodear.')
+    return issues
+
+
 def main():
     all_issues = []
 
@@ -190,6 +223,7 @@ def main():
         all_issues += check_ddd_hardcoded(t, rel)
         all_issues += check_sku_level_sie(t, rel)
         all_issues += check_excluded_products(t, rel)
+        all_issues += check_date_literals_in_render(t, rel)
 
     js_files = collect_data_js()
     for f in js_files:
