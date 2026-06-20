@@ -366,9 +366,9 @@ function getBMS(mk,b,r){const tm=mk.total_monthly[r];if(!tm)return Array(D.month
   return tm.map((t,i)=>t>0?+(bm[i]/t*100).toFixed(1):0)}
 function getQMS(mk,r){const tm=mk.total_monthly[r];if(!tm)return Array(D.quarters.length).fill(0);let s=Array(D.months.length).fill(0);
   mk.top_brands.forEach(b=>{if(mk.brand_meta[b]&&mk.brand_meta[b].sie){const bm=(mk.brand_monthly[b]||{})[r];if(bm)bm.forEach((v,i)=>s[i]+=v)}});
-  returnArray.from({length:D.quarters.length},(_,q)=>{const st=tm.slice(q*3,q*3+3).reduce((a,b)=>a+b,0),ss=s.slice(q*3,q*3+3).reduce((a,b)=>a+b,0);return st>0?+(ss/st*100).toFixed(1):0})}
+  return Array.from({length:D.quarters.length},(_,q)=>{const st=tm.slice(q*3,q*3+3).reduce((a,b)=>a+b,0),ss=s.slice(q*3,q*3+3).reduce((a,b)=>a+b,0);return st>0?+(ss/st*100).toFixed(1):0})}
 function getBQMS(mk,b,r){const tm=mk.total_monthly[r];if(!tm)return Array(D.quarters.length).fill(0);const bm=(mk.brand_monthly[b]||{})[r];if(!bm)return Array(D.quarters.length).fill(0);
-  returnArray.from({length:D.quarters.length},(_,q)=>{const st=tm.slice(q*3,q*3+3).reduce((a,c)=>a+c,0),ss=bm.slice(q*3,q*3+3).reduce((a,c)=>a+c,0);return st>0?+(ss/st*100).toFixed(1):0})}
+  return Array.from({length:D.quarters.length},(_,q)=>{const st=tm.slice(q*3,q*3+3).reduce((a,c)=>a+c,0),ss=bm.slice(q*3,q*3+3).reduce((a,c)=>a+c,0);return st>0?+(ss/st*100).toFixed(1):0})}
 function getRT(mk,r){const tm=mk.total_monthly[r];if(!tm)return{total:0,sie:0,ms:0};const total=tm.reduce((a,b)=>a+b,0);let sie=0;
   mk.top_brands.forEach(b=>{if(mk.brand_meta[b]&&mk.brand_meta[b].sie){const bm=(mk.brand_monthly[b]||{})[r];if(bm)sie+=bm.reduce((a,c)=>a+c,0)}});
   return{total,sie,ms:total>0?+(sie/total*100).toFixed(1):0}}
