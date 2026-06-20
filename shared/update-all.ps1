@@ -40,7 +40,8 @@
 [CmdletBinding()]
 param(
   [string]$Month,
-  [switch]$SkipBuildAll
+  [switch]$SkipBuildAll,
+  [switch]$Competidores
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
@@ -98,11 +99,20 @@ if ($venta -and (Test-Path -LiteralPath $venta)) {
 }
 Step 'OTC MAGNUS iqvia/rec'  { & $py (Join-Path $PSScriptRoot 'split-otc-magnus-iqvia-recetas.py') }
 
-# 12. Competidores (panel regional; su carpeta = cycleFolder)
-Step 'competidores data' { & $py (Join-Path $PSScriptRoot 'build-competidores-shape-a.py') --month $cycleFolder }
-foreach ($s in 'build-competidores-pages.py','update-ddd-from-competidores.py','update-ddd-mujer-from-competidores.py','update-ddd-otcdata-from-competidores.py') {
-  $p = Join-Path $PSScriptRoot $s
-  if (Test-Path -LiteralPath $p) { Step $s { & $py $p } }
+# 12. Competidores (panel regional; su carpeta = cycleFolder).
+# OPT-IN (-Competidores): el generador de paginas (build-competidores-pages /
+# update-ddd-*) produce HOY un template distinto al committeado (titulo/fuente/
+# layout) -> regenerar cambiaria la APARIENCIA de las paginas de competidores sin
+# validar. Hasta definir cual template es el canonico, queda fuera del cierre por
+# defecto (la data IQVIA/venta/KPIs SI se actualiza). Correr aparte: -Competidores.
+if ($Competidores) {
+  Step 'competidores data' { & $py (Join-Path $PSScriptRoot 'build-competidores-shape-a.py') --month $cycleFolder }
+  foreach ($s in 'build-competidores-pages.py','update-ddd-from-competidores.py','update-ddd-mujer-from-competidores.py','update-ddd-otcdata-from-competidores.py') {
+    $p = Join-Path $PSScriptRoot $s
+    if (Test-Path -LiteralPath $p) { Step $s { & $py $p } }
+  }
+} else {
+  Write-Host "`n>>> competidores: OMITIDO (template del generador difiere del committeado; usar -Competidores tras validar)" -ForegroundColor DarkYellow
 }
 
 # 13. Recompute aggregates con cierre FIJO (mata el bug del MAT que se achica)
