@@ -22,9 +22,9 @@ FILES = [
     ('ATB/data.js', False),
     ('OTC/data.js', False),
     ('respiratorio/data.js', False),
-    ('mujer/index.html', True),
-    ('SNC/index.html', True),
-    ('dermatologia/dermato_dashboard.html', True),
+    ('mujer/data.js', False),
+    ('SNC/data.js', False),
+    ('dermatologia/data.js', False),
 ]
 
 

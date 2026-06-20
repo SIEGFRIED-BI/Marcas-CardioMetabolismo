@@ -22,7 +22,7 @@ FILES = [
     ('ATB/data.js', False),
     ('OTC/data.js', False),
     ('respiratorio/data.js', False),
-    ('dermatologia/dermato_dashboard.html', True),
+    ('dermatologia/data.js', False),
 ]
 MES = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split()
 

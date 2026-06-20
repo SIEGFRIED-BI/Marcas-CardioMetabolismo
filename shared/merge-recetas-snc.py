@@ -48,7 +48,7 @@ MARKET_TO_OWNERS = {
     'BREXIPIPAZOL-ARIPIPRAZOL (BREXIL)': ['BREXIL SIE'],  # mercado BREXIL (SIE aun en 0; muestra el contexto competitivo)
 }
 
-SNC_HTMLS = ['SNC/index.html', 'SNC/psq_dashboard.html']
+SNC_HTMLS = ['SNC/data.js', 'SNC/psq_dashboard.html']  # F4: dato vivo en data.js
 
 
 def normalize_brand(name):
@@ -109,7 +109,7 @@ def parse_pivot(pivot_path):
 
 def find_inline_d(text):
     """Retorna (start_index_after_eq, parsed_obj, end_index_in_text)."""
-    m = re.search(r'const\s+D\s*=\s*', text)
+    m = re.search(r'(?:const\s+D|window\.OTC_DASHBOARD)\s*=\s*', text)
     if not m: return None
     obj_start = text.index('{', m.end())
     obj, end = json.JSONDecoder().raw_decode(text[obj_start:])
