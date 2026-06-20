@@ -2092,16 +2092,17 @@ function setCovFilter(f){
 
 // ── INIT ──────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
-  applyMetaLabels();
-  renderGlobalPills();
-  renderKpis();
-  renderBudPills(); renderBudYr(); renderBudget();
-  renderPerfMolGrid(); bindPerfCtrls(); renderPerf();
-  renderRecPills(); bindRecCtrls(); renderRec();
-  renderConvPills(); renderConv();
-  renderPrecPills(); renderPrecDoses(); renderPrec();
-  renderStockPills(); renderStockYr(); renderStock();
-  renderCovBrandPills(); renderCobertura();
+  const _r=(fn,name)=>{try{fn();}catch(e){console.error('Init error in '+name+':',e);}};
+  _r(()=>{ applyMetaLabels(); },'applyMetaLabels');
+  _r(()=>{ renderGlobalPills(); },'renderGlobalPills');
+  _r(()=>{ renderKpis(); },'renderKpis');
+  _r(()=>{ renderBudPills(); renderBudYr(); renderBudget(); },'renderBudPills');
+  _r(()=>{ renderPerfMolGrid(); bindPerfCtrls(); renderPerf(); },'renderPerfMolGrid');
+  _r(()=>{ renderRecPills(); bindRecCtrls(); renderRec(); },'renderRecPills');
+  _r(()=>{ renderConvPills(); renderConv(); },'renderConvPills');
+  _r(()=>{ renderPrecPills(); renderPrecDoses(); renderPrec(); },'renderPrecPills');
+  _r(()=>{ renderStockPills(); renderStockYr(); renderStock(); },'renderStockPills');
+  _r(()=>{ renderCovBrandPills(); renderCobertura(); },'renderCovBrandPills');
 });
 </script>
 <script src="../shared/data-status.js?v=0241a0346a"></script>
