@@ -143,7 +143,16 @@ def month_sort_key(mk: str) -> int:
     return int(parts[1]) * 100 + MONTH_ORDER.get(parts[0], 0)
 
 
+def _title(s: str) -> str:
+    return ' '.join(w.capitalize() for w in str(s).split())
+
+
 def build_one(line: str, xlsx: Path, out: Path) -> str:
+    """Agrupa competidores HIBRIDO molecula/ATC (no por la columna 'Mercado', que
+    mezcla moleculas). Mono-producto -> mercado = su MOLECULA (Droga). Combo (>1
+    molecula) -> mercado = su ATC (Codigo Clase Terapeutica), que el panel asigna
+    una por combo. Solo se exportan los mercados que contienen una marca SIE; sus
+    competidores = todas las marcas del mismo grupo (misma molecula/ATC)."""
     if not xlsx.is_file():
         return f'  [{line}] SKIP: xlsx no existe ({xlsx})'
 
@@ -152,69 +161,109 @@ def build_one(line: str, xlsx: Path, out: Path) -> str:
     hdr = list(next(ws.iter_rows(min_row=1, max_row=1, values_only=True)))
     cols = {str(h or '').strip(): i for i, h in enumerate(hdr)}
     c_region = cols.get('RegionCUP', 0)
-    c_market = cols.get('Mercado', 1)
+    c_droga  = cols.get('Droga', 2)
+    c_atc    = cols.get('Codigo Clase Terapeutica',
+               cols.get('Codigo Clase Terapeutica '.strip(),
+               cols.get('Código Clase Terapeutica', None)))
     c_mes    = cols.get('AñoMes', 4)
     c_prod   = cols.get('Producto', 7)
     c_unid   = cols.get('Unidades', 8)
 
-    months_set = set()
-    regions_set = set()
-    data = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: defaultdict(int))))
-    mkt_totals = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-    sie_flag = defaultdict(dict)
+    months_set, regions_set = set(), set()
+    units = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))   # brand->region->mes->u
+    brand_drogas = defaultdict(set)                                      # brand->{droga}
+    brand_atc = defaultdict(lambda: defaultdict(int))                    # brand->atc->count
+    brand_is_sie = {}
 
     n_rows = n_kept = 0
     for row in ws.iter_rows(min_row=2, values_only=True):
         n_rows += 1
         if not row: continue
-        region = row[c_region]
-        market = row[c_market]
-        mes    = row[c_mes]
-        prod   = row[c_prod]
-        unid   = row[c_unid]
-        if not region or not market or not mes or not prod: continue
+        region = row[c_region] if c_region < len(row) else None
+        mes    = row[c_mes]    if c_mes    < len(row) else None
+        prod   = row[c_prod]   if c_prod   < len(row) else None
+        unid   = row[c_unid]   if c_unid   < len(row) else None
+        if not region or not mes or not prod: continue
         region = str(region).strip()
         if region in ('Totales', '-'): continue
-        market = str(market).strip()
         mes = str(mes).strip()
         try: u = int(round(float(unid or 0)))
         except (TypeError, ValueError): u = 0
         if u <= 0: continue
         brand = extract_brand(prod)
         if not brand or brand == 'UNKNOWN': continue
-        data[market][brand][region][mes] += u
-        mkt_totals[market][region][mes] += u
-        if brand not in sie_flag[market]:
-            sie_flag[market][brand] = is_sie_brand(brand, line)
-        regions_set.add(region)
-        months_set.add(mes)
+        droga = (str(row[c_droga]).strip().upper() if c_droga is not None and c_droga < len(row) and row[c_droga] else '')
+        atc   = (str(row[c_atc]).strip().upper()   if c_atc   is not None and c_atc   < len(row) and row[c_atc]   else '')
+        units[brand][region][mes] += u
+        if droga: brand_drogas[brand].add(droga)
+        if atc:   brand_atc[brand][atc] += 1
+        brand_is_sie.setdefault(brand, is_sie_brand(brand, line))
+        regions_set.add(region); months_set.add(mes)
         n_kept += 1
     wb.close()
+
+    def main_atc(b):
+        d = brand_atc.get(b)
+        return max(d, key=d.get) if d else ''
+
+    # Mercado por marca: mono -> molecula ; combo -> ATC (clave con namespace para no colisionar)
+    brand_market, meta = {}, {}
+    for b in units:
+        dz = brand_drogas.get(b, set())
+        atc = main_atc(b)
+        if len(dz) <= 1:
+            key = 'MOL:' + (next(iter(dz)) if dz else b)
+        else:
+            key = 'ATC:' + (atc if atc else '+'.join(sorted(dz)))
+        brand_market[b] = key
+        m = meta.setdefault(key, {'mol': set(), 'atc': set()})
+        m['mol'] |= dz
+        if atc: m['atc'].add(atc)
+
+    mkt_brands = defaultdict(list)
+    for b, k in brand_market.items():
+        mkt_brands[k].append(b)
+    # solo mercados con al menos una marca SIE
+    keep = [k for k in mkt_brands if any(brand_is_sie.get(b) for b in mkt_brands[k])]
 
     months = sorted(months_set, key=month_sort_key)
     regions = sorted(regions_set, key=lambda r: (r.startswith('_'), r))
 
-    out_obj = {
-        'months': months,
-        'regions': regions,
-        'markets': {},
-    }
-    for market in sorted(data.keys()):
+    out_obj = {'months': months, 'regions': regions, 'markets': {}}
+    used_names = {}
+    for key in keep:
+        brands = sorted(mkt_brands[key])
+        m = meta[key]
+        mols = sorted(m['mol']); atcs = sorted(m['atc'])
+        sie_in = sorted([b for b in brands if brand_is_sie.get(b)])
+        # Nombre del mercado = molecula(s) de la marca SIE PRINCIPAL (la de mas
+        # unidades), no la union del grupo (que en clases ATC anchas de combos da
+        # nombres monstruosos). Asi el nombre refleja el producto SIE real.
+        def _btot(b): return sum(units[b].get(r, {}).get(mk, 0) for r in units[b] for mk in months)
+        primary = sorted(sie_in, key=lambda b: -_btot(b))[0] if sie_in else brands[0]
+        label_mols = sorted(brand_drogas.get(primary, set()))
+        label = '+'.join(_title(x) for x in label_mols) if label_mols else key.split(':', 1)[1]
+        if sie_in:
+            label = f'{label} ({_title(primary)})'
+        # dedup de nombres (raro): apendar ATC
+        name = label
+        if name in used_names:
+            name = f'{label} [{atcs[0] if atcs else used_names[label]}]'
+        used_names[label] = (atcs[0] if atcs else '')
         bm = {}
-        for brand in sorted(data[market].keys()):
-            bm[brand] = {}
+        for b in brands:
+            bm[b] = {}
             for region in regions:
-                arr = [data[market][brand].get(region, {}).get(mk, 0) for mk in months]
-                if any(arr):
-                    bm[brand][region] = arr
+                arr = [units[b].get(region, {}).get(mk, 0) for mk in months]
+                if any(arr): bm[b][region] = arr
         tm = {}
         for region in regions:
-            arr = [mkt_totals[market].get(region, {}).get(mk, 0) for mk in months]
-            if any(arr):
-                tm[region] = arr
-        sie_brands = sorted([b for b, is_s in sie_flag[market].items() if is_s])
-        out_obj['markets'][market] = {
-            'brands': sie_brands,
+            arr = [sum(units[b].get(region, {}).get(mk, 0) for b in brands) for mk in months]
+            if any(arr): tm[region] = arr
+        out_obj['markets'][name] = {
+            'brands': sie_in,
+            'molecules': mols,
+            'atc': atcs,
             'brand_monthly': bm,
             'total_monthly': tm,
         }
@@ -224,11 +273,9 @@ def build_one(line: str, xlsx: Path, out: Path) -> str:
         f'window.SFG_COMP_DATA = {json.dumps(out_obj, ensure_ascii=False)};\n',
         encoding='utf-8', newline=''
     )
-
-    sie_total = sum(1 for mk in out_obj['markets'].values() for b in mk['brand_monthly'] if mk['brands'])
     return (f'  [{line}] OK rows={n_rows:,} kept={n_kept:,} '
-            f'months={len(months)} ({months[0]}..{months[-1]}) '
-            f'regions={len(regions)} markets={len(data)} '
+            f'months={len(months)} ({months[0] if months else "-"}..{months[-1] if months else "-"}) '
+            f'regions={len(regions)} mercados(SIE)={len(out_obj["markets"])} '
             f'-> {out.name} ({out.stat().st_size:,} bytes)')
 
 
@@ -251,8 +298,12 @@ def main():
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument('--month', default='2026-04', help='Carpeta de mes en Hub-Marcas-Inputs (YYYY-MM)')
+    ap.add_argument('--lines', help='Coma-separadas para limitar (ej: cardio,SNC,ATB,respiratorio). Default: todas.')
     a = ap.parse_args()
     LINES = resolve_lines(a.month)
+    if a.lines:
+        want = {x.strip() for x in a.lines.split(',') if x.strip()}
+        LINES = [t for t in LINES if t[0] in want]
     print(f'Build Shape A competidores-data.js (mes {a.month}, {len(LINES)} lineas)...\n')
     for line, xlsx, out in LINES:
         print(build_one(line, xlsx, out))
