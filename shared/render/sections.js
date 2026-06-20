@@ -20,6 +20,12 @@ function renderCobertura(){
   const grid = document.getElementById('cov-grid');
   if(!grid) return;
 
+  // Rango de fechas del sec-sub: derivado del dato (coverage_labels), no literal.
+  const __cr = document.getElementById('cov-range');
+  if(__cr && Array.isArray(D.coverage_labels) && D.coverage_labels.length){
+    __cr.textContent = D.coverage_labels[0] + ' – ' + D.coverage_labels[D.coverage_labels.length-1];
+  }
+
   // If brand filter active, force presentacion view
   const isPresView = covBrand ? true : (covView === 'presentacion');
   const SA_all = isPresView ? (D.stock_pres||{}) : (D.stock_alerts||{});
