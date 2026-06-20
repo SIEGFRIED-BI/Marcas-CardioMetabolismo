@@ -24,7 +24,7 @@ MAP = {
     'otx':     ('otx', 'OTC/data.js', False),
     'resp':    ('resp', 'respiratorio/data.js', False),
     'mujer':   ('mujer', 'mujer/index.html', True),
-    'snc':     ('snc', 'SNC/index.html', True),
+    'snc':     ('snc', 'SNC/data.js', False),
     'derma':   ('derma', 'dermatologia/data.js', False),
 }
 

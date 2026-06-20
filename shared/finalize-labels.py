@@ -23,7 +23,7 @@ REPO = Path(__file__).resolve().parent.parent
 FILES = [
     ('cardio/data.js', False), ('ATB/data.js', False), ('OTC/data.js', False),
     ('respiratorio/data.js', False), ('mujer/data.js', False),
-    ('SNC/index.html', True), ('dermatologia/data.js', False), ('dermatologia/dermato_dashboard.html', True),
+    ('SNC/data.js', False), ('SNC/index.html', True), ('dermatologia/data.js', False), ('dermatologia/dermato_dashboard.html', True),
     ('mujer/index.html', True),
 ]
 MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}

@@ -43,7 +43,7 @@ LINES = [
     {'key':'antibio', 'kind':'data.js', 'path':'ATB/data.js'},
     {'key':'OTC',     'kind':'data.js', 'path':'OTC/data.js'},
     {'key':'respi',   'kind':'data.js', 'path':'respiratorio/data.js'},
-    {'key':'SNC',     'kind':'inline',  'path':'SNC/index.html'},
+    {'key':'SNC',     'kind':'data.js', 'path':'SNC/data.js'},
     {'key':'mujer',   'kind':'inline',  'path':'mujer/index.html'},
     {'key':'dermato', 'kind':'data.js', 'path':'dermatologia/data.js'},
 ]

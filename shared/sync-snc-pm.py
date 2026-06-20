@@ -31,6 +31,7 @@ import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
 HTML = REPO / 'SNC' / 'index.html'
+DATA = REPO / 'SNC' / 'data.js'  # F4: dato externo (window.OTC_DASHBOARD)
 DEFAULT_MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\AR_PM_FV_Standard_Apr-27-2026.xlsx')
 
 # Moleculas que SNC trackea (deben matchear AR_PM "Molecules Long")
@@ -177,7 +178,7 @@ def aggregate_mat(monthly, cierre_month=12):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--master', default=str(DEFAULT_MASTER))
-    ap.add_argument('--html', default=str(HTML))
+    ap.add_argument('--html', default=str(DATA))
     ap.add_argument('--dry-run', action='store_true')
     args = ap.parse_args()
 
@@ -197,7 +198,7 @@ def main():
     # Read inline D
     html_path = Path(args.html)
     text = html_path.read_text(encoding='utf-8', errors='replace')
-    m = re.search(r'const D = (\{)', text)
+    m = re.search(r'(?:const D = |window\.OTC_DASHBOARD\s*=\s*)(\{)', text)
     if not m:
         print('ERROR: const D no encontrado'); return 3
     abs_start = m.start() + len('const D = ')

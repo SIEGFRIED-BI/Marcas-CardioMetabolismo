@@ -15,7 +15,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 FILES = {
     'cardio': 'cardio/data.js', 'ATB': 'ATB/data.js', 'OTC': 'OTC/data.js',
-    'respiratorio': 'respiratorio/data.js', 'SNC': 'SNC/index.html',
+    'respiratorio': 'respiratorio/data.js', 'SNC': 'SNC/data.js',
     'derma': 'dermatologia/data.js', 'mujer': 'mujer/index.html',
 }
 ANCHORS = [r'window\.OTC_DASHBOARD\s*=\s*', r'const\s+D\s*=\s*']

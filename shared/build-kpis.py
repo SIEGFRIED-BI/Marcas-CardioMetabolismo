@@ -54,7 +54,7 @@ LINES = [
      'source':('inline','mujer/index.html')},
     {'key':'snc',     'name':'S.N.C.',           'icon':'🧠', 'color':'#7C3AED',
      'href':'SNC/',           'owner':'Juan Filidoro',
-     'source':('inline','SNC/index.html')},
+     'source':('data.js','SNC/data.js')},
     {'key':'resp',    'name':'Respiratoria',     'icon':'🫁', 'color':'#0D9488',
      'href':'respiratorio/',  'owner':'Antonella Mariani',
      'source':('data.js','respiratorio/data.js')},

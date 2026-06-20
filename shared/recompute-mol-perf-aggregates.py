@@ -154,7 +154,7 @@ LINES = [
     ('OTC',     'OTC/data.js',                        'window.OTC_DASHBOARD'),
     ('respi',   'respiratorio/data.js',               'window.OTC_DASHBOARD'),
     ('mujer',   'mujer/index.html',                   'const D'),
-    ('SNC',     'SNC/index.html',                     'const D'),
+    ('SNC',     'SNC/data.js',                     'window.OTC_DASHBOARD'),
     ('derma',   'dermatologia/data.js','window.OTC_DASHBOARD'),
 ]
 

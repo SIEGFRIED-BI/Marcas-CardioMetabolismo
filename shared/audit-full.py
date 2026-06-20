@@ -20,7 +20,7 @@ LINES = [
     ('otx',     'OTC',          'OTC/data.js',    False),
     ('resp',    'respiratorio', 'respiratorio/data.js', False),
     ('mujer',   'mujer',        'mujer/index.html', True),
-    ('snc',     'SNC',          'SNC/index.html',   True),
+    ('snc',     'SNC',          'SNC/data.js',   False),
     ('derma',   'dermatologia', 'dermatologia/data.js', False),
 ]
 MES = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split()

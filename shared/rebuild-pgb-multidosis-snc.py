@@ -24,7 +24,7 @@ from pathlib import Path
 import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
-HTML = REPO / 'SNC' / 'index.html'
+HTML = REPO / 'SNC' / 'data.js'  # F4: dato externo
 MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\AR_PM_FV_Standard_Jun-12-2026.xlsx')
 
 FAM_KEY = 'PREGABALIN'
@@ -159,7 +159,7 @@ def main():
         print(f'    {"SIE " if p["is_sie"] else "    "}{p["monthly_vals"].get(last,0):>7} {p["prod"]}')
 
     text=HTML.read_text(encoding='utf-8',errors='replace')
-    m=re.search(r'const\s+D\s*=\s*',text); ob=text.index('{',m.end())
+    m=re.search(r'(?:const\s+D|window\.OTC_DASHBOARD)\s*=\s*',text); ob=text.index('{',m.end())
     D,end=json.JSONDecoder().raw_decode(text[ob:])
     old=D['mol_perf'].get(FAM_KEY,{})
     print(f'\nPREGABALIN actual: ultimo mes {max(old.get("monthly",{}),key=msort,default="?")}')

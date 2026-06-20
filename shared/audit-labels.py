@@ -20,7 +20,7 @@ ES = {1:'Ene',2:'Feb',3:'Mar',4:'Abr',5:'May',6:'Jun',7:'Jul',8:'Ago',9:'Sep',10
 ANCHORS = [r'window\.OTC_DASHBOARD\s*=\s*', r'const\s+D\s*=\s*']
 FILES = {
     'cardio': 'cardio/data.js', 'ATB': 'ATB/data.js', 'OTC': 'OTC/data.js',
-    'respiratorio': 'respiratorio/data.js', 'SNC': 'SNC/index.html',
+    'respiratorio': 'respiratorio/data.js', 'SNC': 'SNC/data.js',
     'derma': 'dermatologia/data.js', 'mujer': 'mujer/index.html',
 }
 

@@ -25,7 +25,7 @@ REPO = Path(__file__).resolve().parent.parent
 LINES = [
     ('cardio', 'cardio/data.js', False), ('ATB', 'ATB/data.js', False),
     ('OTC', 'OTC/data.js', False), ('respi', 'respiratorio/data.js', False),
-    ('mujer', 'mujer/index.html', True), ('SNC', 'SNC/index.html', True),
+    ('mujer', 'mujer/index.html', True), ('SNC', 'SNC/data.js', False),
     ('derma', 'dermatologia/data.js', False),
 ]
 WARN_HI, FAIL_HI = 300, 500
