@@ -161,6 +161,7 @@ def _emit_ps():
     out['CycleFolder'] = cycle_folder()
     out['HubRoot'] = str(hub_root())
     out['RepoRoot'] = str(repo_root())
+    out['InboxDir'] = str(inbox_dir())
     for s in ('iqvia_master', 'venta_interna', 'ateneo_mat'):
         p = resolve_source(s)
         out['src_' + s] = str(p) if p else ''
