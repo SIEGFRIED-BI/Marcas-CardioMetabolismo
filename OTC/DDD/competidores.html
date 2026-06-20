@@ -190,6 +190,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         <button data-m="du">VAR UNIDADES%</button>
       </div>
       <span class="meta" id="period-label"></span>
+      <span class="meta" id="metric-legend" style="margin-left:10px;color:#6b7280;"></span>
       <button id="btn-export" style="padding:7px 14px;background:#16a34a;color:#fff;border:0;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.04em;margin-left:8px;">📥 Exportar Excel</button>
     </div>
 
@@ -991,6 +992,12 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
 
     document.getElementById('period-label').textContent =
       `${HEAT_MARKET} · ${period.label}` + (HEAT_METRIC==='ms' ? '' : (period.prevLabel ? ` (vs ${period.prevLabel})` : ' · sin comparador'));
+    { const __leg=document.getElementById('metric-legend');
+      if(__leg){ __leg.innerHTML = HEAT_METRIC==='ms'
+        ? `<b>Escala:</b> intensidad = MS% relativa al máximo de <b>esta</b> tabla (no comparable entre mercados)`
+        : (HEAT_METRIC==='dms'
+          ? `<b>Escala:</b> <span style="color:#16a34a">verde</span> ganó share · <span style="color:#dc2626">rojo</span> perdió (var. en pp)`
+          : `<b>Escala:</b> <span style="color:#16a34a">verde</span> creció · <span style="color:#dc2626">rojo</span> cayó (var. % unidades)`); } }
 
     const noteEl = document.getElementById('note');
     if (SHAPE==='A'){
