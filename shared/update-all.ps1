@@ -1,39 +1,45 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-  Cierre mensual COMPLETO en un comando: actualiza las 7 lineas + DDD/competidores
-  + KPIs + etiquetas + cache-busters desde las mismas bases. FRENA antes de pushear.
+  Cierre mensual COMPLETO e IDEMPOTENTE en un comando, manifest-driven.
+  Actualiza las 7 lineas (IQVIA + venta + competidores + KPIs + etiquetas) desde
+  shared/close-manifest.json. FRENA antes de pushear.
 
 .DESCRIPTION
-  Corre, en orden:
-    1. build-all.ps1 -Month <M>            (cardio/ATB/OTC/mujer/respiratorio + DDD principal + venta + kpis)
-    2. sync-snc-pm.py / sync-dermato-pm.py --master <AR_PM>   (SNC y derma)
-    3. build-competidores-shape-a.py --month <M>             (competidores-data.js + pages)
-       (+ build-competidores-pages.py / update-ddd-from-competidores.py si existen)
-    4. build-kpis.py + build-families-perf.py + sync-kpistrip-with-kpis-json.py
-    5. finalize-labels.py                  (etiquetas consistentes + "Datos al"=hoy)
-    6. bump-cache-busters.py
-    7. Gates: check-syntax-and-consistency.py, audit-full.py, verify-history-preserved.py
-  NO hace commit ni push: imprime git status para que revises y pushees vos.
+  Toda la config sale del manifiesto (shared/close-manifest.json via Get-CloseParams.ps1):
+    closeMonth (corte real, ej 2026-05) -> --cutoff / --cierre
+    cycleFolder (carpeta legacy, ej 2026-04) -> -Month de build-all / paneles
+    master / ateneo / venta -> rutas resueltas (de _inbox/<closeMonth> o legacy)
 
-  IMPORTANTE: correr con Windows PowerShell 5.1 (powershell.exe), NO pwsh 7
-  (pwsh corrompe los data.js por el serializer). Este script lo verifica.
+  Orden (con las cadenas de reversion bakeadas y los flags de idempotencia):
+    1. build-all (5 data.js)
+    2. sync SNC -> 3. re-aplicar PGB multidosis -> 4. re-aplicar BREXPIPRAZOLE
+    5. sync derma -> 6. sync mujer
+    7. preservar meses pre-ventana que los syncs borran (regla #7)
+    8. venta --cutoff -> 9. re-split MAGNUS venta -> 10. re-aplicar mujer TRIP
+    11. split MAGNUS iqvia/recetas
+    12. competidores Shape-A
+    13. recompute --cierre (ventana FIJA, evita que un mes parcial achique MAT)
+    14. build-kpis + build-families + sync-kpistrip
+    15. finalize-labels -> 16. cache-busters
+    17. gates (syntax / audit / history --strict)
+  Re-correrlo da el mismo resultado (idempotente). NO commitea ni pushea.
+
+  Recetas (CloseUp) tienen su propia cadencia/corte: se mergean aparte cuando llega
+  el pivot, NO en este cierre.
+
+  IMPORTANTE: Windows PowerShell 5.1 (powershell.exe), NO pwsh 7 (corrompe data.js).
 
 .PARAMETER Month
-  Mes a procesar, YYYY-MM. Default '2026-04'.
-.PARAMETER IqviaPattern
-  Glob del master AR_PM en _iqvia-master/<Month>/. Default 'AR_PM*'.
+  Override del cycleFolder (carpeta de inputs). Default = manifest.cycleFolder.
 .PARAMETER SkipBuildAll
-  Saltea el build-all pesado (util si los data.js ya estan al dia y solo
-  queres re-sincronizar SNC/derma/competidores/kpis/etiquetas).
+  Saltea el build-all pesado (util para re-sincronizar el resto sin reconstruir data.js).
 .EXAMPLE
-  powershell.exe -File shared\update-all.ps1 -Month 2026-04
+  powershell.exe -File shared\update-all.ps1
 #>
 [CmdletBinding()]
 param(
-  [ValidatePattern('^\d{4}-\d{2}$')][string]$Month = '2026-04',
-  [string]$BaseDir = (Join-Path $env:OneDrive 'Documentos\Hub-Marcas-Inputs'),
-  [string]$IqviaPattern = 'AR_PM*',
+  [string]$Month,
   [switch]$SkipBuildAll
 )
 $ErrorActionPreference = 'Stop'
@@ -41,59 +47,77 @@ $repo = Split-Path -Parent $PSScriptRoot
 $py = if (Get-Command 'py' -ErrorAction SilentlyContinue) { 'py' } else { 'python' }
 
 if ($PSVersionTable.PSVersion.Major -ge 6) {
-  Write-Warning "Estas en PowerShell $($PSVersionTable.PSVersion) (pwsh). El build necesita Windows PowerShell 5.1 o corrompe los data.js. Reabrí con 'powershell.exe -File shared\update-all.ps1 ...'."
+  Write-Warning "Estas en PowerShell $($PSVersionTable.PSVersion) (pwsh). El build necesita Windows PowerShell 5.1 o corrompe los data.js. Reabri con 'powershell.exe -File shared\update-all.ps1 ...'."
   exit 1
 }
 
-$masterDir = Join-Path $BaseDir (Join-Path '_iqvia-master' $Month)
-$master = Get-ChildItem -LiteralPath $masterDir -Filter $IqviaPattern -File -ErrorAction SilentlyContinue |
-          Where-Object { $_.Name -notmatch '^~\$' } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-if (-not $master) { throw "No encontre master '$IqviaPattern' en $masterDir" }
+# ── Parametros del cierre desde el manifiesto (fuente unica) ──
+. (Join-Path $PSScriptRoot 'Get-CloseParams.ps1')
+$cp = Get-CloseParams
+$closeMonth  = $cp.CloseMonth
+$cycleFolder = if ($Month) { $Month } else { $cp.CycleFolder }
+$master = $cp.src_iqvia_master
+$ateneo = $cp.src_ateneo_mat
+$venta  = $cp.src_venta_interna
+if (-not (Test-Path -LiteralPath $master)) { throw "Master IQVIA no resuelto: '$master' (revisar close-manifest.json / _inbox)" }
 
 Write-Host "================================================================" -ForegroundColor Cyan
-Write-Host " update-all  Mes:$Month  Master:$($master.Name)" -ForegroundColor Cyan
+Write-Host " update-all  close:$closeMonth  cycle:$cycleFolder" -ForegroundColor Cyan
+Write-Host "   master: $(Split-Path $master -Leaf)" -ForegroundColor Cyan
+Write-Host "   venta : $(if($venta){Split-Path $venta -Leaf}else{'(no resuelta)'})" -ForegroundColor Cyan
 Write-Host "================================================================" -ForegroundColor Cyan
 
-function Step($name, $script) {
+function Step($name, $block) {
   Write-Host "`n>>> $name" -ForegroundColor Cyan
-  & $script
+  & $block
   if ($LASTEXITCODE -ne 0) { Write-Warning "$name termino con exit $LASTEXITCODE" }
 }
 
-# 1. build-all (5 lineas + DDD principal + venta + kpis + cache-busters intermedios)
+# 1. build data.js (5 lineas). build-all mergea venta SIN cutoff; el paso 8 la re-mergea con cutoff.
 if (-not $SkipBuildAll) {
-  Step 'build-all (5 lineas)' { & (Join-Path $PSScriptRoot 'build-all.ps1') -Month $Month -IqviaPattern $IqviaPattern -SkipKpis }
+  Step 'build-all (5 lineas)' { & (Join-Path $PSScriptRoot 'build-all.ps1') -Month $cycleFolder -IqviaPattern 'AR_PM*' -SkipKpis }
 }
 
-# 2. SNC + derma (aceptan --master)
-Step 'sync SNC'   { & $py (Join-Path $PSScriptRoot 'sync-snc-pm.py')     --master $master.FullName }
-# SNC tiene customizaciones que sync-snc NO conoce y debe re-aplicar SIEMPRE despues:
-#   - PGB multidosis (PREGABALIN = solo tabletas multidosis, no el mercado completo)
-#   - BREXIL = mercado BREXPIPRAZOLE (sync-snc no genera esa familia)
-# Si no se re-aplican, sync-snc deja PREGABALIN completo y borra BREXPIPRAZOLE.
-Step 'SNC: PGB multidosis'  { & $py (Join-Path $PSScriptRoot 'rebuild-pgb-multidosis-snc.py') }
-Step 'SNC: BREXPIPRAZOLE'   { & $py (Join-Path $PSScriptRoot 'rebuild-brexpiprazole-ateneo-snc.py') }
-Step 'sync derma' { & $py (Join-Path $PSScriptRoot 'sync-dermato-pm.py') --master $master.FullName }
+# 2-6. mol_perf IQVIA: syncs + re-aplicar lo que el sync de SNC revierte
+Step 'sync SNC'            { & $py (Join-Path $PSScriptRoot 'sync-snc-pm.py') --master $master }
+Step 'SNC PGB multidosis'  { & $py (Join-Path $PSScriptRoot 'rebuild-pgb-multidosis-snc.py') --master $master }
+Step 'SNC BREXPIPRAZOLE'   { & $py (Join-Path $PSScriptRoot 'rebuild-brexpiprazole-ateneo-snc.py') --source $ateneo }
+Step 'sync derma'          { & $py (Join-Path $PSScriptRoot 'sync-dermato-pm.py') --master $master }
+Step 'sync mujer'          { & $py (Join-Path $PSScriptRoot 'sync-mujer-pm.py') --master $master }
 
-# 3. Competidores (data + pages) y DDD subpaginas
-Step 'competidores data' { & $py (Join-Path $PSScriptRoot 'build-competidores-shape-a.py') --month $Month }
+# 7. Preservar meses pre-ventana que los syncs borran (regla #7)
+Step 'preservar historia'  { & $py (Join-Path $PSScriptRoot 'preserve-early-history.py') }
+
+# 8-11. Venta (cutoff = mes cerrado) + re-aplicar los splits que venta/build revierten
+if ($venta -and (Test-Path -LiteralPath $venta)) {
+  Step 'venta interna (cutoff)' { & $py (Join-Path $PSScriptRoot 'merge-ventas-internas.py') --file $venta --cutoff $closeMonth }
+  Step 'OTC MAGNUS venta'       { & $py (Join-Path $PSScriptRoot 'apply-otc-magnus-split.py') --file $venta --cutoff $closeMonth }
+  Step 'mujer TRIP venta'       { & $py (Join-Path $PSScriptRoot 'fix-mujer-trip-venta.py') $venta --cutoff $closeMonth }
+} else {
+  Write-Warning "Venta no resuelta -> se saltea merge/splits de venta."
+}
+Step 'OTC MAGNUS iqvia/rec'  { & $py (Join-Path $PSScriptRoot 'split-otc-magnus-iqvia-recetas.py') }
+
+# 12. Competidores (panel regional; su carpeta = cycleFolder)
+Step 'competidores data' { & $py (Join-Path $PSScriptRoot 'build-competidores-shape-a.py') --month $cycleFolder }
 foreach ($s in 'build-competidores-pages.py','update-ddd-from-competidores.py','update-ddd-mujer-from-competidores.py','update-ddd-otcdata-from-competidores.py') {
   $p = Join-Path $PSScriptRoot $s
   if (Test-Path -LiteralPath $p) { Step $s { & $py $p } }
 }
 
-# 4. KPIs consolidados + sync del strip en las 7
-Step 'build-kpis'        { & $py (Join-Path $PSScriptRoot 'build-kpis.py') --repo $repo }
-Step 'build-families'    { & $py (Join-Path $PSScriptRoot 'build-families-perf.py') }
-Step 'sync-kpistrip'     { & $py (Join-Path $PSScriptRoot 'sync-kpistrip-with-kpis-json.py') }
+# 13. Recompute aggregates con cierre FIJO (mata el bug del MAT que se achica)
+Step 'recompute aggregates' { & $py (Join-Path $PSScriptRoot 'recompute-mol-perf-aggregates.py') --cierre $closeMonth }
 
-# 5. Etiquetas consistentes + "Datos al" = hoy
-Step 'finalize-labels'   { & $py (Join-Path $PSScriptRoot 'finalize-labels.py') }
+# 14. KPIs consolidados + strip en las 7
+Step 'build-kpis'     { & $py (Join-Path $PSScriptRoot 'build-kpis.py') --repo $repo }
+Step 'build-families' { & $py (Join-Path $PSScriptRoot 'build-families-perf.py') }
+Step 'sync-kpistrip'  { & $py (Join-Path $PSScriptRoot 'sync-kpistrip-with-kpis-json.py') }
 
-# 6. Cache-busters
-Step 'cache-busters'     { & $py (Join-Path $PSScriptRoot 'bump-cache-busters.py') }
+# 15-16. Etiquetas + cache-busters
+Step 'finalize-labels' { & $py (Join-Path $PSScriptRoot 'finalize-labels.py') }
+Step 'cache-busters'   { & $py (Join-Path $PSScriptRoot 'bump-cache-busters.py') }
 
-# 7. Gates
+# 17. Gates
 Write-Host "`n================================================================" -ForegroundColor Cyan
 Write-Host " GATES" -ForegroundColor Cyan
 Write-Host "================================================================" -ForegroundColor Cyan
@@ -101,7 +125,7 @@ $gateFail = $false
 foreach ($g in @(
     @{n='syntax';  s='check-syntax-and-consistency.py'; a=@()},
     @{n='audit';   s='audit-full.py';                   a=@()},
-    @{n='history'; s='verify-history-preserved.py';     a=@('--baseline','HEAD')}
+    @{n='history'; s='verify-history-preserved.py';     a=@('--baseline','HEAD','--strict')}
 )) {
   $gp = Join-Path $PSScriptRoot $g.s
   if (-not (Test-Path -LiteralPath $gp)) { continue }
