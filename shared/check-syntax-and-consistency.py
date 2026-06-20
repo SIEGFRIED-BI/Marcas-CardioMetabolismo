@@ -211,6 +211,21 @@ def check_date_literals_in_render(t, label):
     return issues
 
 
+def check_return_glued(t, label):
+    """Detecta 'return' PEGADO a un global/keyword (return + sin espacio), p.ej.
+    'returnArray.from(' por 'return Array.from(' -> ReferenceError silencioso que
+    rompe el render (paso justo: rompio los 3 DDD, ningun gate lo atrapaba).
+    Conservador: solo formas que casi nunca son identificadores validos."""
+    issues = []
+    pat = (r'\breturn(Array|Object|JSON|Math|String|Number|Boolean|Date|Promise|'
+           r'Map|Set|new|null|true|false|document|window|function)\b')
+    for mt in re.finditer(pat, t):
+        line = t[:mt.start()].count('\n') + 1
+        issues.append(f"{label}: RETURN-GLUED 'return{mt.group(1)}' ~linea {line} "
+                      f"-> falta el espacio: 'return {mt.group(1)}...' (ReferenceError).")
+    return issues
+
+
 def main():
     all_issues = []
 
@@ -224,6 +239,7 @@ def main():
         all_issues += check_sku_level_sie(t, rel)
         all_issues += check_excluded_products(t, rel)
         all_issues += check_date_literals_in_render(t, rel)
+        all_issues += check_return_glued(t, rel)
 
     js_files = collect_data_js()
     for f in js_files:
