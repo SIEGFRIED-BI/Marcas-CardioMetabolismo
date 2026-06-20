@@ -30,6 +30,7 @@ PAGES = [
 
 # Assets compartidos a cache-bustear (los que existan).
 SHARED_ASSETS = [
+    'render/sections.js',
     'multi-period-table.js', 'multi-period-table.css',
     'budget-overrides.js', 'ux-shared.js', 'data-status.js',
     'export-pdf.js', 'export-common.js', 'export-dashboard.js', 'export-ddd.js',
