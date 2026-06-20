@@ -45,7 +45,7 @@ LINES = [
     {'key':'respi',   'kind':'data.js', 'path':'respiratorio/data.js'},
     {'key':'SNC',     'kind':'inline',  'path':'SNC/index.html'},
     {'key':'mujer',   'kind':'inline',  'path':'mujer/index.html'},
-    {'key':'dermato', 'kind':'inline',  'path':'dermatologia/dermato_dashboard.html'},
+    {'key':'dermato', 'kind':'data.js', 'path':'dermatologia/data.js'},
 ]
 
 # Mapeo de segmento (mujer inline D) -> familia(s) del Excel

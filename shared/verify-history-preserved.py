@@ -28,7 +28,7 @@ LINES = [
     ('respi',   'respiratorio/data.js',               'window.OTC_DASHBOARD'),
     ('mujer',   'mujer/index.html',                   'const D'),
     ('SNC',     'SNC/index.html',                     'const D'),
-    ('derma',   'dermatologia/dermato_dashboard.html','const D'),
+    ('derma',   'dermatologia/data.js','window.OTC_DASHBOARD'),
 ]
 
 MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,

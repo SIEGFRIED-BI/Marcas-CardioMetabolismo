@@ -26,7 +26,7 @@ LINES = [
     ('cardio', 'cardio/data.js', False), ('ATB', 'ATB/data.js', False),
     ('OTC', 'OTC/data.js', False), ('respi', 'respiratorio/data.js', False),
     ('mujer', 'mujer/index.html', True), ('SNC', 'SNC/index.html', True),
-    ('derma', 'dermatologia/dermato_dashboard.html', True),
+    ('derma', 'dermatologia/data.js', False),
 ]
 WARN_HI, FAIL_HI = 300, 500
 WARN_LO = 30  # < WARN_LO -> warning (no bloquea; cumpl bajo es ambiguo)

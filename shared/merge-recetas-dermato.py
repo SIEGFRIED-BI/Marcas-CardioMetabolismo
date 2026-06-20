@@ -30,7 +30,7 @@ from pathlib import Path
 import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
-HTML = REPO / 'dermatologia' / 'dermato_dashboard.html'
+HTML = REPO / 'dermatologia' / 'data.js'  # F4: dato externo (window.OTC_DASHBOARD)
 MES_EN = {1:'Jan',2:'Feb',3:'Mar',4:'Apr',5:'May',6:'Jun',7:'Jul',8:'Aug',9:'Sep',10:'Oct',11:'Nov',12:'Dec'}
 
 # familia -> (substring del mercado en el pivot, marca SIE de la familia en el pivot)
@@ -131,7 +131,7 @@ def main():
     print('Meses en pivot:', months)
 
     text = HTML.read_text(encoding='utf-8', errors='replace')
-    m = re.search(r'const\s+D\s*=\s*', text)
+    m = re.search(r'(?:const\s+D|window\.OTC_DASHBOARD)\s*=\s*', text)
     ob = text.index('{', m.end())
     D, end = json.JSONDecoder().raw_decode(text[ob:])
     rec_comp = D.setdefault('rec_comp', {})

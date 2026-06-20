@@ -25,7 +25,7 @@ MAP = {
     'resp':    ('resp', 'respiratorio/data.js', False),
     'mujer':   ('mujer', 'mujer/index.html', True),
     'snc':     ('snc', 'SNC/index.html', True),
-    'derma':   ('derma', 'dermatologia/dermato_dashboard.html', True),
+    'derma':   ('derma', 'dermatologia/data.js', False),
 }
 
 

@@ -63,7 +63,7 @@ LINES = [
      'source':('data.js','OTC/data.js')},
     {'key':'derma',   'name':'Dermatología',     'icon':'🩹', 'color':'#D97706',
      'href':'dermatologia/',  'owner':'Javier Rodríguez',
-     'source':('inline','dermatologia/dermato_dashboard.html')},
+     'source':('data.js','dermatologia/data.js')},
 ]
 
 

@@ -21,11 +21,11 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 # Solo las inline (const D): son las de historia larga que el sync recorta.
 # Las data.js (cardio/ATB/OTC/respi) tienen ventana Feb-2024+ -> no sufren esto.
-FILES = ['SNC/index.html', 'dermatologia/dermato_dashboard.html', 'mujer/index.html']
+FILES = ['SNC/index.html', 'dermatologia/data.js', 'mujer/index.html']
 
 
 def load_D(text):
-    m = re.search(r'const\s+D\s*=\s*', text)
+    m = re.search(r'(?:const\s+D|window\.OTC_DASHBOARD)\s*=\s*', text)
     if not m:
         return None, None, None
     ob = text.index('{', m.end())

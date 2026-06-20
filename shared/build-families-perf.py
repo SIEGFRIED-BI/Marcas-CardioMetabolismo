@@ -34,7 +34,7 @@ LINES = [
     ('resp',   'Respiratoria',      'respiratorio/data.js', False),
     ('mujer',  'Mujer',             'mujer/index.html', True),
     ('snc',    'SNC',               'SNC/index.html', True),
-    ('derma',  'Dermatología',      'dermatologia/dermato_dashboard.html', True),
+    ('derma',  'Dermatología',      'dermatologia/data.js', False),
 ]
 
 MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,

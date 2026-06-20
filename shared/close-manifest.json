@@ -81,7 +81,7 @@
       "segmentations": ["pgb_multidosis", "brexpiprazole"]
     },
     "dermato": {
-      "structure": "inline", "file": "dermatologia\\dermato_dashboard.html", "anchor": "const D",
+      "structure": "data.js", "file": "dermatologia\\data.js", "anchor": "window.OTC_DASHBOARD",
       "buildScript": null, "syncScript": "shared\\sync-dermato-pm.py",
       "hubFolder": null, "fuentesSub": null,
       "useCentralIqvia": true, "useSlicedIqvia": false, "overrideBaseDir": null,
