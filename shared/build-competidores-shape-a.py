@@ -32,8 +32,11 @@ LINE_CFG = [
     ('OTC',          'OTC',         'OTC/DDD/competidores-data.js'),
     ('dermato',      'dermato',     'dermatologia/competidores-data.js'),
     ('cardio',       'cardio',      'cardio/DDD/competidores-data.js'),
-    ('mujer',        'linea-mujer', 'mujer/DDD/competidores-data.js'),
     ('SNC',          'PSQ',         'SNC/DDD/competidores-data.js'),
+    # mujer NO va aca: usa mercados PERSONALIZADOS (segmentos de marketing:
+    # Isis/Mini/Nat, Trip, Siderblut...) via build-mujer-competidores-data.py.
+    # NO regenerar mujer con este builder generico molecula/ATC (colapsa los
+    # segmentos custom). Ver memoria iqvia-base-unica-arquitectura.
 ]
 
 def resolve_regional_xlsx(hub_sub, month):
