@@ -493,8 +493,8 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
     const cache = VIS_BY_MKT[market];
     if (HEAT_PRESET==='all') return new Set(allRanked.map(r=>r.brand));
     if (HEAT_PRESET==='sie') return new Set(allRanked.filter(r=>r.isSie).map(r=>r.brand));
-    if (HEAT_PRESET==='top5') return new Set(allRanked.slice(0,5).map(r=>r.brand));
-    if (HEAT_PRESET==='top10') return new Set(allRanked.slice(0,10).map(r=>r.brand));
+    if (HEAT_PRESET==='top5')  { const s=new Set(allRanked.slice(0,5).map(r=>r.brand));  allRanked.forEach(r=>{if(r.isSie)s.add(r.brand);}); return s; }
+    if (HEAT_PRESET==='top10') { const s=new Set(allRanked.slice(0,10).map(r=>r.brand)); allRanked.forEach(r=>{if(r.isSie)s.add(r.brand);}); return s; }
     // custom
     if (cache.size===0) allRanked.slice(0,10).forEach(r=>cache.add(r.brand));
     return cache;
