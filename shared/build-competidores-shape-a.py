@@ -150,6 +150,28 @@ def _title(s: str) -> str:
     return ' '.join(w.capitalize() for w in str(s).split())
 
 
+# Overrides curados (semilla del parametrizador): corrigen mislabels del panel
+# IQVIA que el agrupamiento automatico molecula/ATC no puede detectar solo.
+_OVR_FILE = REPO / 'shared' / 'ddd-competidores-overrides.json'
+try:
+    OVERRIDES = json.loads(_OVR_FILE.read_text(encoding='utf-8')) if _OVR_FILE.is_file() else {}
+except (ValueError, OSError):
+    OVERRIDES = {}
+
+
+def apply_overrides(line: str, molecules: set, atc: str, key: str):
+    """Devuelve (key, corrected_atc). Si una regla molecule_regroup de la linea
+    matchea (la marca contiene if_molecule y su ATC == in_atc), re-asigna el
+    mercado a new_key y reporta corrected_atc para la metadata. Sin match -> sin
+    cambios. Cada regla esta justificada por una inconsistencia interna del dato."""
+    for rule in OVERRIDES.get('molecule_regroup', {}).get(line, []):
+        if rule.get('if_molecule') in molecules:
+            in_atc = rule.get('in_atc')
+            if not in_atc or atc == in_atc:
+                return rule['new_key'], rule.get('corrected_atc')
+    return key, None
+
+
 def build_one(line: str, xlsx: Path, out: Path) -> str:
     """Agrupa competidores HIBRIDO molecula/ATC (no por la columna 'Mercado', que
     mezcla moleculas). Mono-producto -> mercado = su MOLECULA (Droga). Combo (>1
@@ -218,10 +240,14 @@ def build_one(line: str, xlsx: Path, out: Path) -> str:
             key = 'MOL:' + (next(iter(dz)) if dz else b)
         else:
             key = 'ATC:' + (atc if atc else '+'.join(sorted(dz)))
+        # Override curado (parametrizador): corrige mislabels del panel que el
+        # agrupamiento automatico no detecta (ej: montelukast etiquetado R01B0).
+        key, corr_atc = apply_overrides(line, dz, atc, key)
         brand_market[b] = key
         m = meta.setdefault(key, {'mol': set(), 'atc': set()})
         m['mol'] |= dz
-        if atc: m['atc'].add(atc)
+        eff_atc = corr_atc or atc
+        if eff_atc: m['atc'].add(eff_atc)
 
     mkt_brands = defaultdict(list)
     for b, k in brand_market.items():

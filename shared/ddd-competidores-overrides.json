@@ -1,0 +1,17 @@
+{
+  "_comment": "Overrides CURADOS del DDD competidores (semilla del parametrizador). Corrigen mislabels del panel IQVIA que el agrupamiento automatico molecula/ATC NO puede detectar solo. Cada regla debe estar justificada por una inconsistencia INTERNA del dato (ej: una molecula que contradice su ATC). NO usar para overridear clasificaciones del panel que son internamente consistentes (eso seria afirmar que IQVIA esta mal sin senal en el dato; decision de negocio, no de este archivo).",
+  "_schema": {
+    "molecule_regroup": "por linea, lista de reglas: si la marca (combo) contiene 'if_molecule' Y su ATC dominante == 'in_atc', se re-asigna su mercado a 'new_key' (formato 'ATC:xxxx' o 'MOL:xxxx'). 'corrected_atc' (opcional) es el ATC real que se guarda en la metadata del mercado nuevo."
+  },
+  "molecule_regroup": {
+    "respiratorio": [
+      {
+        "comment": "AIREAL PLUS (flagship SIE) y los demas combos de montelukast (LUKAST COMPUESTO, MONTRATE PLUS, SUPRALER M, ALERVITAN, PLENAIR PLUS) vienen mislabeleados ATC=R01B0 (descongestivos nasales sistemicos) en el panel. Pero montelukast + antihistaminico es R03DC53 (obstruccion via aerea, sistema respiratorio R03): la molecula MONTELUKAST contradice el ATC R01B0. Se los regrupa por montelukast, separandolos de los descongestivos antihistaminico+pseudoefedrina (DECIDEX, ALERPRIV D, FRENALER D, NASTIZOL, ALERCAS D, HEXALER PLUS, ...) que SI son legitimamente R01B0. Asi AIREAL PLUS queda con su set competitivo real (otros combos montelukast) y HEXALER PLUS con el suyo (descongestivos).",
+        "if_molecule": "MONTELUKAST",
+        "in_atc": "R01B0",
+        "new_key": "ATC:R03DC53",
+        "corrected_atc": "R03DC53"
+      }
+    ]
+  }
+}
