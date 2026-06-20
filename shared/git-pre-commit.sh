@@ -89,4 +89,18 @@ if git diff --cached --name-only | grep -qE '(data\.js|index\.html|dermato_dashb
         exit 1
     fi
 fi
+
+# Check 7: render-parity (F3). Bloquea que una funcion del bundle shared/render/
+# se vuelva a copiar inline en una pagina (regresion del fix-7-veces).
+if git diff --cached --name-only | grep -qE '(index\.html|dermato_dashboard\.html|shared/render/.*\.js)$'; then
+    echo "Running render-parity check..."
+    py shared/check-render-parity.py
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "RENDER-PARITY FAILED -- commit bloqueado"
+        echo "Una funcion de render compartida quedo definida inline en una pagina."
+        echo "Debe venir SOLO del bundle shared/render/ (borrar la copia inline)."
+        exit 1
+    fi
+fi
 exit 0
