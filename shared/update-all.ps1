@@ -107,7 +107,7 @@ Step 'OTC MAGNUS iqvia/rec'  { & $py (Join-Path $PSScriptRoot 'split-otc-magnus-
 # defecto (la data IQVIA/venta/KPIs SI se actualiza). Correr aparte: -Competidores.
 if ($Competidores) {
   Step 'competidores data' { & $py (Join-Path $PSScriptRoot 'build-competidores-shape-a.py') --month $cycleFolder }
-  foreach ($s in 'build-competidores-pages.py','update-ddd-from-competidores.py','update-ddd-mujer-from-competidores.py','update-ddd-otcdata-from-competidores.py') {
+  foreach ($s in 'build-competidores-pages.py','rebuild-ddd-inline-from-competidores.py','update-ddd-mujer-from-competidores.py','update-ddd-otcdata-from-competidores.py') {
     $p = Join-Path $PSScriptRoot $s
     if (Test-Path -LiteralPath $p) { Step $s { & $py $p } }
   }
