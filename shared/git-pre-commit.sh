@@ -131,4 +131,18 @@ if git diff --cached --name-only | grep -qE 'data\.js$'; then
         exit 1
     fi
 fi
+
+# Check 10: brandKpis market_total/ms vs mol_perf (agregado autoritativo). Bloquea
+# market_total de un mercado más amplio o units del mes (no MAT).
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    echo "Running brandKpis-market-total check..."
+    py shared/fix-brandkpis-market-total.py --check
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "BRANDKPIS-MARKET FAILED -- commit bloqueado"
+        echo "Algun brandKpis.market_total/ms no coincide con mol_perf[fam].ytd/mat."
+        echo "Correr: py shared/fix-brandkpis-market-total.py"
+        exit 1
+    fi
+fi
 exit 0

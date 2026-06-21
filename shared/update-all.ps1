@@ -122,8 +122,12 @@ Step 'recompute aggregates' { & $py (Join-Path $PSScriptRoot 'recompute-mol-perf
 Step 'build-kpis'     { & $py (Join-Path $PSScriptRoot 'build-kpis.py') --repo $repo }
 Step 'build-families' { & $py (Join-Path $PSScriptRoot 'build-families-perf.py') }
 Step 'sync-kpistrip'  { & $py (Join-Path $PSScriptRoot 'sync-kpistrip-with-kpis-json.py') }
-# brandKpis[marca].ie = IE relativo al mercado (no crecimiento propio). build-data deja
-# crecimiento propio; esto lo recomputa vs-mercado para las 7. Idempotente.
+# brandKpis[marca].market_total/ms/units = agregado autoritativo de mol_perf[fam].ytd/mat
+# (build-data a veces deja un mercado más amplio o valores del mes). Va PRIMERO porque
+# corrige units, de las que depende el IE. Idempotente.
+Step 'brandKpis market_total' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-market-total.py') }
+# brandKpis[marca].ie = IE relativo al mercado (no crecimiento propio), con las units
+# ya corregidas por el paso anterior. Idempotente.
 Step 'brandKpis IE vs mercado' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-ie-vs-market.py') }
 
 # 15-16. Etiquetas + cache-busters
@@ -142,6 +146,7 @@ foreach ($g in @(
     @{n='ddd';     s='check-ddd-health.py';             a=@()},
     @{n='labels';  s='audit-labels.py';                 a=@()},
     @{n='ie-rel';  s='fix-brandkpis-ie-vs-market.py';   a=@('--check')},
+    @{n='bk-mkt';  s='fix-brandkpis-market-total.py';   a=@('--check')},
     @{n='audit';   s='audit-full.py';                   a=@()},
     @{n='history'; s='verify-history-preserved.py';     a=@('--baseline','HEAD','--strict')}
 )) {
