@@ -145,4 +145,31 @@ if git diff --cached --name-only | grep -qE 'data\.js$'; then
         exit 1
     fi
 fi
+
+# Check 11: convenios sin filas duplicadas exactas (misma OS + mismas unidades con
+# código distinto) que el render suma -> doble conteo.
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    echo "Running convenios-dedup check..."
+    py shared/dedup-convenios-exact.py --check
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "CONVENIOS-DEDUP FAILED -- commit bloqueado"
+        echo "Hay filas de convenios duplicadas exactas (doble conteo en el render)."
+        echo "Correr: py shared/dedup-convenios-exact.py"
+        exit 1
+    fi
+fi
+
+# Check 12: brandKpis.rec.ms sin ceros espurios (0 con dato en rec_ms).
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    echo "Running brandKpis-rec check..."
+    py shared/fix-brandkpis-rec.py --check
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "BRANDKPIS-REC FAILED -- commit bloqueado"
+        echo "Algun brandKpis.rec.ms quedo en 0 teniendo dato en rec_ms."
+        echo "Correr: py shared/fix-brandkpis-rec.py"
+        exit 1
+    fi
+fi
 exit 0

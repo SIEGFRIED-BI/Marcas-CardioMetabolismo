@@ -129,6 +129,11 @@ Step 'brandKpis market_total' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-ma
 # brandKpis[marca].ie = IE relativo al mercado (no crecimiento propio), con las units
 # ya corregidas por el paso anterior. Idempotente.
 Step 'brandKpis IE vs mercado' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-ie-vs-market.py') }
+# convenios: quita filas duplicadas exactas (misma OS con código distinto y mismas
+# unidades) que el render suma -> doble conteo (PAMI/IOMA/SWISS). Idempotente.
+Step 'convenios dedup' { & $py (Join-Path $PSScriptRoot 'dedup-convenios-exact.py') }
+# brandKpis[marca].rec.ms: rellena desde rec_ms si quedó en 0 con dato (MOMETAX). Idempotente.
+Step 'brandKpis rec.ms' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-rec.py') }
 
 # 15-16. Etiquetas + cache-busters
 Step 'finalize-labels' { & $py (Join-Path $PSScriptRoot 'finalize-labels.py') }
@@ -147,6 +152,8 @@ foreach ($g in @(
     @{n='labels';  s='audit-labels.py';                 a=@()},
     @{n='ie-rel';  s='fix-brandkpis-ie-vs-market.py';   a=@('--check')},
     @{n='bk-mkt';  s='fix-brandkpis-market-total.py';   a=@('--check')},
+    @{n='conv-dup';s='dedup-convenios-exact.py';        a=@('--check')},
+    @{n='bk-rec';  s='fix-brandkpis-rec.py';            a=@('--check')},
     @{n='audit';   s='audit-full.py';                   a=@()},
     @{n='history'; s='verify-history-preserved.py';     a=@('--baseline','HEAD','--strict')}
 )) {

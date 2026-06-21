@@ -117,7 +117,7 @@ def main():
         text = p.read_text(encoding='utf-8', errors='replace'); orig = text
         obj, obj_start = find_live_obj(text)
         labels = {'footer_date': today}
-        new_im = None
+        new_im = None; meta_dates = {}
         if obj:
             iq = last_iqvia(obj)
             if iq:
@@ -126,6 +126,12 @@ def main():
                 labels['kpi_ytd_prev_label'] = f"YTD {ES[mm]}'{yy-1}"
                 labels['kpi_mat_label'] = f"MAT {ES[mm]}'{yy}"
                 labels['kpi_mat_prev_label'] = f"MAT {ES[mm]}'{yy-1}"
+                # meta.latest_month/latestKey/prevKey desde el dato real (corrige el
+                # stale 'Apr 2026' en SNC/derma/mujer). Solo ACTUALIZA si ya existen.
+                _en = {v: k for k, v in MES_INV.items()}
+                meta_dates = {'latest_month': f'{_en[mm]} {yy}',
+                              'latestKey':    f'{_en[mm]} {yy}',
+                              'prevKey':      f'{_en[mm]} {yy-1}'}
                 # iqviaMeta (solo mujer): objeto anidado con el corte IQVIA.
                 # Sus cards LEEN datos por latestKey -> si queda viejo, muestran
                 # el mes anterior aunque mol_perf este al dia. Regenerar completo.
@@ -142,6 +148,10 @@ def main():
         for key, val in labels.items():
             text, n = ensure_label(text, key, val, obj_start)
             if n: changed.append(f'{key}={val}({n})')
+        # meta dates: update-only (set_label no inserta -> no cambia parity de meta)
+        for mkey, mval in meta_dates.items():
+            text, n = set_label(text, mkey, mval)
+            if n: changed.append(f'{mkey}={mval}({n})')
         if new_im:
             text, n = re.subn(r'"iqviaMeta"\s*:\s*\{[^{}]*\}',
                               '"iqviaMeta":' + json.dumps(new_im, ensure_ascii=False), text)
