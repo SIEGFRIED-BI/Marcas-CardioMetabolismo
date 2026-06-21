@@ -6,7 +6,7 @@
 <title>Línea S.N.C. · Siegfried</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="./data.js?v=4381a8de9e"></script>
+<script src="./data.js?v=a15614e6bd"></script>
 <script src="../shared/budget-overrides.js?v=0e5cee0263"></script>
 <style>
 :root{
@@ -732,7 +732,7 @@ function renderBrandKpis(){
   document.getElementById('brand-kpi-period-label').textContent = '· ' + period;
 
   // ── IQVIA data ──
-  let units=null, unitsPrev=null, ms=null, mktTotal=null;
+  let units=null, unitsPrev=null, ms=null, mktTotal=null, mktPrev=null;
   const sieProdName = brand + ' (SIE)';
   if(pm.mol && D.mol_perf[pm.mol]){
     const molData = D.mol_perf[pm.mol];
@@ -749,9 +749,13 @@ function renderBrandKpis(){
       // Market total from mol level
       const molMkt = molData[_fld]?.[_curK];
       if(molMkt && units) mktTotal = molMkt;
+      mktPrev = molData[_fld]?.[_prevK];
     }
   }
-  const ie = (units && unitsPrev) ? Math.round(units / unitsPrev * 100) : null;
+  // growth = crecimiento propio de la marca; ie = IE relativo al mercado (base 100, con cap de volatilidad).
+  const growth = (units && unitsPrev) ? Math.round((units/unitsPrev-1)*1000)/10 : null;
+  const _br = (units&&unitsPrev) ? units/unitsPrev : null, _mr = (mktTotal&&mktPrev) ? mktTotal/mktPrev : null;
+  const ie = (_br!=null && _mr && _br<5 && _mr>0.2 && _mr<5) ? Math.round(_br/_mr*100) : null;
   const ieColor   = !ie?'b':ie>=100?'g':ie>=90?'y':'r';
   const ieAccent  = !ie?'var(--blue)':ie>=100?'var(--green)':ie>=90?'var(--yellow)':'var(--red)';
 
@@ -789,7 +793,7 @@ function renderBrandKpis(){
   items.push({
     lbl:`IE · ${period}`, accent:ieAccent, cls:ieColor,
     num: ie ? ie+'' : '—',
-    sub: ie ? (ie>=100?'▲ Sobre año anterior':'▼ Bajo año anterior') : 'Sin datos IQVIA',
+    sub: ie ? (ie>=100?'▲ Sobre el mercado':'▼ Bajo el mercado') : 'Sin datos IQVIA',
     sub2: units&&unitsPrev ? `${fmt(units)} vs ${fmt(unitsPrev)} u.` : '',
   });
 
@@ -810,18 +814,18 @@ function renderBrandKpis(){
       lbl:`Unidades IQVIA · ${period}`, accent:'var(--cyan)', cls:'b',
       num: uStr,
       sub: unitsPrev ? `${periodPrev}: ${fmt(unitsPrev)} u.` : '',
-      sub2: ie&&ie!==100 ? `${ie>=100?'▲':'▼'} ${Math.abs(ie-100).toFixed(1)}% vs año ant.` : '',
+      sub2: growth!=null&&growth!==0 ? `${growth>=0?'▲':'▼'} ${Math.abs(growth).toFixed(1)}% vs año ant.` : '',
     });
   }
 
   // Crecimiento
-  if(ie!==null){
+  if(growth!==null){
     items.push({
-      lbl:`Crecimiento · ${period}`, 
-      accent: ie>=100?'var(--green)':'var(--red)', 
-      cls: ie>=100?'g':'r',
-      num: (ie>=100?'+':'')+(ie-100).toFixed(1)+'%',
-      sub: `iEvol ${ie}`,
+      lbl:`Crecimiento · ${period}`,
+      accent: growth>=0?'var(--green)':'var(--red)',
+      cls: growth>=0?'g':'r',
+      num: (growth>=0?'+':'')+growth.toFixed(1)+'%',
+      sub: ie!=null?`iEvol ${ie}`:'',
       sub2: units&&unitsPrev ? `${fmt(units)} vs ${fmt(unitsPrev)} u.` : '',
     });
   }
@@ -874,7 +878,7 @@ function renderKpis(){
   const ie    = isYtd ? k.ie_ytd    : k.ie_mat;
   const ms    = isYtd ? k.ms_ytd    : k.ms_mat;
   const units = isYtd ? k.units_ytd : k.units_mat;
-  const unitsPrev = isYtd ? (k.sie_ytd25||k.units_ytd25) : (k.sie_mat25||k.units_mat25);
+  const unitsPrev = isYtd ? (k.units_ytd25||k.sie_ytd25) : (k.units_mat25||k.sie_mat25);
   const mkt   = isYtd ? k.mkt_ytd26 : k.mkt_mat26;
   const budLabel = D.meta?.budget_label || "";
   const period = (isYtd ? (D.meta?.kpi_ytd_label || "YTD") : (D.meta?.kpi_mat_label || "MAT")) + brandLabel;
@@ -892,7 +896,7 @@ function renderKpis(){
       lbl:`IE Línea · ${period}`,
       num: ie||'—', cls:ieColor, accent:ieAccent,
       sub:`vs ${periodPrev}`,
-      sub2: ie ? (ie>=100?'▲ Por encima del año anterior':'▼ Por debajo del año anterior') : '',
+      sub2: ie ? (ie>=100?'▲ Por encima del mercado':'▼ Por debajo del mercado') : '',
     },
     {
       lbl:`MS% Línea · ${period}`,
@@ -909,9 +913,9 @@ function renderKpis(){
     },
     {
       lbl:`Crecimiento Línea · ${period}`,
-      num: ie&&ie>0 ? (ie>=100?'+':'')+(ie-100).toFixed(1)+'%' : '—',
-      cls: ie>=100?'g':'r', accent: ie>=100?'var(--green)':'var(--red)',
-      sub:ie?`iEvol ${ie}`:'',  
+      num: (units&&unitsPrev) ? ((units>=unitsPrev?'+':'')+((units/unitsPrev-1)*100).toFixed(1)+'%') : '—',
+      cls: (units>=unitsPrev)?'g':'r', accent: (units>=unitsPrev)?'var(--green)':'var(--red)',
+      sub:ie?`iEvol ${ie}`:'',
       sub2:units&&unitsPrev?`${fmt(units)} vs ${fmt(unitsPrev)} u.`:'',  
     },
     {

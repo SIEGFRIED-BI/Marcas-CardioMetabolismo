@@ -117,4 +117,18 @@ if git diff --cached --name-only | grep -qE '(DDD/.*\.(html|js)|dermato_ddd\.htm
         exit 1
     fi
 fi
+
+# Check 9: IE relativo al mercado. Bloquea que brandKpis[marca].ie quede como
+# crecimiento propio (units/units_prev) en vez de IE vs-mercado (base 100).
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    echo "Running IE-vs-market check..."
+    py shared/fix-brandkpis-ie-vs-market.py --check
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "IE-RELATIVE FAILED -- commit bloqueado"
+        echo "Algun brandKpis.ie quedo como crecimiento propio en vez de IE vs-mercado."
+        echo "Correr: py shared/fix-brandkpis-ie-vs-market.py"
+        exit 1
+    fi
+fi
 exit 0

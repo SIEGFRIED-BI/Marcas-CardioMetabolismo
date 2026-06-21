@@ -91,10 +91,10 @@ def get_mat_months(D, end_year, end_month):
     return list(reversed(out))
 
 
-def patch_line(path_rel, is_inline):
+def patch_line(path_rel, is_inline, check_only=False):
     file_p = REPO / path_rel
     if not file_p.is_file():
-        return f'MISS'
+        return 0, 'MISS'
     text = file_p.read_text(encoding='utf-8-sig' if not is_inline else 'utf-8', errors='replace')
     ob = find_obj(text, is_inline)
     D, end = json.JSONDecoder().raw_decode(text[ob:])
@@ -103,7 +103,7 @@ def patch_line(path_rel, is_inline):
     bk = D.get('brandKpis', {})
     mol = D.get('mol_perf', {})
     if not bk or not mol:
-        return f'no brandKpis or mol_perf'
+        return 0, 'no brandKpis or mol_perf'
 
     brand_to_mol = build_brand_to_mol(D)
 
@@ -119,7 +119,7 @@ def patch_line(path_rel, is_inline):
         return int(parts[1])*100 + MES.index(parts[0])+1
     sorted_months = sorted(all_months, key=msort)
     if not sorted_months:
-        return 'no months'
+        return 0, 'no months'
     last = sorted_months[-1]
     last_m_name, last_y = last.split()
     last_y = int(last_y)
@@ -132,7 +132,10 @@ def patch_line(path_rel, is_inline):
     changed = 0
     for brand, kobj in bk.items():
         if not isinstance(kobj, dict): continue
-        mol_key = brand_to_mol.get(brand) or brand_to_mol.get(brand.upper())
+        # 1:1 directo: brandKpis keys == mol_perf keys (cada marca tiene su propia
+        # familia-mercado). Cubre variantes DUO/D que el mapeo por nombre-de-producto
+        # no resuelve (p.ej. CEFALEXINA ARG DUO -> producto 'CEFALEXINA ARGENTI').
+        mol_key = brand if brand in mol else (brand_to_mol.get(brand) or brand_to_mol.get(brand.upper()))
         if not mol_key:
             # Fallback: search the brand name in any mol_perf
             for k, o in mol.items():
@@ -152,11 +155,12 @@ def patch_line(path_rel, is_inline):
             if mkt_prev > 0 and ytd['units_prev'] > 0:
                 brand_ratio = ytd['units'] / ytd['units_prev']
                 mkt_ratio = mkt_curr / mkt_prev
-                if mkt_ratio > 0:
-                    new_ie = round(brand_ratio / mkt_ratio * 100, 1)
-                    if ytd.get('ie') != new_ie:
-                        ytd['ie'] = new_ie
-                        changed += 1
+                # Cap volatilidad (igual que multi-period-table.computeBrand): marca
+                # off-base (>5x) o mercado del periodo volatil/incompleto -> IE no comparable.
+                new_ie = round(brand_ratio / mkt_ratio * 100, 1) if (brand_ratio < 5 and 0.2 < mkt_ratio < 5) else None
+                if ytd.get('ie') != new_ie:
+                    ytd['ie'] = new_ie
+                    changed += 1
         # MAT
         mat = kobj.get('mat', {})
         if isinstance(mat, dict) and mat.get('units') and mat.get('units_prev'):
@@ -165,21 +169,41 @@ def patch_line(path_rel, is_inline):
             if mkt_prev > 0 and mat['units_prev'] > 0:
                 brand_ratio = mat['units'] / mat['units_prev']
                 mkt_ratio = mkt_curr / mkt_prev
-                if mkt_ratio > 0:
-                    new_ie = round(brand_ratio / mkt_ratio * 100, 1)
-                    if mat.get('ie') != new_ie:
-                        mat['ie'] = new_ie
-                        changed += 1
+                # Cap volatilidad (igual que multi-period-table.computeBrand): marca
+                # off-base (>5x) o mercado del periodo volatil/incompleto -> IE no comparable.
+                new_ie = round(brand_ratio / mkt_ratio * 100, 1) if (brand_ratio < 5 and 0.2 < mkt_ratio < 5) else None
+                if mat.get('ie') != new_ie:
+                    mat['ie'] = new_ie
+                    changed += 1
 
-    file_p.write_text(prefix + json.dumps(D, ensure_ascii=False) + suffix,
-                      encoding='utf-8', newline='')
-    return f'{changed} IEs recomputados'
+    if changed and not check_only:
+        file_p.write_text(prefix + json.dumps(D, ensure_ascii=False) + suffix,
+                          encoding='utf-8', newline='')
+    verb = 'no son relativos (necesitan recompute)' if check_only else 'recomputados'
+    return changed, f'{changed} IE(s) {verb}'
 
 
 def main():
+    import sys
+    check_only = '--check' in sys.argv
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
+    total = 0
     for path_rel, is_inline in FILES:
-        print(f'  {path_rel}: {patch_line(path_rel, is_inline)}')
+        res = patch_line(path_rel, is_inline, check_only)
+        if isinstance(res, tuple):
+            n, msg = res; total += n
+        else:
+            msg = res
+        print(f'  {path_rel}: {msg}')
+    if check_only and total > 0:
+        print(f'IE-RELATIVE FAIL: {total} brandKpis.ie quedaron como crecimiento propio. '
+              f'Correr: py shared/fix-brandkpis-ie-vs-market.py')
+        return 1
+    print('OK: brandKpis.ie relativo al mercado en las 7.' if check_only else 'Listo.')
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    sys.exit(main())

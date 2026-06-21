@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="./data.js?v=b359c50296"></script>
+<script src="./data.js?v=cbe2535c03"></script>
 <script src="../shared/budget-overrides.js?v=0e5cee0263"></script>
 <script src="../shared/export-common.js?v=f21e6390a2"></script>
 <script src="./export.js"></script>
@@ -815,7 +815,7 @@ function renderBrandKpis(){
   document.getElementById('brand-kpi-period-label').textContent='· '+(view==='ytd'?(D.meta?.kpi_ytd_label||'YTD'):(D.meta?.kpi_mat_label||'MAT'));
   const items=[];
   if(data.ie!=null){
-    items.push({lbl:`IE · ${view==='ytd'?(D.meta?.kpi_ytd_label||'YTD'):(D.meta?.kpi_mat_label||'MAT')}`,num:data.ie+'',cls:data.ie>=100?'g':data.ie>=90?'y':'r',accent:data.ie>=100?'var(--green)':data.ie>=90?'var(--yellow)':'var(--red)',sub:view==='ytd'?(D.meta?.kpi_ytd_prev_label||'Prev'):(D.meta?.kpi_mat_prev_label||'Prev'),sub2:data.ie>=100?'▲ Sobre año anterior':'▼ Bajo año anterior'});
+    items.push({lbl:`IE · ${view==='ytd'?(D.meta?.kpi_ytd_label||'YTD'):(D.meta?.kpi_mat_label||'MAT')}`,num:data.ie+'',cls:data.ie>=100?'g':data.ie>=90?'y':'r',accent:data.ie>=100?'var(--green)':data.ie>=90?'var(--yellow)':'var(--red)',sub:view==='ytd'?(D.meta?.kpi_ytd_prev_label||'Prev'):(D.meta?.kpi_mat_prev_label||'Prev'),sub2:data.ie>=100?'▲ Sobre el mercado':'▼ Bajo el mercado'});
   }
   if(data.ms!=null){
     items.push({lbl:`MS% · ${view==='ytd'?(D.meta?.kpi_ytd_label||'YTD'):(D.meta?.kpi_mat_label||'MAT')}`,num:data.ms.toFixed(1)+'%',cls:'b',accent:'var(--blue)',sub:data.market_total?`de ${fmt(data.market_total)} u. mercado`:'mercado familia',sub2:''});
@@ -853,9 +853,9 @@ function renderKpis(){
   const periodPrev=isYtd?(D.meta?.kpi_ytd_prev_label||'Prev'):(D.meta?.kpi_mat_prev_label||'Prev');
   const bud=k.bud_pct||0;
   const items=[
-    {lbl:`IE Línea · ${period}`,num:ie||'—',cls:!ie?'b':ie>=100?'g':ie>=90?'y':'r',accent:!ie?'var(--blue)':ie>=100?'var(--green)':ie>=90?'var(--yellow)':'var(--red)',sub:`vs ${periodPrev}`,sub2:ie?(ie>=100?'▲ Por encima del año anterior':'▼ Por debajo del año anterior'):''},
+    {lbl:`IE Línea · ${period}`,num:ie||'—',cls:!ie?'b':ie>=100?'g':ie>=90?'y':'r',accent:!ie?'var(--blue)':ie>=100?'var(--green)':ie>=90?'var(--yellow)':'var(--red)',sub:`vs ${periodPrev}`,sub2:ie?(ie>=100?'▲ Por encima del mercado':'▼ Por debajo del mercado'):''},
     {lbl:`MS% Línea · ${period}`,num:ms!=null?ms.toFixed(1)+'%':'—',cls:'b',accent:'var(--blue)',sub:'del mercado OTC',sub2:mkt?`${fmt(mkt)} u. total mercado`:''},
-    {lbl:`Unidades · ${period}`,num:!units?'—':units>=1e6?(units/1e6).toFixed(2)+'M':units>=1e3?(units/1e3).toFixed(1)+'k':fmt(units),cls:'b',accent:'var(--cyan)',sub:'SIE OTC',sub2:unitsPrev?`${periodPrev}: ${fmt(unitsPrev)} u.`:''},    {lbl:`Crecimiento Línea · ${period}`,num:ie&&ie>0?(ie>=100?'+':'')+(ie-100).toFixed(1)+'%':'—',cls:ie>=100?'g':'r',accent:ie>=100?'var(--green)':'var(--red)',sub:ie?`iEvol ${ie}`:'',sub2:units&&unitsPrev?`${fmt(units)} vs ${fmt(unitsPrev)} u.`:''},
+    {lbl:`Unidades · ${period}`,num:!units?'—':units>=1e6?(units/1e6).toFixed(2)+'M':units>=1e3?(units/1e3).toFixed(1)+'k':fmt(units),cls:'b',accent:'var(--cyan)',sub:'SIE OTC',sub2:unitsPrev?`${periodPrev}: ${fmt(unitsPrev)} u.`:''},    {lbl:`Crecimiento Línea · ${period}`,num:(units&&unitsPrev)?((units>=unitsPrev?'+':'')+((units/unitsPrev-1)*100).toFixed(1)+'%'):'—',cls:(units>=unitsPrev)?'g':'r',accent:(units>=unitsPrev)?'var(--green)':'var(--red)',sub:ie?`iEvol ${ie}`:'',sub2:units&&unitsPrev?`${fmt(units)} vs ${fmt(unitsPrev)} u.`:''},
     {lbl:`Estimado · ${D.meta?.budget_label||'2026'}`,num:bud?bud+'%':'—',cls:bud>=100?'g':bud>=85?'y':'r',accent:bud>=100?'var(--green)':bud>=85?'var(--yellow)':'var(--red)',sub:k.bud_total?`${fmt(k.real_total)} de ${fmt(k.bud_total)} u.`:'Sin datos de estimado',sub2:!k.bud_total?'':bud>=100?'✓ Objetivo alcanzado':`Δ ${fmt((k.real_total||0)-(k.bud_total||0))} u.`},
 
     {lbl:`MS% Recetas · ${D.meta?.rec_label||'Recetas'}`,num:k.ms_rec?k.ms_rec.toFixed(1)+'%':'—',cls:'p',accent:'var(--purple)',sub:k.sie_rec_dic25?`${fmt(k.sie_rec_dic25)} de ${fmt(k.tot_rec_dic25)} rec.`:'',sub2:'CloseUp · mercado OTC'},

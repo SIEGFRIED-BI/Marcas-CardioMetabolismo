@@ -912,9 +912,19 @@ def main():
                 """IE = (curr/prev)*100. None si prev<=0 o falta."""
                 if c is None or p is None or p <= 0: return None
                 return round(c / p * 100, 1)
+            def ie_vs_market(brand_c, brand_p, mkt_c, mkt_p):
+                """IE relativo al mercado = (brand_c/brand_p)/(mkt_c/mkt_p)*100.
+                100 = la marca creció igual que su mercado. None si falta algun dato o prev<=0."""
+                if brand_c is None or brand_p is None or brand_p <= 0: return None
+                if mkt_c is None or mkt_p is None or mkt_p <= 0: return None
+                mkt_ratio = mkt_c / mkt_p
+                if mkt_ratio == 0: return None
+                return round((brand_c / brand_p) / mkt_ratio * 100, 1)
             # IE / MS comparable usan sym (curr emparejado a meses prev disponibles)
             rec_sie_c_sym = rec.get('sie_curr_sym', rec['sie_curr'])
             rec_mkt_c_sym = rec.get('mkt_curr_sym', rec['mkt_curr'])
+            iq_sie_c_sym  = iqvia.get('sie_curr_sym', iqvia['sie_curr'])
+            iq_mkt_c_sym  = iqvia.get('mkt_curr_sym', iqvia['mkt_curr'])
             kpis[period] = {
                 'recetas_sie':   {'curr': rec['sie_curr'],   'prev': rec['sie_prev'],
                                   'ie': safe_ie(rec_sie_c_sym, rec['sie_prev'])},
@@ -923,7 +933,7 @@ def main():
                 'mercado_recetas': {'curr': rec['mkt_curr'], 'prev': rec['mkt_prev'],
                                     'ie': safe_ie(rec_mkt_c_sym, rec['mkt_prev'])},
                 'units_sie':     {'curr': iqvia['sie_curr'], 'prev': iqvia['sie_prev'],
-                                  'ie': safe_ie(iqvia['sie_curr'], iqvia['sie_prev'])},
+                                  'ie': ie_vs_market(iq_sie_c_sym, iqvia['sie_prev'], iq_mkt_c_sym, iqvia['mkt_prev'])},
                 'ms_units':      {'curr': safe_ms(iqvia['sie_curr'], iqvia['mkt_curr']),
                                   'prev': safe_ms(iqvia['sie_prev'], iqvia['mkt_prev'])},
                 'mercado_units': {'curr': iqvia['mkt_curr'], 'prev': iqvia['mkt_prev'],
