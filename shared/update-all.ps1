@@ -135,6 +135,9 @@ Step 'brandKpis IE vs mercado' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-i
 # convenios: quita filas duplicadas exactas (misma OS con código distinto y mismas
 # unidades) que el render suma -> doble conteo (PAMI/IOMA/SWISS). Idempotente.
 Step 'convenios dedup' { & $py (Join-Path $PSScriptRoot 'dedup-convenios-exact.py') }
+# canales_quarterly (Mostrador vs Convenios trimestral) desde las planillas
+# 'convenios NUEVO/*' del hub. Skipea si no estan. Solo familias del tablero.
+Step 'canales trimestral' { & $py (Join-Path $PSScriptRoot 'build-canales-quarterly.py') }
 # brandKpis[marca].rec.ms: rellena desde rec_ms si quedó en 0 con dato (MOMETAX). Idempotente.
 Step 'brandKpis rec.ms' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-rec.py') }
 
