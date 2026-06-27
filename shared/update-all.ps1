@@ -101,6 +101,9 @@ Step 'OTC MAGNUS iqvia/rec'  { & $py (Join-Path $PSScriptRoot 'split-otc-magnus-
 # Estimado de MAGNUS / MAGNUS 36 desde la planilla por-SKU 'MKT sidus' (el panel de
 # budget agrupa MAGNUS combinado -> MAGNUS 36 quedaba en 0). Skipea si falta el xlsx.
 Step 'OTC MAGNUS estimado'   { & $py (Join-Path $PSScriptRoot 'fix-otc-magnus-estimado.py') }
+# Stock + Cobertura desde 'Laboratorio - Familia - Producto*' del hub (18 meses).
+# Solo familias/presentaciones del tablero. Skipea si falta el xlsx.
+Step 'stock + cobertura'     { & $py (Join-Path $PSScriptRoot 'build-stock-from-laboratorio.py') }
 
 # 12. Competidores (panel regional; su carpeta = cycleFolder).
 # OPT-IN (-Competidores): el generador de paginas (build-competidores-pages /
