@@ -98,6 +98,9 @@ if ($venta -and (Test-Path -LiteralPath $venta)) {
   Write-Warning "Venta no resuelta -> se saltea merge/splits de venta."
 }
 Step 'OTC MAGNUS iqvia/rec'  { & $py (Join-Path $PSScriptRoot 'split-otc-magnus-iqvia-recetas.py') }
+# Estimado de MAGNUS / MAGNUS 36 desde la planilla por-SKU 'MKT sidus' (el panel de
+# budget agrupa MAGNUS combinado -> MAGNUS 36 quedaba en 0). Skipea si falta el xlsx.
+Step 'OTC MAGNUS estimado'   { & $py (Join-Path $PSScriptRoot 'fix-otc-magnus-estimado.py') }
 
 # 12. Competidores (panel regional; su carpeta = cycleFolder).
 # OPT-IN (-Competidores): el generador de paginas (build-competidores-pages /
