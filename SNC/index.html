@@ -1027,6 +1027,10 @@ function renderBudget(){
   }
   const __sfPct = __sfBudget>0 ? Math.round(__sfReal/__sfBudget*100) : null;
   const __sfPend = Math.max(0, __sfBudget - __sfReal);
+  // YTD: estimado y cumplimiento sobre meses transcurridos (real vs budget del mismo periodo)
+  let __ytdLast=-1; for(let i=0;i<12;i++){ if(+real[i]>0) __ytdLast=i; }
+  let __budYtd=0; for(let i=0;i<=__ytdLast;i++){ __budYtd += (+__origBudgetArr[i]||0); }
+  const __pctYtd = __budYtd>0 ? Math.round(__sfReal/__budYtd*100) : null;
   const __sfTotalsEl = document.getElementById('bud-totals');
   const __sfMESES = (typeof MESES!=='undefined' && MESES.length===12) ? MESES : ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
   if(__sfTotalsEl){
@@ -1044,6 +1048,8 @@ function renderBudget(){
       + '<span>Budget <b style="color:#111827">' + fmtU(__sfBudget) + '</b> u.</span>'
       + '<span>Real <b style="color:#111827">' + fmtU(__sfReal) + '</b> u.</span>'
       + '<span style="' + pctCls + '">Cumpl. <b>' + (__sfPct==null?'—':__sfPct+'%') + '</b></span>'
+      + '<span>Estim. YTD <b style="color:#111827">' + fmtU(__budYtd) + '</b> u.</span>'
+      + '<span style="' + (__pctYtd==null?'color:#4b5563':__pctYtd>=100?'color:#15803d':__pctYtd>=85?'color:#ca8a04':'color:#b01e1e') + '">Cumpl. YTD <b>' + (__pctYtd==null?'—':__pctYtd+'%') + '</b></span>'
       + (__sfPend>0?'<span>Pendiente <b style="color:#b01e1e">' + fmtU(__sfPend) + '</b> u.</span>':'')
       + __triHtml;
   }

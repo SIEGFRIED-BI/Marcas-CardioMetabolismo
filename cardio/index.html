@@ -964,12 +964,17 @@ function renderBudget(){
     }
     rows.push({prod: prod, real: real, bud: bud, totR: totR, totB: totB});
   });
+  // Ventana YTD = meses transcurridos (con venta real en alguna marca de la linea)
+  var ytdLast = -1;
+  for(var yi=0;yi<12;yi++){ if(totalsReal[yi]>0) ytdLast = yi; }
+  var ytdLabel = ytdLast>=0 ? ('YTD '+MESES_L[ytdLast]) : 'YTD';
   // Colgroup: distribuye anchos para responsive sin scroll horizontal
   var cg = document.getElementById('bud-table-cols');
   if(cg){
     var cgh = '<col style="width:11%">';      // Producto
     cgh    += '<col style="width:5%">';       // Metrica label
-    for(var ci=0;ci<12;ci++) cgh += '<col style="width:6.5%">';  // 12 meses
+    for(var ci=0;ci<12;ci++) cgh += '<col style="width:6%">';  // 12 meses
+    cgh    += '<col style="width:6%">';       // YTD
     cgh    += '<col style="width:6%">';       // Total
     cg.innerHTML = cgh;
   }
@@ -982,6 +987,7 @@ function renderBudget(){
     MESES_L.forEach(function(m){
       hh += '<th style="text-align:right;padding:5px 4px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.04em;text-transform:uppercase;">'+m+'</th>';
     });
+    hh += '<th style="text-align:right;padding:5px 5px;font-size:9px;font-weight:800;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #dbeafe;">'+ytdLabel+'</th>';
     hh += '<th style="text-align:right;padding:5px 6px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
     hh += '</tr>';
     head.innerHTML = hh;
@@ -992,6 +998,12 @@ function renderBudget(){
     var html = '';
     rows.forEach(function(r, idx){
       var rowBorderTop = idx===0 ? '' : 'border-top:1px solid #e5e7eb;';
+      var ytdR=0,ytdB=0,ytdRhas=false,ytdBhas=false;
+      for(var yi=0;yi<=ytdLast;yi++){
+        if(r.real[yi]!=null){ ytdR+=+r.real[yi]||0; ytdRhas=true; }
+        if(r.bud[yi]!=null && +r.bud[yi]>0){ ytdB+=+r.bud[yi]||0; ytdBhas=true; }
+      }
+      var ytdPct=(ytdB>0&&ytdR>0)?(ytdR/ytdB*100):null;
       // Row 1: Venta
       html += '<tr style="'+rowBorderTop+'">';
       html += '<td rowspan="3" title="'+r.prod+'" style="padding:5px 6px;font-weight:700;font-size:10px;color:#111827;font-family:\'IBM Plex Sans\',sans-serif;vertical-align:top;background:#fafbfc;border-right:1px solid #e5e7eb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.prod+'</td>';
@@ -999,6 +1011,7 @@ function renderBudget(){
       r.real.forEach(function(v){
         html += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+(v==null?'—':fmtU(v))+'</td>';
       });
+      html += '<td style="padding:2px 5px;text-align:right;font-weight:700;color:#1f4ba6;background:rgba(31,75,166,.05);border-left:2px solid #dbeafe;">'+(ytdRhas?fmtU(ytdR):'—')+'</td>';
       html += '<td style="padding:2px 5px;text-align:right;font-weight:700;color:#b01e1e;border-left:2px solid #fde2e2;">'+fmtU(r.totR)+'</td>';
       html += '</tr>';
       // Row 2: Estim.
@@ -1009,6 +1022,7 @@ function renderBudget(){
         html += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+disp+'</td>';
       });
       var totBStr = r.totB>0 ? fmtU(r.totB) : '—';
+      html += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:700;background:rgba(31,75,166,.05);border-left:2px solid #dbeafe;">'+(ytdBhas?fmtU(ytdB):'—')+'</td>';
       html += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:700;border-left:2px solid #fde2e2;">'+totBStr+'</td>';
       html += '</tr>';
       // Row 3: % Cumpl (mes a mes)
@@ -1022,6 +1036,8 @@ function renderBudget(){
       }
       var totPct = (r.totB>0 && r.totR>0) ? (r.totR/r.totB*100) : null;
       var totPctStr = totPct==null ? '—' : totPct.toFixed(0)+'%';
+      var ytdPctStr = ytdPct==null ? '—' : ytdPct.toFixed(0)+'%';
+      html += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(ytdPct)+';background:'+pctBg(ytdPct)+';border-left:2px solid #dbeafe;">'+ytdPctStr+'</td>';
       html += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(totPct)+';background:'+pctBg(totPct)+';border-left:2px solid #fde2e2;">'+totPctStr+'</td>';
       html += '</tr>';
     });
@@ -1033,6 +1049,9 @@ function renderBudget(){
     var grandReal = totalsReal.reduce(function(a,b){return a+b;},0);
     var grandBud  = totalsBud.reduce(function(a,b){return a+b;},0);
     var grandPct  = (grandBud > 0 && grandReal > 0) ? (grandReal/grandBud*100) : null;
+    var grandYtdReal=0, grandYtdBud=0;
+    for(var gy=0;gy<=ytdLast;gy++){ grandYtdReal+=totalsReal[gy]; grandYtdBud+=totalsBud[gy]; }
+    var grandYtdPct=(grandYtdBud>0&&grandYtdReal>0)?(grandYtdReal/grandYtdBud*100):null;
     var fhtml = '';
     // Row 1: TOTAL LINEA - Venta
     fhtml += '<tr style="border-top:2px solid #b01e1e;background:#fef2f2;font-weight:700;">';
@@ -1042,6 +1061,7 @@ function renderBudget(){
       var tv = hasReal[j] ? fmtU(totalsReal[j]) : '—';
       fhtml += '<td style="padding:2px 3px;text-align:right;color:#111827;">'+tv+'</td>';
     }
+    fhtml += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:800;background:rgba(31,75,166,.06);border-left:2px solid #dbeafe;">'+fmtU(grandYtdReal)+'</td>';
     fhtml += '<td style="padding:2px 5px;text-align:right;color:#b01e1e;font-weight:800;border-left:2px solid #fde2e2;">'+fmtU(grandReal)+'</td>';
     fhtml += '</tr>';
     // Row 2: TOTAL LINEA - Estim.
@@ -1052,6 +1072,7 @@ function renderBudget(){
       fhtml += '<td style="padding:2px 3px;text-align:right;color:#1f4ba6;">'+tb+'</td>';
     }
     var gbStr = grandBud>0 ? fmtU(grandBud) : '—';
+    fhtml += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:800;background:rgba(31,75,166,.06);border-left:2px solid #dbeafe;">'+(grandYtdBud>0?fmtU(grandYtdBud):'—')+'</td>';
     fhtml += '<td style="padding:2px 5px;text-align:right;color:#1f4ba6;font-weight:800;border-left:2px solid #fde2e2;">'+gbStr+'</td>';
     fhtml += '</tr>';
     // Row 3: TOTAL LINEA - % Cumpl
@@ -1064,6 +1085,8 @@ function renderBudget(){
       fhtml += '<td style="padding:2px 3px;text-align:right;font-weight:800;color:'+pctColor(mpct)+';background:'+pctBg(mpct)+';">'+mpctStr+'</td>';
     }
     var gpctStr = grandPct == null ? '—' : grandPct.toFixed(0)+'%';
+    var gYtdPctStr = grandYtdPct == null ? '—' : grandYtdPct.toFixed(0)+'%';
+    fhtml += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(grandYtdPct)+';background:'+pctBg(grandYtdPct)+';border-left:2px solid #dbeafe;">'+gYtdPctStr+'</td>';
     fhtml += '<td style="padding:2px 5px;text-align:right;font-weight:800;color:'+pctColor(grandPct)+';background:'+pctBg(grandPct)+';border-left:2px solid #fde2e2;">'+gpctStr+'</td>';
     fhtml += '</tr>';
     foot.innerHTML = fhtml;
