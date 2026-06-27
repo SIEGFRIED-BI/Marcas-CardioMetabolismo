@@ -121,6 +121,11 @@ if ($Competidores) {
   Write-Host "`n>>> competidores: OMITIDO (template del generador difiere del committeado; usar -Competidores tras validar)" -ForegroundColor DarkYellow
 }
 
+# 12.5 Mercado completo MAGNUS/MAGNUS 36 (sildenafil/tadalafil) desde el export IQVIA
+# de 2 mercados del hub (el master general solo trae SIE + 2 competidores). Antes del
+# recompute para que tome todas las marcas. Skipea si falta el xlsx.
+Step 'mercado MAGNUS (IQVIA)' { & $py (Join-Path $PSScriptRoot 'rebuild-otc-magnus-from-iqvia.py') }
+
 # 13. Recompute aggregates con cierre FIJO (mata el bug del MAT que se achica)
 Step 'recompute aggregates' { & $py (Join-Path $PSScriptRoot 'recompute-mol-perf-aggregates.py') --cierre $closeMonth }
 

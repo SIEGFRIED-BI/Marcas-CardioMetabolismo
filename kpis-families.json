@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-19",
+  "generated_at": "2026-06-27",
   "as_of_month": "May 2026",
   "as_of_short": "May 2026",
   "period_labels": {
@@ -884,6 +884,57 @@
       }
     },
     {
+      "family": "MAGNUS",
+      "display": "MAGNUS",
+      "line": "otx",
+      "lineName": "OTX",
+      "sie_brands": [
+        "MAGNUS (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 194484,
+          "market_prev": 212013,
+          "sie_curr": 68836,
+          "sie_prev": 67542,
+          "ms_curr": 35.4,
+          "ms_prev": 31.9,
+          "ie": 111.0,
+          "var_pp": 3.5
+        },
+        "ytd": {
+          "market_curr": 983137,
+          "market_prev": 1088497,
+          "sie_curr": 339717,
+          "sie_prev": 334358,
+          "ms_curr": 34.6,
+          "ms_prev": 30.7,
+          "ie": 112.0,
+          "var_pp": 3.9
+        },
+        "trimestre": {
+          "market_curr": 596211,
+          "market_prev": 643637,
+          "sie_curr": 206834,
+          "sie_prev": 202288,
+          "ms_curr": 34.7,
+          "ms_prev": 31.4,
+          "ie": 110.0,
+          "var_pp": 3.3
+        },
+        "mat": {
+          "market_curr": 2413669,
+          "market_prev": 2676461,
+          "sie_curr": 787152,
+          "sie_prev": 815798,
+          "ms_curr": 32.6,
+          "ms_prev": 30.5,
+          "ie": 107.0,
+          "var_pp": 2.1
+        }
+      }
+    },
+    {
       "family": "TETRALGIN",
       "display": "TETRALGIN",
       "line": "otx",
@@ -984,57 +1035,6 @@
           "ms_prev": 17.0,
           "ie": 102.0,
           "var_pp": 0.3
-        }
-      }
-    },
-    {
-      "family": "MAGNUS",
-      "display": "MAGNUS",
-      "line": "otx",
-      "lineName": "OTX",
-      "sie_brands": [
-        "MAGNUS (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 170988,
-          "market_prev": 185046,
-          "sie_curr": 68836,
-          "sie_prev": 67542,
-          "ms_curr": 40.3,
-          "ms_prev": 36.5,
-          "ie": 110.0,
-          "var_pp": 3.8
-        },
-        "ytd": {
-          "market_curr": 856452,
-          "market_prev": 943587,
-          "sie_curr": 339717,
-          "sie_prev": 334358,
-          "ms_curr": 39.7,
-          "ms_prev": 35.4,
-          "ie": 112.0,
-          "var_pp": 4.3
-        },
-        "trimestre": {
-          "market_curr": 522240,
-          "market_prev": 560038,
-          "sie_curr": 206834,
-          "sie_prev": 202288,
-          "ms_curr": 39.6,
-          "ms_prev": 36.1,
-          "ie": 110.0,
-          "var_pp": 3.5
-        },
-        "mat": {
-          "market_curr": 2089402,
-          "market_prev": 2269356,
-          "sie_curr": 787152,
-          "sie_prev": 815798,
-          "ms_curr": 37.7,
-          "ms_prev": 35.9,
-          "ie": 105.0,
-          "var_pp": 1.8
         }
       }
     },
@@ -1763,6 +1763,57 @@
       }
     },
     {
+      "family": "MAGNUS 36",
+      "display": "MAGNUS 36",
+      "line": "otx",
+      "lineName": "OTX",
+      "sie_brands": [
+        "MAGNUS 36 (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 113479,
+          "market_prev": 98699,
+          "sie_curr": 4241,
+          "sie_prev": 4108,
+          "ms_curr": 3.7,
+          "ms_prev": 4.2,
+          "ie": 90.0,
+          "var_pp": -0.5
+        },
+        "ytd": {
+          "market_curr": 556851,
+          "market_prev": 472491,
+          "sie_curr": 20327,
+          "sie_prev": 20752,
+          "ms_curr": 3.7,
+          "ms_prev": 4.4,
+          "ie": 83.0,
+          "var_pp": -0.7
+        },
+        "trimestre": {
+          "market_curr": 344253,
+          "market_prev": 296031,
+          "sie_curr": 12642,
+          "sie_prev": 12365,
+          "ms_curr": 3.7,
+          "ms_prev": 4.2,
+          "ie": 88.0,
+          "var_pp": -0.5
+        },
+        "mat": {
+          "market_curr": 1304574,
+          "market_prev": 1097761,
+          "sie_curr": 48706,
+          "sie_prev": 50763,
+          "ms_curr": 3.7,
+          "ms_prev": 4.6,
+          "ie": 81.0,
+          "var_pp": -0.9
+        }
+      }
+    },
+    {
       "family": "COMPLEX",
       "display": "COMPLEX",
       "line": "mujer",
@@ -2327,57 +2378,6 @@
           "ms_prev": 0.4,
           "ie": 184.0,
           "var_pp": 0.3
-        }
-      }
-    },
-    {
-      "family": "MAGNUS 36",
-      "display": "MAGNUS 36",
-      "line": "otx",
-      "lineName": "OTX",
-      "sie_brands": [
-        "MAGNUS 36 (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 80373,
-          "market_prev": 67561,
-          "sie_curr": 4241,
-          "sie_prev": 4108,
-          "ms_curr": 5.3,
-          "ms_prev": 6.1,
-          "ie": 87.0,
-          "var_pp": -0.8
-        },
-        "ytd": {
-          "market_curr": 400220,
-          "market_prev": 330457,
-          "sie_curr": 20327,
-          "sie_prev": 20752,
-          "ms_curr": 5.1,
-          "ms_prev": 6.3,
-          "ie": 81.0,
-          "var_pp": -1.2
-        },
-        "trimestre": {
-          "market_curr": 246118,
-          "market_prev": 207855,
-          "sie_curr": 12642,
-          "sie_prev": 12365,
-          "ms_curr": 5.1,
-          "ms_prev": 5.9,
-          "ie": 86.0,
-          "var_pp": -0.8
-        },
-        "mat": {
-          "market_curr": 925869,
-          "market_prev": 782878,
-          "sie_curr": 48706,
-          "sie_prev": 50763,
-          "ms_curr": 5.3,
-          "ms_prev": 6.5,
-          "ie": 81.0,
-          "var_pp": -1.2
         }
       }
     },
