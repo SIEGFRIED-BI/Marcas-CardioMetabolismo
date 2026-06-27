@@ -128,6 +128,9 @@ Step 'mercado MAGNUS (IQVIA)' { & $py (Join-Path $PSScriptRoot 'rebuild-otc-magn
 
 # 13. Recompute aggregates con cierre FIJO (mata el bug del MAT que se achica)
 Step 'recompute aggregates' { & $py (Join-Path $PSScriptRoot 'recompute-mol-perf-aggregates.py') --cierre $closeMonth }
+# brandKpis de MAGNUS 36 (no lo crea build-data; lo arma desde mol_perf MAGNUS 36 +
+# budget + rec_ms, y lo suma a sieProds). Tras el recompute (necesita ytd/mat). Idempotente.
+Step 'MAGNUS 36 brandKpis' { & $py (Join-Path $PSScriptRoot 'ensure-magnus36-brandkpis.py') }
 
 # 14. KPIs consolidados + strip en las 7
 Step 'build-kpis'     { & $py (Join-Path $PSScriptRoot 'build-kpis.py') --repo $repo }
