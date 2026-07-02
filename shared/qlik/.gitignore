@@ -1,0 +1,7 @@
+# credenciales — NUNCA commitear
+.qlik-key.txt
+# dependencias node
+node_modules/
+# archivos intermedios de extracción
+ventas_qlik*.json
+*.xlsx

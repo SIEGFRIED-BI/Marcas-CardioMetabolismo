@@ -1,0 +1,10 @@
+{
+  "name": "marcas-qlik-extract",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Extractores de datos desde Qlik Cloud (tableros.us) para el tablero de Marcas",
+  "dependencies": {
+    "@qlik/api": "^1.35.0"
+  }
+}
