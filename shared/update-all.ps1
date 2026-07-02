@@ -89,6 +89,23 @@ Step 'sync mujer'          { & $py (Join-Path $PSScriptRoot 'sync-mujer-pm.py') 
 # 7. Preservar meses pre-ventana que los syncs borran (regla #7)
 Step 'preservar historia'  { & $py (Join-Path $PSScriptRoot 'preserve-early-history.py') }
 
+# ── Venta desde Qlik (tableros.us), ADITIVO: si hay API key + node, extrae de Qlik y
+#    reemplaza $venta. Si no hay key/node o falla la extraccion, se usa la venta del
+#    manifest (archivo manual). NO puede romper el cierre: solo pisa $venta si el xlsx Qlik
+#    se genero OK. Receta validada (filtro Rofina; drop-in identico en la ventana vigente).
+#    Ver shared/qlik/POC-VENTAS.md. Key: env QLIK_API_KEY o shared/qlik/.qlik-key.txt.
+$qlikKey = if ($env:QLIK_API_KEY) { $true } elseif (Test-Path (Join-Path $PSScriptRoot 'qlik\.qlik-key.txt')) { $true } else { $false }
+if ($qlikKey -and (Get-Command 'node' -ErrorAction SilentlyContinue)) {
+  $qJson = Join-Path $env:TEMP 'ventas_qlik.json'
+  $qXlsx = Join-Path $env:TEMP 'Planilla de Ventas (Qlik).xlsx'
+  Remove-Item -LiteralPath $qJson, $qXlsx -ErrorAction SilentlyContinue
+  Step 'venta Qlik: extraer (tableros.us)' { & node (Join-Path $PSScriptRoot 'qlik\extract-ventas.mjs') $qJson }
+  if (Test-Path -LiteralPath $qJson) {
+    Step 'venta Qlik: pivot -> xlsx' { & $py (Join-Path $PSScriptRoot 'qlik\qlik-ventas-to-planilla.py') $qJson $qXlsx }
+    if (Test-Path -LiteralPath $qXlsx) { $venta = $qXlsx; Write-Host "   venta: usando extracto Qlik -> $(Split-Path $venta -Leaf)" -ForegroundColor Green }
+  } else { Write-Warning 'Venta Qlik: extraccion fallo -> uso archivo manual (fallback).' }
+}
+
 # 8-11. Venta (cutoff = mes cerrado) + re-aplicar los splits que venta/build revierten
 if ($venta -and (Test-Path -LiteralPath $venta)) {
   Step 'venta interna (cutoff)' { & $py (Join-Path $PSScriptRoot 'merge-ventas-internas.py') --file $venta --cutoff $closeMonth }

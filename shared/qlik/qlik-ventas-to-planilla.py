@@ -36,21 +36,26 @@ def main():
     rows = json.load(open(src, encoding='utf-8'))
 
     months = sorted({r[4] for r in rows}, key=ym_key)
-    # ventana: quedarse con los ultimos ~3 anios (el filtro por Año del engine no aplica
-    # por la ñ; los labels "Jun-2025" son ASCII asi que ventaneamos aca, robusto).
+    # Ventana = año actual + el anterior (los años que tiene el budget del tablero).
+    # Incluir años más viejos hace que el merge CREE un año espurio en budget[fam]
+    # (que solo tiene 2025-2026) -> columnas basura. El filtro por Año del engine no
+    # aplica (ñ); ventaneamos acá (labels "Jun-2025" son ASCII). maxy-1 = 2 años.
     if months:
         maxy = max(ym_key(m)[0] for m in months)
-        months = [m for m in months if ym_key(m)[0] >= maxy - 2]
+        months = [m for m in months if ym_key(m)[0] >= maxy - 1]
     grid = defaultdict(lambda: defaultdict(float))  # (g,f,prod,cod) -> mes -> val
     for g, f, prod, cod, ym, val in rows:
         grid[(g, f, prod, cod)][ym] += val
 
+    # Layout EXACTO del manual (5 cols de etiqueta): el merge usa col0/col1 (Gran
+    # Familia/Familia); apply-otc-magnus-split.py y fix-mujer-trip-venta.py clasifican
+    # por col3 = Presentación (SKU). col2 (Producto) no lo consume nadie -> familia como proxy.
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = 'Sheet1'
-    ws.append(['Gran Familia', 'Familia', 'Producto', 'Cód. Presentación'] + months)
+    ws.append(['Gran Familia', 'Familia', 'Producto', 'Presentación', 'Cód. Presentación'] + months)
     for (g, f, prod, cod), mv in sorted(grid.items()):
-        ws.append([g, f, prod, cod] + [round(mv.get(m, 0)) for m in months])
+        ws.append([g, f, f, prod, cod] + [round(mv.get(m, 0)) for m in months])
     wb.save(out)
     print(f'OK: {ws.max_row - 1} filas x {len(months)} meses ({months[0]}..{months[-1]}) -> {out}')
     return 0
