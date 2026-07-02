@@ -68,7 +68,23 @@ async function main() {
     process.stderr.write(`${Math.min(top + H, total)}/${total} `);
   }
   writeFileSync(OUT, JSON.stringify(out));
-  process.stderr.write(`\nOK: ${out.length} filas -> ${OUT}\n`);
+  process.stderr.write(`\nOK grano marca: ${out.length} filas -> ${OUT}\n`);
+
+  // 2do cubo: grano MERCADO (para las filas 'Totales' del build: recetas=sum, medicos=DISTINCT
+  //   a nivel mercado, que NO es la suma de los medicos por marca).
+  const mdef = { qInfo: { qType: "sessiontable" }, qHyperCubeDef: {
+    qDimensions: [{ qDef: { qFieldDefs: [MERCADO_SINMIX] } }, { qDef: { qFieldDefs: ["AñoMes"] } }],
+    qMeasures: [{ qDef: { qDef: `sum(${SET} Cantidad)` } }, { qDef: { qDef: `count(distinct ${SET} CodigoMedicoUnico)` } }],
+    qInitialDataFetch: [], qSuppressZero: true, qSuppressMissing: true } };
+  const mobj = await app.createSessionObject(mdef);
+  const mtot = (await mobj.getLayout()).qHyperCube.qSize.qcy, mout = [];
+  for (let top = 0; top < mtot; top += H) {
+    const p = await mobj.getHyperCubeData({ qPath: "/qHyperCubeDef", qPages: [{ qTop: top, qLeft: 0, qHeight: H, qWidth: 4 }] });
+    for (const r of p[0].qMatrix) mout.push([r[0].qText, r[1].qText, r[2].qNum, r[3].qNum]);
+  }
+  const mktOut = OUT.replace(/\.json$/, '') + '.mkt.json';
+  writeFileSync(mktOut, JSON.stringify(mout));
+  process.stderr.write(`OK grano mercado: ${mout.length} filas -> ${mktOut}\n`);
   process.exit(0);
 }
 main().catch(e => { console.error("ERROR:", e.message); process.exit(1); });
