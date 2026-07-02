@@ -142,7 +142,7 @@ $iqviaSlicedDir = Join-Path $iqviaMasterDir 'sliced'
 $iqviaCentralized = Test-Path -LiteralPath $iqviaMasterDir
 $iqviaMasterFile = $null
 if ($iqviaCentralized) {
-    $iqviaMasterFile = Get-ChildItem -LiteralPath $iqviaMasterDir -Filter $IqviaPattern -File -ErrorAction SilentlyContinue | Select-Object -First 1
+    $iqviaMasterFile = Get-ChildItem -LiteralPath $iqviaMasterDir -Filter $IqviaPattern -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if (-not $iqviaMasterFile) {
         Write-Warning "Carpeta IQVIA centralizada existe pero no hay match para '$IqviaPattern' en $iqviaMasterDir. Cae a legacy."
         $iqviaCentralized = $false

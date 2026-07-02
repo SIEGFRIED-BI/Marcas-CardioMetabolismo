@@ -151,7 +151,7 @@ function Get-MatchingPath {
     $items = $items | Where-Object { $_.Name -notlike $Exclude }
   }
 
-  $match = $items | Select-Object -First 1
+  $match = $items | Sort-Object LastWriteTime -Descending | Select-Object -First 1
   if (-not $match) {
     throw "No se encontro un archivo que coincida con '$Include' en '$Dir'."
   }
@@ -2668,6 +2668,6 @@ $data = [ordered]@{
 
 $json = $data | ConvertTo-Json -Depth 40 -Compress
 $dashboardJson = $dashboardData | ConvertTo-Json -Depth 50 -Compress
-$content = "window.MUJER_DATA = $json;`r`nwindow.MUJER_DASHBOARD = $dashboardJson;"
+$content = "window.MUJER_DATA = $json;`r`nwindow.OTC_DASHBOARD = $dashboardJson;"
 Set-Content -LiteralPath $OutputPath -Value $content -Encoding UTF8
 Write-Output "Mujer data generated: $OutputPath"

@@ -154,7 +154,7 @@ function Get-MatchingPath {
     $items = $items | Where-Object { $_.Name -notlike $Exclude }
   }
 
-  $match = $items | Select-Object -First 1
+  $match = $items | Sort-Object LastWriteTime -Descending | Select-Object -First 1
   if (-not $match) {
     throw "No se encontro un archivo que coincida con '$Include' en '$Dir'."
   }
