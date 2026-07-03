@@ -7,7 +7,7 @@
 #  OFF : volvé a comentarla (o dejá este archivo sin reglas activas) y
 #        hacé push  ->  el tablero vuelve a la normalidad.
 #
-#  Estado actual: ON (mantenimiento activo durante el deploy 2026-07-03).
+#  Estado actual: OFF (regla comentada).
 # ═══════════════════════════════════════════════════════════════════
 
-/*  /mantenimiento.html  200
+# /*  /mantenimiento.html  200
