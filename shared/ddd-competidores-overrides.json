@@ -1,7 +1,17 @@
 {
   "_comment": "Overrides CURADOS del DDD competidores (semilla del parametrizador). Corrigen mislabels del panel IQVIA que el agrupamiento automatico molecula/ATC NO puede detectar solo. Cada regla debe estar justificada por una inconsistencia INTERNA del dato (ej: una molecula que contradice su ATC). NO usar para overridear clasificaciones del panel que son internamente consistentes (eso seria afirmar que IQVIA esta mal sin senal en el dato; decision de negocio, no de este archivo).",
   "_schema": {
-    "molecule_regroup": "por linea, lista de reglas: si la marca (combo) contiene 'if_molecule' Y su ATC dominante == 'in_atc', se re-asigna su mercado a 'new_key' (formato 'ATC:xxxx' o 'MOL:xxxx'). 'corrected_atc' (opcional) es el ATC real que se guarda en la metadata del mercado nuevo."
+    "molecule_regroup": "por linea, lista de reglas: si la marca (combo) contiene 'if_molecule' Y su ATC dominante == 'in_atc', se re-asigna su mercado a 'new_key' (formato 'ATC:xxxx' o 'MOL:xxxx'). 'corrected_atc' (opcional) es el ATC real que se guarda en la metadata del mercado nuevo.",
+    "exclude_class": "por linea, filas a EXCLUIR del build ANTES de agregar (a nivel fila). Uso: una misma Droga (molecula) abarca >1 clase ATC y el agrupamiento mono-molecula las fusiona mal (ej. sistemico + topico). Cada regla: {droga, atc, reason}. Excluye TODAS las filas de esa (droga, atc) en esa linea."
+  },
+  "exclude_class": {
+    "OTC": [
+      {
+        "droga": "ACICLOVIR",
+        "atc": "D06D1",
+        "reason": "Aciclovir TOPICO (crema, ANTIVIRALES TOPICOS D06D1) != aciclovir SISTEMICO (comprimidos, ANTIVIRALES HERPES J05B3). El tablero trackea el mercado ACERPES sistemico (~58k). Como el builder mono-molecula agrupa por Droga=ACICLOVIR, sin este filtro fusiona crema (codprod 47444 ACERPES 5% CREMA = ~122k) + comprimidos (50003/50004 ~60k) y triplica la marca propia ACERPES. La crema es venta SIE real pero de otra categoria terapeutica; queda fuera del mercado sistemico (consistente con prod). Confirmado por workflow de verificacion 2026-07-03."
+      }
+    ]
   },
   "molecule_regroup": {
     "respiratorio": [

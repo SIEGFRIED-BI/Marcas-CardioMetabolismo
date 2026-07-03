@@ -129,6 +129,12 @@ def month_sort_key(mk: str) -> int:
 
 
 def main():
+    global XLSX
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--xlsx', default=str(XLSX), help='Producto-Mol-ATC-provincia xlsx (default: hardcoded)')
+    a = ap.parse_args()
+    XLSX = Path(a.xlsx)
     if not XLSX.is_file():
         print(f'ERROR: {XLSX} no existe', file=sys.stderr); return 2
 

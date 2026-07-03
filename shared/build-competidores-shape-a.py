@@ -159,6 +159,17 @@ except (ValueError, OSError):
     OVERRIDES = {}
 
 
+def is_excluded_class(line: str, droga: str, atc: str) -> bool:
+    """True si (droga, atc) esta en exclude_class[line] del override -> la fila se
+    descarta ANTES de agregar. Uso: separar una molecula que abarca >1 clase ATC
+    (ej. aciclovir sistemico J05B3 vs topico D06D1) que el agrupamiento mono-molecula
+    fusionaria mal."""
+    for r in OVERRIDES.get('exclude_class', {}).get(line, []):
+        if str(r.get('droga', '')).upper() == droga and str(r.get('atc', '')).upper() == atc:
+            return True
+    return False
+
+
 def apply_overrides(line: str, molecules: set, atc: str, key: str):
     """Devuelve (key, corrected_atc). Si una regla molecule_regroup de la linea
     matchea (la marca contiene if_molecule y su ATC == in_atc), re-asigna el
@@ -219,6 +230,7 @@ def build_one(line: str, xlsx: Path, out: Path) -> str:
         if not brand or brand == 'UNKNOWN': continue
         droga = (str(row[c_droga]).strip().upper() if c_droga is not None and c_droga < len(row) and row[c_droga] else '')
         atc   = (str(row[c_atc]).strip().upper()   if c_atc   is not None and c_atc   < len(row) and row[c_atc]   else '')
+        if is_excluded_class(line, droga, atc): continue   # override: clase ATC a excluir (ej. aciclovir topico)
         units[brand][region][mes] += u
         if droga: brand_drogas[brand].add(droga)
         if atc:   brand_atc[brand][atc] += 1
