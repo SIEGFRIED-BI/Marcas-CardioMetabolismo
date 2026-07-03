@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-06-19T08:57:56",
+  "generatedAt": "2026-07-03T12:36:27",
   "lines": [
     {
       "hasData": true,
-      "generatedAt": "2026-06-18 20:54",
+      "generatedAt": "2026-07-03 12:09",
       "budgetCut": "Mar-2026",
       "rxCut": null,
       "stockCut": "Mar-2026",
@@ -20,7 +20,7 @@
     },
     {
       "hasData": true,
-      "generatedAt": "2026-06-18 20:59",
+      "generatedAt": "2026-07-03 12:12",
       "budgetCut": "Mar-2026",
       "rxCut": null,
       "stockCut": "Abr-2026",
@@ -37,9 +37,9 @@
     },
     {
       "hasData": true,
-      "generatedAt": "2026-06-18 22:07",
+      "generatedAt": "2026-07-03 12:16",
       "budgetCut": "Mar-2026",
-      "rxCut": "Feb-2026",
+      "rxCut": "May-2026",
       "stockCut": "Feb-2026",
       "totalsYtdActual": 425450,
       "totalsYtdBudget": 425456,
@@ -47,7 +47,7 @@
       "latestMonth": "Mar-2026",
       "latestActual": 117709,
       "familiesCount": 9,
-      "familiesWithPm": 9,
+      "familiesWithPm": 8,
       "key": "OTC",
       "label": "OTC",
       "href": "OTC/"
@@ -64,16 +64,16 @@
       "latestMonth": null,
       "latestActual": null,
       "familiesCount": 0,
-      "familiesWithPm": 0,
+      "familiesWithPm": 14,
       "key": "mujer",
       "label": "Linea Mujer",
       "href": "mujer/"
     },
     {
       "hasData": true,
-      "generatedAt": "2026-06-19 08:57",
+      "generatedAt": "2026-07-03 12:36",
       "budgetCut": "Abr-2026",
-      "rxCut": "Feb-2026",
+      "rxCut": "May-2026",
       "stockCut": "Abr-2026",
       "totalsYtdActual": 944310,
       "totalsYtdBudget": 0,
@@ -87,7 +87,7 @@
       "href": "respiratorio/"
     },
     {
-      "hasData": false,
+      "hasData": true,
       "generatedAt": null,
       "budgetCut": null,
       "rxCut": null,
@@ -97,8 +97,8 @@
       "compliance": null,
       "latestMonth": null,
       "latestActual": null,
-      "familiesCount": null,
-      "familiesWithPm": null,
+      "familiesCount": 0,
+      "familiesWithPm": 11,
       "key": "SNC",
       "label": "SNC / PSQ",
       "href": "SNC/"

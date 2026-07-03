@@ -1,0 +1,13 @@
+{
+  "_docs": "Correcciones de taxonomia Qlik -> tablero para RECETAS. Qlik (CloseUp actual) a veces (a) parte en dos un mercado que el archivo manual historico tenia unificado, o (b) reetiqueta el laboratorio de una marca. Estas reglas normalizan el export de Qlik ANTES del build para reproducir el tablero. Las aplica shared/qlik/qlik-recetas-to-file.py. Aditivo y reversible: sin reglas, el pivot se comporta como antes.",
+
+  "marketMerges": {
+    "_docs": "sourceMarket -> targetMarket. Mueve TODAS las filas (marcas + Totales) de sourceMarket dentro de targetMarket, sumando recetas/medicos por mes. Uso: cuando Qlik parte un mercado que el tablero mantiene unificado.",
+    "ROXOLAN PLUS": "ROSUVASTATINA (ROXOLAN)"
+  },
+
+  "labOverrides": {
+    "_docs": "baseMarca -> labForzado. Si el nombre-base de la marca (sin el token de lab final) matchea la key, se reemplaza el token de lab. Uso: cuando CloseUp reetiqueta el lab de una marca propia. CARDIVAS: el tablero lo muestra como SIE (propio) pero Qlik ahora lo tagea SIU; se fuerza SIE para reproducir prod. NOTA: CARDIVAS no figura en ningun sieProducts del build ni tiene familia -> probablemente NO sea propio y esto sea perpetuar una mala clasificacion vieja. Vaciar labOverrides ({}) para adoptar la clasificacion de Qlik (TERLOC recetas propias caeria ~15%).",
+    "CARDIVAS": "SIE"
+  }
+}

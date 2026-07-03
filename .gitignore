@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 *.pyo
 .DS_Store
+.claude/
+# artefactos intermedios de extraccion Qlik (regenerables; la fuente vive en el hub)
+shared/qlik/recetas_qlik*.json
+shared/qlik/recetas_build.xlsx
+shared/qlik/node_modules/
