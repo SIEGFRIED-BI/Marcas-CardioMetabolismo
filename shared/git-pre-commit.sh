@@ -78,6 +78,22 @@ if git diff --cached --name-only | grep -qE '(data\.js|index\.html|dermato_dashb
     fi
 fi
 
+# Check 5b: mujer conserva su segmentacion por CLASE IQVIA (ALTA DOSIS, SIN
+# ESTROGENO, ...). Bloquea la regresion de reconstruir mujer por MARCA (ISIS,
+# SIDERBLUT, TRIP D3) = sintoma de haber metido 'mujer' en build-all. mujer debe
+# quedar FUERA de build-all (como SNC/derma): se preserva de prod + sync time-series.
+if git diff --cached --name-only | grep -qE 'mujer/data\.js$'; then
+    echo "Running mujer-segmentation check..."
+    py shared/check-mujer-segmentation.py
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "MUJER-SEGMENTATION FAILED -- commit bloqueado"
+        echo "mujer/data.js perdio la segmentacion por CLASE IQVIA (mercados por marca)."
+        echo "mujer debe quedar FUERA de build-all (como SNC/derma): se preserva + sync."
+        exit 1
+    fi
+fi
+
 # Check 6: etiquetas vs dato real (cada label = su fuente; atrapa rec_label/iqviaMeta stale).
 if git diff --cached --name-only | grep -qE '(data\.js|index\.html|dermato_dashboard\.html)$'; then
     echo "Running labels-vs-data check..."

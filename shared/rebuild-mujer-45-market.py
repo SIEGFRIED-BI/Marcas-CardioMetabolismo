@@ -27,7 +27,10 @@ from pathlib import Path
 import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
-DATA_FILE = REPO / 'mujer' / 'index.html'
+# F4: el dato de mujer vive en data.js (window.OTC_DASHBOARD), ya no inline en
+# index.html. El regex de abajo acepta ambos anchors, pero el archivo a
+# leer/escribir es data.js.
+DATA_FILE = REPO / 'mujer' / 'data.js'
 MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\Ateneo Total - MAT Movil_May-19-2026 (3).xlsx')
 
 # Productos que SI deben ir en el mercado '45':
@@ -233,7 +236,7 @@ def main():
 
     # Patch into mujer/index.html
     t = DATA_FILE.read_text(encoding='utf-8')
-    m = re.search(r'const D\s*=\s*\{', t)
+    m = re.search(r'(?:const D|window\.OTC_DASHBOARD)\s*=\s*\{', t)
     ob = m.end() - 1
     D, end_idx = json.JSONDecoder().raw_decode(t[ob:])
     abs_end = ob + end_idx

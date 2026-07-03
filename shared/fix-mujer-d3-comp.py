@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# DEPRECADO (jul-2026): NINGUN orquestador lo invoca. Lee mujer/index.html PRE-F4
+# (const D inline), que ya no existe (mujer migro a mujer/data.js /
+# window.OTC_DASHBOARD en commit ebf0c2f) -> hoy fallaria. Se conserva como
+# referencia; si se reactiva, migrar a data.js/OTC_DASHBOARD primero.
 """
 shared/fix-mujer-d3-comp.py
 

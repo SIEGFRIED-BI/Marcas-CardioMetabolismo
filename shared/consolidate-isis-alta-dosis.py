@@ -1,3 +1,8 @@
+# DEPRECADO (jul-2026): NINGUN orquestador lo invoca. Lee mujer/index.html PRE-F4
+# (const D inline), que ya no existe (mujer migro a mujer/data.js /
+# window.OTC_DASHBOARD en commit ebf0c2f) -> hoy fallaria. La consolidacion ya
+# esta horneada en mujer/data.js y se preserva via sync-mujer-pm.py. Se conserva
+# como referencia; si se reactiva, migrar a data.js/OTC_DASHBOARD primero.
 """Consolida los 3 SKUs de ISIS en mol_perf['ALTA DOSIS'] de mujer en un solo
 producto brand-level 'ISIS (SIE)', para mantener consistencia con el resto:
 

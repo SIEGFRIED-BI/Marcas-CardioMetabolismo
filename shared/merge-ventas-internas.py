@@ -168,15 +168,32 @@ def parse_xlsx(path, cutoff=None):
 
 
 def load_data_js(p):
+    """Devuelve (text, d1, d2, bounds). El budget VIVO vive en OTC_DASHBOARD (d2)
+    en las 7 lineas (ver close-manifest 'anchor'); main() usa d2['budget'].
+
+    - Lineas construidas por build-data: llevan un OTC_DATA legacy/muerto (d1) ANTES
+      del OTC_DASHBOARD vivo (d2). Ambos se re-serializan al escribir.
+    - Lineas inline post-F5 (SNC/mujer/dermato): SOLO tienen OTC_DASHBOARD (o, como
+      fallback, 'const D =') -> d1=None; se escribe unicamente ese objeto.
+      (Antes esto lanzaba 'OTC_DATA not found' y la venta de esas 3 no se
+      actualizaba; ver shared/sync-snc-pm.py para el mismo patron raw_decode.)
+
+    bounds = (obj_start1, abs_end1, obj_start2, abs_end2); los dos primeros son None
+    cuando no hay OTC_DATA."""
     text = p.read_text(encoding='utf-8-sig', errors='replace')
     m1 = re.search(r'window\.OTC_DATA\s*=\s*', text)
-    if not m1: raise ValueError('OTC_DATA not found in ' + str(p))
-    obj_start1 = text.index('{', m1.end())
-    d1, end1 = json.JSONDecoder().raw_decode(text[obj_start1:])
-    abs_end1 = obj_start1 + end1
-    m2 = re.search(r'window\.OTC_DASHBOARD\s*=\s*', text[abs_end1:])
-    if not m2: return text, d1, None, None
-    obj_start2 = abs_end1 + text[abs_end1:].index('{', m2.end())
+    if m1:
+        obj_start1 = text.index('{', m1.end())
+        d1, end1 = json.JSONDecoder().raw_decode(text[obj_start1:])
+        abs_end1 = obj_start1 + end1
+        search_from = abs_end1
+    else:
+        d1, obj_start1, abs_end1, search_from = None, None, None, 0
+    m2 = (re.search(r'window\.OTC_DASHBOARD\s*=\s*', text[search_from:])
+          or re.search(r'const D\s*=\s*', text[search_from:]))
+    if not m2:
+        raise ValueError('OTC_DASHBOARD/const D not found in ' + str(p))
+    obj_start2 = search_from + text[search_from:].index('{', m2.end())
     d2, end2 = json.JSONDecoder().raw_decode(text[obj_start2:])
     abs_end2 = obj_start2 + end2
     return text, d1, d2, (obj_start1, abs_end1, obj_start2, abs_end2)
@@ -184,6 +201,9 @@ def load_data_js(p):
 
 def write_data_js(text, d1, d2, bounds):
     obj_start1, abs_end1, obj_start2, abs_end2 = bounds
+    if d1 is None:
+        # Lineas inline post-F5: solo el objeto vivo (OTC_DASHBOARD) se re-serializa.
+        return text[:obj_start2] + json.dumps(d2, ensure_ascii=False) + text[abs_end2:]
     return (text[:obj_start1]
             + json.dumps(d1, ensure_ascii=False)
             + text[abs_end1:obj_start2]

@@ -41,7 +41,14 @@
 param(
   [string]$Month,
   [switch]$SkipBuildAll,
-  [switch]$Competidores
+  [switch]$Competidores,
+  # Venta desde Qlik: default ON si hay key+node. El extractor filtra Organizacion='Rofina'
+  # (canal domestico, EXCLUYE Roemmers) = alcance CORRECTO confirmado por el usuario
+  # (2026-07-03: Jun-2026 Rofina = 2.46M coincide con la venta real). OJO: la Planilla
+  # manual SOBRE-cuenta el ATB 2025 porque incluye Roemmers (migracion de org: ATB bajo
+  # Roemmers en 2025 -> Rofina en 2026); por eso Qlik-Rofina es PREFERIDA a la Planilla.
+  # -NoQlikVenta fuerza el fallback a la Planilla. Ver shared/qlik/query-venta-org.mjs.
+  [switch]$NoQlikVenta
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
@@ -74,9 +81,15 @@ function Step($name, $block) {
   if ($LASTEXITCODE -ne 0) { Write-Warning "$name termino con exit $LASTEXITCODE" }
 }
 
-# 1. build data.js (5 lineas). build-all mergea venta SIN cutoff; el paso 8 la re-mergea con cutoff.
+# 1. build data.js (4 lineas: cardio/ATB/OTC/respi). build-all mergea venta SIN
+#    cutoff; el paso 8 la re-mergea con cutoff.
+#    mujer NO se reconstruye aca: su mol_perf usa segmentacion por CLASE IQVIA
+#    (ALTA DOSIS, SIN ESTROGENO, ...) que es un artefacto one-off (build-market-
+#    overrides.ps1, abr-2026) y build-data.ps1 produce por MARCA -> clobbearia la
+#    estructura de prod. Igual que SNC/derma, mujer se PRESERVA de prod y solo se
+#    le actualiza el time-series en 'sync mujer' (paso 5) + preserve-early-history.
 if (-not $SkipBuildAll) {
-  Step 'build-all (5 lineas)' { & (Join-Path $PSScriptRoot 'build-all.ps1') -Month $cycleFolder -IqviaPattern 'AR_PM*' -SkipKpis }
+  Step 'build-all (4 lineas)' { & (Join-Path $PSScriptRoot 'build-all.ps1') -Month $cycleFolder -Lines cardio,ATB,OTC,respiratorio -IqviaPattern 'AR_PM*' -SkipKpis }
 }
 
 # 2-6. mol_perf IQVIA: syncs + re-aplicar lo que el sync de SNC revierte
@@ -95,7 +108,7 @@ Step 'preservar historia'  { & $py (Join-Path $PSScriptRoot 'preserve-early-hist
 #    se genero OK. Receta validada (filtro Rofina; drop-in identico en la ventana vigente).
 #    Ver shared/qlik/POC-VENTAS.md. Key: env QLIK_API_KEY o shared/qlik/.qlik-key.txt.
 $qlikKey = if ($env:QLIK_API_KEY) { $true } elseif (Test-Path (Join-Path $PSScriptRoot 'qlik\.qlik-key.txt')) { $true } else { $false }
-if ($qlikKey -and (Get-Command 'node' -ErrorAction SilentlyContinue)) {
+if (-not $NoQlikVenta -and $qlikKey -and (Get-Command 'node' -ErrorAction SilentlyContinue)) {
   $qJson = Join-Path $env:TEMP 'ventas_qlik.json'
   $qXlsx = Join-Path $env:TEMP 'Planilla de Ventas (Qlik).xlsx'
   Remove-Item -LiteralPath $qJson, $qXlsx -ErrorAction SilentlyContinue
@@ -144,6 +157,9 @@ if ($Competidores) {
 Step 'mercado MAGNUS (IQVIA)' { & $py (Join-Path $PSScriptRoot 'rebuild-otc-magnus-from-iqvia.py') }
 
 # 13. Recompute aggregates con cierre FIJO (mata el bug del MAT que se achica)
+# Excluir productos vetados (BONVIVA, CALCITOL D3, etc.) de todas las data.js ANTES de agregados/KPIs.
+Step 'excluir productos' { & $py (Join-Path $PSScriptRoot 'apply-product-exclusions.py') }
+
 Step 'recompute aggregates' { & $py (Join-Path $PSScriptRoot 'recompute-mol-perf-aggregates.py') --cierre $closeMonth }
 # brandKpis de MAGNUS 36 (no lo crea build-data; lo arma desde mol_perf MAGNUS 36 +
 # budget + rec_ms, y lo suma a sieProds). Tras el recompute (necesita ytd/mat). Idempotente.
@@ -181,6 +197,7 @@ $gateFail = $false
 foreach ($g in @(
     @{n='syntax';  s='check-syntax-and-consistency.py'; a=@()},
     @{n='parity';  s='check-cross-line-parity.py';      a=@()},
+    @{n='mujer-seg';s='check-mujer-segmentation.py';    a=@()},
     @{n='render';  s='check-render-parity.py';          a=@()},
     @{n='ddd';     s='check-ddd-health.py';             a=@()},
     @{n='labels';  s='audit-labels.py';                 a=@()},

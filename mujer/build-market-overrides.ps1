@@ -1,3 +1,15 @@
+# ============================================================================
+# DEPRECADO / SOLO-REFERENCIA (jul-2026). NO forma parte del pipeline de cierre.
+# Genero UNA VEZ (10-abr-2026) la segmentacion por CLASE IQVIA de mujer
+# (ALTA DOSIS, SIN ESTROGENO, BAJA DOSIS 21+7, ...) mapeando familias por-MARCA
+# -> CLASE (ver $segmentToFamilies mas abajo) y la horneo en mujer/data.js. Desde
+# entonces esa segmentacion se PRESERVA y solo se le actualiza el time-series via
+# shared/sync-mujer-pm.py (mujer se trata como SNC/derma; la protege el gate
+# shared/check-mujer-segmentation.py; ver shared/update-all.ps1).
+# Se conserva SOLO como REFERENCIA del mapeo marca<->clase. Su salida
+# (mujer/market-overrides.js) era codigo muerto -ninguna pagina la cargaba- y fue
+# eliminada. Requiere el Excel manual 'TABLERO ULTIMA VISTA 2.xlsx'.
+# ============================================================================
 param(
   [string]$WorkbookPath = 'C:\Users\camarinaro\Downloads\TABLERO ULTIMA VISTA 2.xlsx',
   [string]$OutputPath = (Join-Path $PSScriptRoot 'market-overrides.js')
