@@ -63,6 +63,10 @@ if ($PSVersionTable.PSVersion.Major -ge 6) {
 . (Join-Path $PSScriptRoot 'Get-CloseParams.ps1')
 $cp = Get-CloseParams
 $closeMonth  = $cp.CloseMonth
+# ventaCutoff: la venta interna puede ir ADELANTE del cierre IQVIA (IQVIA reporta
+# atrasado ~2 meses). Corta la tabla Venta vs Estimado y el KPI de venta; el resto
+# (IQVIA/IE de mercado) usa closeMonth. Default = closeMonth (manifest global.ventaCutoff).
+$ventaCutoff = if ($cp.VentaCutoff) { $cp.VentaCutoff } else { $closeMonth }
 $cycleFolder = if ($Month) { $Month } else { $cp.CycleFolder }
 $master = $cp.src_iqvia_master
 $ateneo = $cp.src_ateneo_mat
@@ -121,9 +125,9 @@ if (-not $NoQlikVenta -and $qlikKey -and (Get-Command 'node' -ErrorAction Silent
 
 # 8-11. Venta (cutoff = mes cerrado) + re-aplicar los splits que venta/build revierten
 if ($venta -and (Test-Path -LiteralPath $venta)) {
-  Step 'venta interna (cutoff)' { & $py (Join-Path $PSScriptRoot 'merge-ventas-internas.py') --file $venta --cutoff $closeMonth }
-  Step 'OTC MAGNUS venta'       { & $py (Join-Path $PSScriptRoot 'apply-otc-magnus-split.py') --file $venta --cutoff $closeMonth }
-  Step 'mujer TRIP venta'       { & $py (Join-Path $PSScriptRoot 'fix-mujer-trip-venta.py') $venta --cutoff $closeMonth }
+  Step 'venta interna (cutoff)' { & $py (Join-Path $PSScriptRoot 'merge-ventas-internas.py') --file $venta --cutoff $ventaCutoff }
+  Step 'OTC MAGNUS venta'       { & $py (Join-Path $PSScriptRoot 'apply-otc-magnus-split.py') --file $venta --cutoff $ventaCutoff }
+  Step 'mujer TRIP venta'       { & $py (Join-Path $PSScriptRoot 'fix-mujer-trip-venta.py') $venta --cutoff $ventaCutoff }
 } else {
   Write-Warning "Venta no resuelta -> se saltea merge/splits de venta."
 }

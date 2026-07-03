@@ -157,6 +157,9 @@ def _emit_ps():
     """Imprime key=value (una por linea) para que Get-CloseParams.ps1 los parsee."""
     out = {}
     out['CloseMonth'] = cierre_month()
+    # ventaCutoff: ultimo mes COMPLETO de venta interna (puede ir ADELANTE de
+    # closeMonth porque IQVIA reporta atrasado). Si se omite, cae a closeMonth.
+    out['VentaCutoff'] = str(_g('global', 'ventaCutoff', default='') or cierre_month())
     out['CloseYear'] = str(_g('global', 'closeYear', default=''))
     out['CycleFolder'] = cycle_folder()
     out['HubRoot'] = str(hub_root())
