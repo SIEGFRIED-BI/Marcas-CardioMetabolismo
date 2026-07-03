@@ -7,7 +7,6 @@
   },
 
   "labOverrides": {
-    "_docs": "baseMarca -> labForzado. Si el nombre-base de la marca (sin el token de lab final) matchea la key, se reemplaza el token de lab. Uso: cuando CloseUp reetiqueta el lab de una marca propia. CARDIVAS: el tablero lo muestra como SIE (propio) pero Qlik ahora lo tagea SIU; se fuerza SIE para reproducir prod. NOTA: CARDIVAS no figura en ningun sieProducts del build ni tiene familia -> probablemente NO sea propio y esto sea perpetuar una mala clasificacion vieja. Vaciar labOverrides ({}) para adoptar la clasificacion de Qlik (TERLOC recetas propias caeria ~15%).",
-    "CARDIVAS": "SIE"
+    "_docs": "baseMarca -> labForzado. Si el nombre-base de la marca (sin el token de lab final) matchea la key, se reemplaza el token de lab. Uso: cuando CloseUp reetiqueta el lab de una marca propia y el tablero deberia contarla como propia. VACIO a proposito: CARDIVAS se saco (usuario confirmo 2026-07-03 que CARDIVAS ya NO es de Siegfried) -> se adopta la clasificacion de Qlik (lab SIU = competidor); TERLOC recetas propias baja ~15%, que es lo correcto."
   }
 }

@@ -38,7 +38,7 @@ DERMATO_FAM = {
     'ACNECLIN':    ('TETRACICLINAS (ACNECLIN)',              'ACNECLIN SIE'),
     'ACNECLIN AP': ('TETRACICLINAS (ACNECLIN)',              'ACNECLIN AP SIE'),
     'CLOBESOL':    ('CLOBETASOL (CLOBESOL)',                 'CLOBESOL SIE'),
-    'MICOMAZOL':   ('ANTIM CREMA (MICOMAZOL)',               'MICOMAZOL SIE'),
+    'MICOMAZOL':   ('ANTIM CREMA (MICOMAZOL)',               ['MICOMAZOL SIE', 'MICOMAZOL DEO SIE']),
     'MICROSONA':   ('HIDROCORTISO (MICROSONA)',              'MICROSONA SIE'),
     'MICROSONA C': ('TRIPLE CORT-ATB-ANTIM (MICROSONA C)',   'MICROSONA C SIE'),
     'MOMETAX':     ('MOMETAX TOTAL',                         'MOMETAX SIE'),
@@ -158,12 +158,13 @@ def main():
         for k in comp:
             rc_index[norm(k)] = k
             rc_index[re.sub(r'\s+SIE$', '', norm(k))] = k
-        sie_n = norm(sie_brand)
-        sie_n_nos = re.sub(r'\s+SIE$', '', sie_n)
+        # sie_brand puede ser str o lista (familias con variantes SIE, ej. MICOMAZOL
+        # = MICOMAZOL SIE + MICOMAZOL DEO SIE). Se suman todas.
+        sie_ns = [norm(b) for b in (sie_brand if isinstance(sie_brand, list) else [sie_brand])]
         lm, lv = last_existing(fam)
         for mk in months:
-            sie_apr = (brands.get(sie_n, {}).get(mk) or {}).get('recetas', 0)
-            sie_med = (brands.get(sie_n, {}).get(mk) or {}).get('medicos', 0)
+            sie_apr = sum((brands.get(sn, {}).get(mk) or {}).get('recetas', 0) for sn in sie_ns)
+            sie_med = sum((brands.get(sn, {}).get(mk) or {}).get('medicos', 0) for sn in sie_ns)
             # Mercado = SUMA de las marcas YA trackeadas (set curado). Es el mismo
             # mercado que recompone el multi-period (suma de rec_comp[fam].monthly),
             # asi rec_ms.ms coincide. NO se agregan marcas nuevas del pivot (se
@@ -175,12 +176,17 @@ def main():
                 rec_val = (monthly.get(mk) or {}).get('recetas', 0)
                 bn_nos = re.sub(r'\s+SIE$', '', bn)
                 key = rc_index.get(bn) or rc_index.get(bn_nos)
-                if key is None:
+                if key is not None:
+                    comp[key].setdefault('monthly', {})[mk] = rec_val
+                    market_total += rec_val
+                    matched += 1
+                elif bn in sie_ns:
+                    # variante SIE de la familia no curada (ej. MICOMAZOL DEO SIE):
+                    # cuenta en el mercado igual (esta dentro del sie sumado).
+                    market_total += rec_val
+                    matched += 1
+                else:
                     skipped += 1  # marca del pivot fuera del set curado -> no agregar
-                    continue
-                comp[key].setdefault('monthly', {})[mk] = rec_val
-                market_total += rec_val
-                matched += 1
             rms = rec_ms.setdefault(fam, {})
             rms.setdefault('sie', {})[mk] = sie_apr
             rms.setdefault('ms', {})[mk] = round(sie_apr / market_total * 100, 2) if market_total else 0

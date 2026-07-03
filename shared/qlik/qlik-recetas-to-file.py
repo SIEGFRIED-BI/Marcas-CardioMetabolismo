@@ -23,6 +23,7 @@ Uso:
 from __future__ import annotations
 import json, sys, os
 from collections import defaultdict
+from datetime import datetime
 import openpyxl
 
 MES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -102,9 +103,13 @@ def main():
         c = mkt[merc][ym]; c[0] += rec; c[1] += med
 
     wb = openpyxl.Workbook(); ws = wb.active; ws.title = 'Sheet1'
-    # fila1: fechas en cols 4,6,8...
+    # fila1: fechas en cols 4,6,8... COMO datetime (no string): build-data lo acepta
+    # y los mergers de SNC/derma/mujer EXIGEN datetime (isinstance(h1, datetime)).
+    def _dt(label):
+        mmm, yyyy = label.split('-'); return datetime(int(yyyy), MI.get(mmm, 0) + 1, 1)
     row1 = [None, None, 'Mes-Año']
-    for m in months: row1 += [m, m]
+    for m in months:
+        d = _dt(m); row1 += [d, d]
     ws.append(row1)
     # fila2: nombres de columna
     row2 = ['Mercado (sin Mix)', 'Droga', 'Marca']
