@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-03T08:59:44",
+  "generated_at": "2026-07-03T10:08:48",
   "as_of_month": "May 2026",
   "periods": [
     "mensual",
@@ -25,7 +25,7 @@
       "owner": "Diego Fernández",
       "recetas_through": "Feb 2026",
       "iqvia_through": "May 2026",
-      "venta_through": "May 2026",
+      "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         331152,
@@ -242,7 +242,7 @@
       "owner": "Antonella Mariani",
       "recetas_through": "Feb 2026",
       "iqvia_through": "May 2026",
-      "venta_through": "May 2026",
+      "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         235406,
@@ -459,7 +459,7 @@
       "owner": "María Hernández",
       "recetas_through": "Apr 2026",
       "iqvia_through": "May 2026",
-      "venta_through": "May 2026",
+      "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         253281,
@@ -676,7 +676,7 @@
       "owner": "Juan Filidoro",
       "recetas_through": "Apr 2026",
       "iqvia_through": "May 2026",
-      "venta_through": "May 2026",
+      "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         91058,
@@ -893,7 +893,7 @@
       "owner": "Antonella Mariani",
       "recetas_through": "Feb 2026",
       "iqvia_through": "May 2026",
-      "venta_through": "May 2026",
+      "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         871334,
@@ -1110,7 +1110,7 @@
       "owner": "Tatiana Peker",
       "recetas_through": "Feb 2026",
       "iqvia_through": "May 2026",
-      "venta_through": "May 2026",
+      "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         129112,
@@ -1327,7 +1327,7 @@
       "owner": "Javier Rodríguez",
       "recetas_through": "Apr 2026",
       "iqvia_through": "May 2026",
-      "venta_through": "May 2026",
+      "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         164739,
