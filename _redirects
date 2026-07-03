@@ -1,0 +1,13 @@
+# ═══════════════════════════════════════════════════════════════════
+#  MODO MANTENIMIENTO  (Cloudflare Pages)
+#
+#  ON  : descomentá la línea `/*  /mantenimiento.html  200` de abajo y
+#        hacé push  ->  TODO el tablero muestra mantenimiento.html
+#        (nadie ve datos; el logo va embebido, no necesita assets).
+#  OFF : volvé a comentarla (o dejá este archivo sin reglas activas) y
+#        hacé push  ->  el tablero vuelve a la normalidad.
+#
+#  Estado actual: ON (mantenimiento activo durante el deploy 2026-07-03).
+# ═══════════════════════════════════════════════════════════════════
+
+/*  /mantenimiento.html  200
