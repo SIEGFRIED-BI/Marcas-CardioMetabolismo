@@ -90,7 +90,19 @@ def build_ddd_from_comp(comp_data):
             'productsByMonth': products_by_month,
         }
 
-    return {'months': months, 'markets': new_markets}
+    # familyToMarkets: el render (app.js) arma ORDERED_MARKETS = familyToMarkets.Totales
+    # .filter(m => markets[m]). Si las keys de markets cambiaron (nombres molecula) y
+    # Totales quedo con los nombres viejos, el filtro da VACIO -> pagina en blanco.
+    # Por eso se REGENERA aca, consistente con las keys nuevas de markets.
+    fam2mk = {'Totales': list(new_markets.keys())}
+    for mk_name, mk_obj in comp_data.get('markets', {}).items():
+        for b in mk_obj.get('brands', []):
+            bu = str(b).upper()
+            fam2mk.setdefault(bu, [])
+            if mk_name not in fam2mk[bu]:
+                fam2mk[bu].append(mk_name)
+
+    return {'months': months, 'markets': new_markets, 'familyToMarkets': fam2mk}
 
 
 def patch_line(line_key, data_rel, comp_rel):
@@ -105,13 +117,16 @@ def patch_line(line_key, data_rel, comp_rel):
     D, end = json.JSONDecoder().raw_decode(t[ob:])
     prefix = t[:ob]; suffix = t[ob+end:]
 
+    fam2mk = new_ddd.pop('familyToMarkets')
     D['ddd'] = new_ddd
+    D['familyToMarkets'] = fam2mk   # regenerado para que matchee las keys nuevas de markets
 
     n_markets = len(new_ddd['markets'])
     n_months = len(new_ddd['months'])
+    ordered = [m for m in fam2mk['Totales'] if m in new_ddd['markets']]
     p.write_text(prefix + json.dumps(D, ensure_ascii=False) + suffix,
                  encoding='utf-8', newline='')
-    return f'OK [months={n_months}, markets={n_markets}]'
+    return f'OK [months={n_months}, markets={n_markets}, familyToMarkets.Totales={len(fam2mk["Totales"])}, ORDERED={len(ordered)}]'
 
 
 def main():
