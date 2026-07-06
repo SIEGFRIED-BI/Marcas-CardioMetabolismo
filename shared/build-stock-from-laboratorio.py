@@ -119,6 +119,21 @@ def alerts_from_series(series, months12, label):
     return out
 
 
+# mujer: D.stock esta keyeado por SEGMENTO de marketing (ALTA DOSIS, SIN ESTROGENO...)
+# pero la planilla Laboratorio-Familia-Producto trae FAMILIAS de producto (ISIS, TRIP D3...).
+# Sin este mapa, ningun segmento matchea y el "conservar lo que habia" re-keyeaba
+# stock_alerts a segmentos VACIOS ({}) -> la seccion Cobertura de mujer moria con
+# TypeError (bug 70800a1, detectado 2026-07-03). Mapa 1:1 validado contra las filas
+# reales de la planilla (= keys del stock_alerts historico pre-70800a1).
+MUJER_SEG_FAM = {
+    'SIN ESTROGENO': 'ISIS FREE', 'ALTA DOSIS': 'ISIS', 'BAJA DOSIS 21+7': 'ISIS MINI',
+    'BAJA DOSIS 24': 'ISIS MINI 24', 'COMPLEX': 'SIDERBLUT COMPLEX', 'SOLO': 'SIDERBLUT',
+    'D3': 'TRIP D3', 'D3 PLUS': 'TRIP D3 PLUS', 'MAGNESIO': 'TRIP MAGNESIO',
+    'BASE': 'CALCIO BASE', 'BASE D': 'CALCIO BASE D', 'DELTROX': 'DELTROX',
+    'CLIMATIX': 'CLIMATIX',
+}
+
+
 def patch(check_only=False):
     src = find_source()
     if src is None:
@@ -145,11 +160,14 @@ def patch(check_only=False):
         cur_pres = set(D.get('stock_pres', {}))
         if not cur_fams and not cur_pres:
             continue
+        is_mujer = rel.startswith('mujer/')
         new_stock, new_alerts, new_pres = {}, {}, {}
         for fam in cur_fams:
-            if fam in fam_data:
-                new_stock[fam] = fam_data[fam]
-                a = alerts_from_series(fam_data[fam], months12, fam); a['familia'] = fam
+            # mujer: el segmento se resuelve a su familia de producto en la planilla
+            src_key = fam if fam in fam_data else (MUJER_SEG_FAM.get(fam) if is_mujer else None)
+            if src_key and src_key in fam_data:
+                new_stock[fam] = fam_data[src_key]
+                a = alerts_from_series(fam_data[src_key], months12, fam); a['familia'] = fam
                 new_alerts[fam] = a
             else:  # conservar lo que habia si la planilla no lo trae
                 new_stock[fam] = D['stock'][fam]
