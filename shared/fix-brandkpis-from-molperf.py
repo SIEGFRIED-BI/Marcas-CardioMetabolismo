@@ -180,7 +180,9 @@ def patch_line(path_rel, is_inline):
             if b_p > 0 and m_p > 0 and m_c > 0:
                 brand_ratio = b_c / b_p
                 mkt_ratio = m_c / m_p
-                if mkt_ratio > 0 and brand_ratio < 5:  # cap unrealistic growth
+                # cap: base insignificante (>=5x) o mercado volatil -> IE no comparable
+                # (igual que fix-brandkpis-ie-vs-market.py / build-families-perf.py)
+                if brand_ratio < 5 and 0.2 < mkt_ratio < 5:
                     new_ie = round(brand_ratio / mkt_ratio * 100, 1)
             if target.get('ie') != new_ie:
                 if new_ie is None: new_null += 1

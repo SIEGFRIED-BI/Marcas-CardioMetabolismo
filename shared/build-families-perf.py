@@ -150,7 +150,10 @@ def compute_family_period(fam_data, window_curr, window_prev):
     # IE relative = (sie growth) / (market growth) * 100
     sie_growth = safe_div(sie_curr, sie_prev)
     mkt_growth = safe_div(market_curr, market_prev)
-    if sie_growth is not None and mkt_growth is not None and mkt_growth > 0:
+    # Cap volatilidad (igual que fix-brandkpis-ie-vs-market.py y multi-period-table.computeBrand):
+    # base insignificante (crecimiento propio >=5x) o mercado volatil/incompleto -> IE no comparable.
+    if (sie_growth is not None and mkt_growth is not None
+            and sie_growth < 5 and 0.2 < mkt_growth < 5):
         ie = round(sie_growth / mkt_growth * 100, 0)
     else:
         ie = None

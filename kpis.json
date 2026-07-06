@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-03T13:39:36",
+  "generated_at": "2026-07-06T12:35:16",
   "as_of_month": "May 2026",
   "periods": [
     "mensual",
@@ -60,7 +60,7 @@
           "recetas_sie": {
             "curr": 46311,
             "prev": 46274,
-            "ie": 100.1
+            "ie": 90.2
           },
           "ms_recetas": {
             "curr": 7.62,
@@ -95,7 +95,7 @@
           "recetas_sie": {
             "curr": 221958,
             "prev": 234731,
-            "ie": 94.6
+            "ie": 88.3
           },
           "ms_recetas": {
             "curr": 7.61,
@@ -130,7 +130,7 @@
           "recetas_sie": {
             "curr": 136161,
             "prev": 139031,
-            "ie": 97.9
+            "ie": 89.7
           },
           "ms_recetas": {
             "curr": 7.62,
@@ -165,7 +165,7 @@
           "recetas_sie": {
             "curr": 266356,
             "prev": 285366,
-            "ie": 93.3
+            "ie": 87.8
           },
           "ms_recetas": {
             "curr": 7.63,
@@ -200,7 +200,7 @@
           "recetas_sie": {
             "curr": 536477,
             "prev": 595473,
-            "ie": 90.1
+            "ie": 87.6
           },
           "ms_recetas": {
             "curr": 7.9,
@@ -277,7 +277,7 @@
           "recetas_sie": {
             "curr": 21170,
             "prev": 21585,
-            "ie": 98.1
+            "ie": 100.9
           },
           "ms_recetas": {
             "curr": 55.67,
@@ -312,7 +312,7 @@
           "recetas_sie": {
             "curr": 100112,
             "prev": 105347,
-            "ie": 95.0
+            "ie": 99.2
           },
           "ms_recetas": {
             "curr": 53.15,
@@ -347,7 +347,7 @@
           "recetas_sie": {
             "curr": 61215,
             "prev": 63805,
-            "ie": 95.9
+            "ie": 98.8
           },
           "ms_recetas": {
             "curr": 53.76,
@@ -382,7 +382,7 @@
           "recetas_sie": {
             "curr": 120211,
             "prev": 126931,
-            "ie": 94.7
+            "ie": 99.4
           },
           "ms_recetas": {
             "curr": 53.14,
@@ -417,7 +417,7 @@
           "recetas_sie": {
             "curr": 246453,
             "prev": 269780,
-            "ie": 91.4
+            "ie": 100.4
           },
           "ms_recetas": {
             "curr": 54.48,
@@ -494,7 +494,7 @@
           "recetas_sie": {
             "curr": 26431,
             "prev": 27072,
-            "ie": 97.6
+            "ie": 100.1
           },
           "ms_recetas": {
             "curr": 11.09,
@@ -529,7 +529,7 @@
           "recetas_sie": {
             "curr": 135629,
             "prev": 135408,
-            "ie": 100.2
+            "ie": 101.4
           },
           "ms_recetas": {
             "curr": 11.35,
@@ -599,7 +599,7 @@
           "recetas_sie": {
             "curr": 163113,
             "prev": 158176,
-            "ie": 98.7
+            "ie": null
           },
           "ms_recetas": {
             "curr": 11.33,
@@ -634,7 +634,7 @@
           "recetas_sie": {
             "curr": 327221,
             "prev": 298266,
-            "ie": 93.1
+            "ie": null
           },
           "ms_recetas": {
             "curr": 11.17,
@@ -711,7 +711,7 @@
           "recetas_sie": {
             "curr": 12791,
             "prev": 13177,
-            "ie": 97.1
+            "ie": 94.3
           },
           "ms_recetas": {
             "curr": 10.91,
@@ -746,7 +746,7 @@
           "recetas_sie": {
             "curr": 61977,
             "prev": 65849,
-            "ie": 94.1
+            "ie": 89.5
           },
           "ms_recetas": {
             "curr": 10.78,
@@ -781,7 +781,7 @@
           "recetas_sie": {
             "curr": 37768,
             "prev": 39121,
-            "ie": 96.5
+            "ie": 91.4
           },
           "ms_recetas": {
             "curr": 10.83,
@@ -816,7 +816,7 @@
           "recetas_sie": {
             "curr": 73280,
             "prev": 80057,
-            "ie": 91.5
+            "ie": 87.3
           },
           "ms_recetas": {
             "curr": 10.65,
@@ -851,7 +851,7 @@
           "recetas_sie": {
             "curr": 148743,
             "prev": 164354,
-            "ie": 90.5
+            "ie": 86.9
           },
           "ms_recetas": {
             "curr": 11.06,
@@ -928,7 +928,7 @@
           "recetas_sie": {
             "curr": 53410,
             "prev": 52178,
-            "ie": 102.4
+            "ie": 103.1
           },
           "ms_recetas": {
             "curr": 23.78,
@@ -963,7 +963,7 @@
           "recetas_sie": {
             "curr": 187154,
             "prev": 200998,
-            "ie": 93.1
+            "ie": 100.5
           },
           "ms_recetas": {
             "curr": 20.51,
@@ -998,7 +998,7 @@
           "recetas_sie": {
             "curr": 126581,
             "prev": 138642,
-            "ie": 91.3
+            "ie": 98.1
           },
           "ms_recetas": {
             "curr": 21.47,
@@ -1033,7 +1033,7 @@
           "recetas_sie": {
             "curr": 223870,
             "prev": 239796,
-            "ie": 93.4
+            "ie": 101.2
           },
           "ms_recetas": {
             "curr": 20.4,
@@ -1068,7 +1068,7 @@
           "recetas_sie": {
             "curr": 548324,
             "prev": 591046,
-            "ie": 92.8
+            "ie": 102.8
           },
           "ms_recetas": {
             "curr": 21.98,
@@ -1145,7 +1145,7 @@
           "recetas_sie": {
             "curr": 3073,
             "prev": 3659,
-            "ie": 84.0
+            "ie": 85.9
           },
           "ms_recetas": {
             "curr": 7.99,
@@ -1180,7 +1180,7 @@
           "recetas_sie": {
             "curr": 15519,
             "prev": 18122,
-            "ie": 85.6
+            "ie": 86.6
           },
           "ms_recetas": {
             "curr": 8.17,
@@ -1215,7 +1215,7 @@
           "recetas_sie": {
             "curr": 9265,
             "prev": 10844,
-            "ie": 85.4
+            "ie": 85.9
           },
           "ms_recetas": {
             "curr": 8.06,
@@ -1250,7 +1250,7 @@
           "recetas_sie": {
             "curr": 18816,
             "prev": 21772,
-            "ie": 86.4
+            "ie": 87.3
           },
           "ms_recetas": {
             "curr": 8.23,
@@ -1285,7 +1285,7 @@
           "recetas_sie": {
             "curr": 40358,
             "prev": 45498,
-            "ie": 88.7
+            "ie": 90.6
           },
           "ms_recetas": {
             "curr": 8.76,
@@ -1362,7 +1362,7 @@
           "recetas_sie": {
             "curr": 17887,
             "prev": 19359,
-            "ie": 92.4
+            "ie": 99.6
           },
           "ms_recetas": {
             "curr": 32.46,
@@ -1397,7 +1397,7 @@
           "recetas_sie": {
             "curr": 92312,
             "prev": 94600,
-            "ie": 97.6
+            "ie": 101.3
           },
           "ms_recetas": {
             "curr": 32.6,
@@ -1432,7 +1432,7 @@
           "recetas_sie": {
             "curr": 55138,
             "prev": 56661,
-            "ie": 97.3
+            "ie": 101.2
           },
           "ms_recetas": {
             "curr": 32.71,
@@ -1467,7 +1467,7 @@
           "recetas_sie": {
             "curr": 112379,
             "prev": 115002,
-            "ie": 97.7
+            "ie": 101.5
           },
           "ms_recetas": {
             "curr": 32.74,
@@ -1502,7 +1502,7 @@
           "recetas_sie": {
             "curr": 236270,
             "prev": 243494,
-            "ie": 97.0
+            "ie": 101.2
           },
           "ms_recetas": {
             "curr": 33.16,
@@ -4192,7 +4192,7 @@
         "mensual": {
           "rec_curr": 4522,
           "rec_prev": 155,
-          "rec_ie": 2915.5,
+          "rec_ie": null,
           "units_curr": 3545,
           "units_prev": 3046,
           "units_ie": 116.3,
@@ -4203,7 +4203,7 @@
         "ytd": {
           "rec_curr": 4866,
           "rec_prev": 880,
-          "rec_ie": 558.5,
+          "rec_ie": null,
           "units_curr": 17191,
           "units_prev": 14387,
           "units_ie": 115.8,
@@ -4214,7 +4214,7 @@
         "trimestre": {
           "rec_curr": 4522,
           "rec_prev": 492,
-          "rec_ie": 912.7,
+          "rec_ie": null,
           "units_curr": 10739,
           "units_prev": 8942,
           "units_ie": 114.0,
@@ -4570,7 +4570,7 @@
         "mensual": {
           "rec_curr": 821,
           "rec_prev": 141,
-          "rec_ie": 450.0,
+          "rec_ie": null,
           "units_curr": 2501,
           "units_prev": 729,
           "units_ie": 300.4,
@@ -4581,7 +4581,7 @@
         "ytd": {
           "rec_curr": 3831,
           "rec_prev": 203,
-          "rec_ie": 817.7,
+          "rec_ie": null,
           "units_curr": 11899,
           "units_prev": 2434,
           "units_ie": 427.2,
@@ -4592,7 +4592,7 @@
         "trimestre": {
           "rec_curr": 2342,
           "rec_prev": 203,
-          "rec_ie": 832.3,
+          "rec_ie": null,
           "units_curr": 7575,
           "units_prev": 2434,
           "units_ie": 289.7,
@@ -4603,10 +4603,10 @@
         "semestre": {
           "rec_curr": 4541,
           "rec_prev": 203,
-          "rec_ie": 810.6,
+          "rec_ie": null,
           "units_curr": 14264,
           "units_prev": 2434,
-          "units_ie": 506.9,
+          "units_ie": null,
           "int_curr": 14629,
           "int_prev": 4856,
           "int_ie": 301.3
@@ -4614,10 +4614,10 @@
         "mat": {
           "rec_curr": 6996,
           "rec_prev": 203,
-          "rec_ie": 683.9,
+          "rec_ie": null,
           "units_curr": 22890,
           "units_prev": 2434,
-          "units_ie": 842.9,
+          "units_ie": null,
           "int_curr": 22389,
           "int_prev": 4856,
           "int_ie": 461.1

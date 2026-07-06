@@ -22,9 +22,9 @@ LINES = [
     ('ATB', 'ATB/data.js', False, 'ATB/DDD/competidores-data.js'),
     ('OTC', 'OTC/data.js', False, 'OTC/DDD/competidores-data.js'),
     ('respi', 'respiratorio/data.js', False, 'respiratorio/DDD/competidores-data.js'),
-    ('mujer', 'mujer/index.html', True, 'mujer/DDD/competidores-data.js'),
-    ('SNC', 'SNC/index.html', True, 'SNC/DDD/competidores-data.js'),
-    ('derma', 'dermatologia/dermato_dashboard.html', True, 'dermatologia/competidores-data.js'),
+    ('mujer', 'mujer/data.js', False, 'mujer/DDD/competidores-data.js'),
+    ('SNC', 'SNC/data.js', False, 'SNC/DDD/competidores-data.js'),
+    ('derma', 'dermatologia/data.js', False, 'dermatologia/competidores-data.js'),
 ]
 
 
@@ -33,12 +33,15 @@ def norm(s):
 
 
 def loadD(path, inline):
-    enc = 'utf-8' if inline else 'utf-8-sig'
-    t = (REPO / path).read_text(encoding=enc, errors='replace')
-    if inline:
-        m = re.search(r'const D\s*=\s*\{', t); ob = m.end() - 1
-    else:
-        m = re.search(r'window\.OTC_DASHBOARD\s*=\s*', t); ob = t.index('{', m.end())
+    # Robusto: acepta data.js (window.OTC_DASHBOARD = {...}) o inline legacy
+    # (const D = {...}). Post-migracion F4 las 7 lineas viven en data.js. Falla
+    # RUIDOSAMENTE (ValueError) si no encuentra el objeto, para no saltear lineas
+    # en silencio ni crashear con un traceback cripptico.
+    t = (REPO / path).read_text(encoding='utf-8-sig', errors='replace')
+    m = re.search(r'window\.OTC_DASHBOARD\s*=\s*\{', t) or re.search(r'const\s+D\s*=\s*\{', t)
+    if not m:
+        raise ValueError(f'no encontre window.OTC_DASHBOARD ni "const D = {{...}}" en {path}')
+    ob = t.index('{', m.start())
     return json.JSONDecoder().raw_decode(t[ob:])[0]
 
 
@@ -56,12 +59,18 @@ def loadC(path):
 def main():
     if hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(encoding='utf-8')
     any_flag = False
+    load_errors = []
     for name, dp, inline, cp in LINES:
         C = loadC(cp)
         if not C:
             print(f'[{name}] sin competidores-data.js — no se puede chequear')
             continue
-        D = loadD(dp, inline)
+        try:
+            D = loadD(dp, inline)
+        except Exception as e:
+            load_errors.append(name)
+            print(f'[{name}] ERROR cargando {dp}: {e}')
+            continue
         b2m = {}  # marca SIE normalizada -> mercado fuente
         for mk, mo in C.get('markets', {}).items():
             for b in mo.get('brands', []):
@@ -88,6 +97,10 @@ def main():
         print('\nNota: revisar manualmente. Si son moleculas distintas (ej. mono vs combo,')
         print('sildenafil vs tadalafil) -> separar la familia (ver split-cardio-roxolan.py).')
         print('Si es un split fino intencional o adulto/ped no separable -> dejar.')
+    if load_errors:
+        print(f'\nERROR: no se pudieron cargar {len(load_errors)} linea(s): {load_errors}. '
+              'El chequeo NO cubrio esas lineas — revisar.')
+        return 1
     return 0
 
 

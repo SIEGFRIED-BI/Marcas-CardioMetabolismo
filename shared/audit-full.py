@@ -106,7 +106,9 @@ def compute_brand_vs_market(D, brand_key, win_c, win_p):
     ie = None
     if b_p > 0 and m_p > 0 and m_c > 0:
         br = b_c/b_p; mr = m_c/m_p
-        if mr > 0 and br < 5:
+        # Cap volatilidad igual que fix-brandkpis-ie-vs-market.py / build-families-perf.py:
+        # base insignificante (>=5x) o mercado volatil -> IE no comparable.
+        if br < 5 and 0.2 < mr < 5:
             ie = round(br/mr*100, 1)
     ms = round(b_c/m_c*100, 1) if m_c > 0 else None
     return {'b_c':b_c, 'b_p':b_p, 'm_c':m_c, 'm_p':m_p, 'ie':ie, 'ms':ms}
@@ -230,6 +232,28 @@ def audit_recetas(R):
                 if kpi_rec_curr is not None:
                     R.check(f'{line_dir} sum(rec_ms[].sie YTD) vs kpis.json.recetas_sie.curr',
                             kpi_rec_curr, total, tol=max(10, kpi_rec_curr*0.01) if kpi_rec_curr else 10)
+
+        # 3.3b) recetas_sie.ie debe ser RELATIVO al mercado (no crecimiento propio):
+        # signo(ie-100) == signo(Δshare)  (IE>100 <=> gano share de recetas).
+        # Detecta la regresion "recetas_sie.ie = safe_ie (crecimiento propio)" que
+        # ignora el mercado (build-kpis.py). Cuando la cobertura previa es parcial
+        # y el IE no es comparable, build-kpis pone ie=None -> se skipea (no flag).
+        if kl:
+            for _per in kj.get('periods', []):
+                _kp = kl['kpis'].get(_per)
+                if not isinstance(_kp, dict): continue
+                _ie = (_kp.get('recetas_sie') or {}).get('ie')
+                _ms = _kp.get('ms_recetas') or {}
+                _c, _p = _ms.get('curr'), _ms.get('prev')
+                if _ie is None or _c is None or _p is None: continue
+                _dshare = _c - _p
+                if abs(_dshare) <= 0.2: continue
+                R.checks += 1
+                if (_ie > 100) != (_dshare > 0):
+                    R.fails += 1
+                    R.fail_details.append(
+                        f'  FAIL {line_dir} {_per} recetas_sie.ie direccion: '
+                        f'ie={_ie} contradice share {_p}->{_c} (delta={_dshare:+.2f}pp)')
 
         # 3.4) recetas[fam][m].recetas (Cant. Recetas) vs rec_ms[fam].mkt[m]
         # SOLO cuando D.recetas usa nombres de familia (no de brand).

@@ -350,8 +350,8 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 
   <!-- ══ 01 VENTA INTERNA ══════════════════════════════════════════════ -->
   <div class="sec" id="s-bud">
-    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Presupuesto</h2></div>
-    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs presupuesto planificado · 2025 cierre · 2026 vigente</p>
+    <div class="sec-hd"><span class="sec-num">Venta Interna</span><h2 class="sec-title">Venta Interna vs Estimado de Ventas</h2></div>
+    <p class="sec-sub" id="bud-copy">Unidades mensuales: venta interna Siegfried vs estimado de ventas planificado · 2025 cierre · 2026 vigente</p>
     <div class="card">
       <div class="ctrl-row">
         <div class="pill-group" id="bud-pills"></div><div id="bud-totals" style="margin-left:16px;display:flex;gap:14px;flex-wrap:wrap;font-family:IBM Plex Mono,monospace;font-size:11px;color:#4b5563;align-items:center;"></div>
@@ -550,12 +550,13 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
     <div id="cov-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;"></div>
   </div>
 
-  <div class="footer">Siegfried S.A. · SNC · Datos al 19/06/2026 · PM IQVIA + Manual Farmacéutico + Datos Internos</div>
+  <div class="footer">Siegfried S.A. · SNC · Datos al <span id="footer-date">19/06/2026</span> · PM IQVIA + Manual Farmacéutico + Datos Internos</div>
 </div>
 
 <script src="../shared/render/sections.js?v=5bfe41db94"></script>
 <script>
 const D = window.OTC_DASHBOARD || window.OTC_DATA;
+{ const _fd = document.getElementById('footer-date'); if (_fd && D.meta && D.meta.footer_date) _fd.textContent = D.meta.footer_date; }
 
 window.applyBudget2026Overrides?.({ line: 'snc', data: D });
 const MESES = D.meses;

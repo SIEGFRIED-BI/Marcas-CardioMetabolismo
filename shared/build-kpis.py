@@ -594,6 +594,9 @@ def collect_products(D, window_curr, window_prev, line_key, line_name,
         brand_ratio = brand_c / brand_p
         mkt_ratio = mkt_c / mkt_p
         if mkt_ratio == 0: return None
+        # Cap volatilidad (igual que fix-brandkpis-ie-vs-market.py): base insignificante
+        # (crecimiento propio >=5x) o mercado volatil -> IE no comparable ("—").
+        if not (brand_ratio < 5 and 0.2 < mkt_ratio < 5): return None
         return round(brand_ratio / mkt_ratio * 100, 1)
 
     # Pre-compute IQVIA market (mercado molécula) curr/prev per fam_key
@@ -917,19 +920,35 @@ def main():
                 100 = la marca creció igual que su mercado. None si falta algun dato o prev<=0."""
                 if brand_c is None or brand_p is None or brand_p <= 0: return None
                 if mkt_c is None or mkt_p is None or mkt_p <= 0: return None
+                brand_ratio = brand_c / brand_p
                 mkt_ratio = mkt_c / mkt_p
                 if mkt_ratio == 0: return None
-                return round((brand_c / brand_p) / mkt_ratio * 100, 1)
+                # Cap volatilidad (igual que fix-brandkpis-ie-vs-market.py): base
+                # insignificante (crecimiento propio >=5x) o mercado volatil -> "—".
+                if not (brand_ratio < 5 and 0.2 < mkt_ratio < 5): return None
+                return round((brand_ratio) / mkt_ratio * 100, 1)
             # IE / MS comparable usan sym (curr emparejado a meses prev disponibles)
             rec_sie_c_sym = rec.get('sie_curr_sym', rec['sie_curr'])
             rec_mkt_c_sym = rec.get('mkt_curr_sym', rec['mkt_curr'])
             iq_sie_c_sym  = iqvia.get('sie_curr_sym', iqvia['sie_curr'])
             iq_mkt_c_sym  = iqvia.get('mkt_curr_sym', iqvia['mkt_curr'])
+            # Recetas: IE relativo al mercado (mismo criterio que units, linea abajo).
+            rec_ms_c = safe_ms(rec['sie_curr'], rec['mkt_curr'])
+            rec_ms_p = safe_ms(rec['sie_prev'], rec['mkt_prev'])
+            rec_ie = ie_vs_market(rec_sie_c_sym, rec['sie_prev'], rec_mkt_c_sym, rec['mkt_prev'])
+            # Guardrail de consistencia: el IE se calcula sobre ventana simetrica.
+            # Si contradice la direccion del share MOSTRADO (ventana completa) es
+            # porque la cobertura de recetas del anio previo es parcial (el YoY no
+            # es comparable, se ve en mujer) -> "—", misma politica que
+            # multi-period-table.js ("mercado no comparable -> sin IE").
+            if (rec_ie is not None and rec_ms_c is not None and rec_ms_p is not None
+                    and abs(rec_ms_c - rec_ms_p) > 0.2
+                    and ((rec_ie > 100) != (rec_ms_c > rec_ms_p))):
+                rec_ie = None
             kpis[period] = {
                 'recetas_sie':   {'curr': rec['sie_curr'],   'prev': rec['sie_prev'],
-                                  'ie': safe_ie(rec_sie_c_sym, rec['sie_prev'])},
-                'ms_recetas':    {'curr': safe_ms(rec['sie_curr'], rec['mkt_curr']),
-                                  'prev': safe_ms(rec['sie_prev'], rec['mkt_prev'])},
+                                  'ie': rec_ie},
+                'ms_recetas':    {'curr': rec_ms_c, 'prev': rec_ms_p},
                 'mercado_recetas': {'curr': rec['mkt_curr'], 'prev': rec['mkt_prev'],
                                     'ie': safe_ie(rec_mkt_c_sym, rec['mkt_prev'])},
                 'units_sie':     {'curr': iqvia['sie_curr'], 'prev': iqvia['sie_prev'],

@@ -571,26 +571,26 @@ table.marcas-table .mt-line-pill {
             <th colspan="6" class="mt-group mt-trim">TRIM <span class="mt-label" id="mt-lbl-trim"></span></th>
           </tr>
           <tr class="mt-sub-row">
-            <th data-key="mat.market_prev" class="mt-mat-bg">U Ant</th>
-            <th data-key="mat.market_curr" data-sort="desc" class="mt-mat-bg">U Act</th>
+            <th data-key="mat.sie_prev" class="mt-mat-bg">U Ant</th>
+            <th data-key="mat.sie_curr" data-sort="desc" class="mt-mat-bg">U Act</th>
             <th data-key="mat.ms_prev" class="mt-mat-bg">MS% Ant</th>
             <th data-key="mat.ms_curr" class="mt-mat-bg">MS% Act</th>
             <th data-key="mat.ie" class="mt-mat-bg">IE</th>
             <th data-key="mat.var_pp" class="mt-mat-bg mt-sep">Var pp</th>
-            <th data-key="ytd.market_prev" class="mt-ytd-bg">U Ant</th>
-            <th data-key="ytd.market_curr" class="mt-ytd-bg">U Act</th>
+            <th data-key="ytd.sie_prev" class="mt-ytd-bg">U Ant</th>
+            <th data-key="ytd.sie_curr" class="mt-ytd-bg">U Act</th>
             <th data-key="ytd.ms_prev" class="mt-ytd-bg">MS% Ant</th>
             <th data-key="ytd.ms_curr" class="mt-ytd-bg">MS% Act</th>
             <th data-key="ytd.ie" class="mt-ytd-bg">IE</th>
             <th data-key="ytd.var_pp" class="mt-ytd-bg mt-sep">Var pp</th>
-            <th data-key="mes.market_prev" class="mt-mes-bg">U Ant</th>
-            <th data-key="mes.market_curr" class="mt-mes-bg">U Act</th>
+            <th data-key="mes.sie_prev" class="mt-mes-bg">U Ant</th>
+            <th data-key="mes.sie_curr" class="mt-mes-bg">U Act</th>
             <th data-key="mes.ms_prev" class="mt-mes-bg">MS% Ant</th>
             <th data-key="mes.ms_curr" class="mt-mes-bg">MS% Act</th>
             <th data-key="mes.ie" class="mt-mes-bg">IE</th>
             <th data-key="mes.var_pp" class="mt-mes-bg mt-sep">Var pp</th>
-            <th data-key="trimestre.market_prev" class="mt-trim-bg">U Ant</th>
-            <th data-key="trimestre.market_curr" class="mt-trim-bg">U Act</th>
+            <th data-key="trimestre.sie_prev" class="mt-trim-bg">U Ant</th>
+            <th data-key="trimestre.sie_curr" class="mt-trim-bg">U Act</th>
             <th data-key="trimestre.ms_prev" class="mt-trim-bg">MS% Ant</th>
             <th data-key="trimestre.ms_curr" class="mt-trim-bg">MS% Act</th>
             <th data-key="trimestre.ie" class="mt-trim-bg">IE</th>
@@ -641,7 +641,7 @@ function monthSortKey(mk) {
 
 let DATA = null;
 let state = { view:'lines', period:'ytd', prodLine:'', prodSearch:'', sortKey:'units_curr', sortDir:'desc',
-              marcaLine:'', marcaSearch:'', marcaSortKey:'mat.market_curr', marcaSortDir:'desc' };
+              marcaLine:'', marcaSearch:'', marcaSortKey:'mat.sie_curr', marcaSortDir:'desc' };
 
 function deltaClass(curr, prev, mode) {
   if (curr == null || prev == null) return 'na';
@@ -857,11 +857,11 @@ function renderMarcasPeriodCells(period, periodKey, sep) {
              : periodKey === 'mes' ? 'mt-mes-bg'
              : 'mt-trim-bg';
   // Arrows next to U Act and MS% Act
-  const uArrow = arrowFor(m.market_curr, m.market_prev);
+  const uArrow = arrowFor(m.sie_curr, m.sie_prev);
   const msArrow = arrowFor(m.ms_curr, m.ms_prev);
   return ''
-    + '<td>' + fmtInt(m.market_prev) + '</td>'
-    + '<td>' + uArrow + fmtInt(m.market_curr) + '</td>'
+    + '<td>' + fmtInt(m.sie_prev) + '</td>'
+    + '<td>' + uArrow + fmtInt(m.sie_curr) + '</td>'
     + '<td>' + fmtPct(m.ms_prev) + '</td>'
     + '<td>' + msArrow + fmtPct(m.ms_curr) + '</td>'
     + '<td class="ie-cell ' + ieClass(ie) + '">' + (ie == null ? '—' : ie) + '</td>'

@@ -553,12 +553,13 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
     <div id="cov-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;"></div>
   </div>
 
-  <div class="footer">Siegfried S.A. · Dermato · Datos al 19/06/2026 · PM IQVIA + Manual Farmacéutico + Datos Internos</div>
+  <div class="footer">Siegfried S.A. · Dermato · Datos al <span id="footer-date">19/06/2026</span> · PM IQVIA + Manual Farmacéutico + Datos Internos</div>
 </div>
 
 <script src="../shared/render/sections.js?v=5bfe41db94"></script>
 <script>
 const D = window.OTC_DASHBOARD || window.OTC_DATA;
+{ const _fd = document.getElementById('footer-date'); if (_fd && D.meta && D.meta.footer_date) _fd.textContent = D.meta.footer_date; }
 
 const MESES = D.meses;
 const COLORS = D.colors;
@@ -2073,5 +2074,6 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
   else setTimeout(init, 50);
 })();
 </script>
+<script src="../shared/data-status.js?v=0241a0346a"></script>
 </body></html>
 

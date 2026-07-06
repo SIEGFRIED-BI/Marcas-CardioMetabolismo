@@ -20,21 +20,22 @@ LINES = [
     ('antibio', 'ATB',    'ATB/data.js', False),
     ('otx',     'OTC',    'OTC/data.js', False),
     ('resp',    'respiratorio', 'respiratorio/data.js', False),
-    ('mujer',   'mujer',  'mujer/index.html', True),
-    ('snc',     'SNC',    'SNC/index.html', True),
-    ('derma',   'dermatologia', 'dermatologia/dermato_dashboard.html', True),
+    ('mujer',   'mujer',  'mujer/data.js', False),
+    ('snc',     'SNC',    'SNC/data.js', False),
+    ('derma',   'dermatologia', 'dermatologia/data.js', False),
 ]
 
 
 def load_D(path_rel, is_inline):
+    # Robusto: data.js (window.OTC_DASHBOARD = {...}) o inline legacy (const D = {...}).
+    # Post-migracion F4 las 7 lineas viven en data.js. Falla claro (ValueError) si no
+    # encuentra el objeto, para no saltear lineas en silencio.
     p = REPO / path_rel
-    text = p.read_text(encoding='utf-8-sig' if not is_inline else 'utf-8', errors='replace')
-    if is_inline:
-        m = re.search(r'const D = (\{)', text)
-        ob = text.index('{', m.start() + 8)
-    else:
-        m = re.search(r'window\.OTC_DASHBOARD\s*=\s*', text)
-        ob = text.index('{', m.end())
+    text = p.read_text(encoding='utf-8-sig', errors='replace')
+    m = re.search(r'window\.OTC_DASHBOARD\s*=\s*\{', text) or re.search(r'const\s+D\s*=\s*\{', text)
+    if not m:
+        raise ValueError(f'no encontre window.OTC_DASHBOARD ni "const D = {{...}}" en {path_rel}')
+    ob = text.index('{', m.start())
     D, _ = json.JSONDecoder().raw_decode(text[ob:])
     return D
 
@@ -89,7 +90,10 @@ def compute_mol_ms_for_brand(D, brand, months_curr, months_prev):
                     'ms_curr': round(ms_c,2) if ms_c else None,
                     'ms_prev': round(ms_p,2) if ms_p else None,
                     'ie_brand_growth': round(brand_curr/brand_prev*100,1) if brand_prev>0 else None,
-                    'ie_vs_mkt': round((brand_curr/brand_prev)/(mkt_curr/mkt_prev)*100,1) if mkt_prev>0 and brand_prev>0 else None}
+                    'ie_vs_mkt': (round((brand_curr/brand_prev)/(mkt_curr/mkt_prev)*100,1)
+                                  if (brand_prev>0 and mkt_prev>0
+                                      and (brand_curr/brand_prev)<5 and 0.2<(mkt_curr/mkt_prev)<5)
+                                  else None)}
     return None
 
 
@@ -101,11 +105,13 @@ def audit():
     print('AUDIT: Hub kpis.html (kpis.json) vs Dashboard kpiStrip')
     print('=' * 80)
     print(f"{'LINE':10s} {'METRIC':12s} {'kpis.json':>12s} {'data.js':>12s} {'STATUS'}")
+    load_errors = set()
     issues = 0
     for key, line_dir, path_rel, is_inline in LINES:
         try:
             D = load_D(path_rel, is_inline)
         except Exception as e:
+            load_errors.add(line_dir)
             print(f'  {line_dir}: ERROR loading: {e}')
             continue
         ks = D.get('kpiStrip', {})
@@ -123,6 +129,7 @@ def audit():
             status = 'OK' if a == b else 'MISMATCH'
             if status != 'OK': issues += 1
             print(f"  {line_dir:10s} {label:8s} {str(a):>12s} {str(b):>12s} {status}")
+    total_issues = issues
     print(f'\nLine-level mismatches: {issues}\n')
 
     print('=' * 80)
@@ -134,6 +141,7 @@ def audit():
         try:
             D = load_D(path_rel, is_inline)
         except Exception as e:
+            load_errors.add(line_dir)
             continue
         bk = D.get('brandKpis', {})
         if not bk: continue
@@ -153,8 +161,19 @@ def audit():
             status = 'OK' if diff < 0.5 else f'MISMATCH (diff={diff})'
             if status != 'OK': issues += 1
             print(f"  {line_dir:10s} {brand:25s} {str(bk_ie):>8s} {str(expected):>9s} {status}")
+    total_issues += issues
     print(f'\nBrand-level mismatches: {issues}\n')
+
+    # Fail loudly: exit != 0 si alguna linea no cargo (cobertura incompleta ->
+    # NO reportar "0 mismatches" como verde) o si hay mismatches reales.
+    if load_errors:
+        print(f'ERROR: no se pudieron cargar {len(load_errors)} linea(s): '
+              f'{sorted(load_errors)}. El audit NO cubrio esas lineas.')
+    if load_errors or total_issues:
+        return 1
+    print('OK: consistencia verificada en las 7 lineas (0 mismatches).')
+    return 0
 
 
 if __name__ == '__main__':
-    audit()
+    sys.exit(audit())

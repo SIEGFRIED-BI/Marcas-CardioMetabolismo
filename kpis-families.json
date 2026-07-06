@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-03",
+  "generated_at": "2026-07-06",
   "as_of_month": "May 2026",
   "as_of_short": "May 2026",
   "period_labels": {
@@ -2891,7 +2891,7 @@
           "sie_prev": 2434,
           "ms_curr": 5.1,
           "ms_prev": 0.6,
-          "ie": 843.0,
+          "ie": null,
           "var_pp": 4.5
         }
       }
@@ -3782,7 +3782,7 @@
           "sie_prev": 15,
           "ms_curr": 1.8,
           "ms_prev": 0.1,
-          "ie": 1263.0,
+          "ie": null,
           "var_pp": 1.7
         },
         "ytd": {
@@ -3792,7 +3792,7 @@
           "sie_prev": 71,
           "ms_curr": 1.6,
           "ms_prev": 0.1,
-          "ie": 1057.0,
+          "ie": null,
           "var_pp": 1.5
         },
         "trimestre": {
@@ -3802,7 +3802,7 @@
           "sie_prev": 45,
           "ms_curr": 1.6,
           "ms_prev": 0.1,
-          "ie": 1140.0,
+          "ie": null,
           "var_pp": 1.5
         },
         "mat": {
@@ -3812,7 +3812,7 @@
           "sie_prev": 263,
           "ms_curr": 1.7,
           "ms_prev": 0.2,
-          "ie": 733.0,
+          "ie": null,
           "var_pp": 1.5
         }
       }
@@ -4169,7 +4169,7 @@
           "sie_prev": 621,
           "ms_curr": 8.6,
           "ms_prev": 1.5,
-          "ie": 590.0,
+          "ie": null,
           "var_pp": 7.1
         }
       }
