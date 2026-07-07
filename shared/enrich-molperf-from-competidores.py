@@ -144,6 +144,12 @@ def enrich_line(line_key, data_rel, comp_rel):
         stats['matched'] += 1
 
         mol_obj = mol[mol_key]
+        # RESTO sintetico (build-data) y enrich (competidores reales) son MUTUAMENTE
+        # EXCLUYENTES: ambos des-truncan el mercado. Si coexisten, el total se cuenta
+        # doble (resto + competidores). Al enriquecer con marcas reales descartamos el
+        # 'Otros (resto del mercado)'; el recompute posterior deja sum(products)=mercado.
+        if any(p.get('is_resto') for p in mol_obj.get('products', [])):
+            mol_obj['products'] = [p for p in mol_obj['products'] if not p.get('is_resto')]
         existing_prods = mol_obj.get('products', [])
         existing_bases = {}
         for p in existing_prods:

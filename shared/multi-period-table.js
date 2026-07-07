@@ -298,11 +298,14 @@
         competitors.push({
           brand: prod.prod || '(sin nombre)',
           is_sie: !!prod.is_sie,
+          is_resto: !!prod.is_resto,
           periods: brandPeriods,
         });
       }
       competitors.sort(function(a,b){
-        // Ranking por MAT units desc (SIE en su posicion natural, no forzado primero)
+        // 'Otros (resto del mercado)' siempre ultimo; luego ranking por MAT units desc.
+        if (a.is_resto && !b.is_resto) return 1;
+        if (!a.is_resto && b.is_resto) return -1;
         return (b.periods.mat.market_curr||0) - (a.periods.mat.market_curr||0);
       });
       families.push({ family: fam, periods: periods, competitors: competitors });
@@ -543,7 +546,7 @@
     function buildCompRows(family, idx) {
       var comps = family.competitors || [];
       var rowsHtml = comps.map(function(c, i){
-        var sieCls = c.is_sie ? ' mp-comp-sie' : '';
+        var sieCls = c.is_sie ? ' mp-comp-sie' : (c.is_resto ? ' mp-comp-resto' : '');
         var rank = '#' + (i + 1);
         return '<tr class="mp-comp-row' + sieCls + '">'
           + '<td class="mp-fam mp-comp-fam" title="' + escapeHtml(c.brand) + '">'

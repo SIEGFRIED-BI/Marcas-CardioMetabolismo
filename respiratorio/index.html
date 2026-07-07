@@ -270,7 +270,7 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 <link rel="stylesheet" href="../shared/responsive.css?v=357fd002bf">
 <script src="../shared/ux-shared.js?v=75c8f37c8a" defer></script>
 <script src="../shared/guide.js?v=g1" defer></script>
-  <link rel="stylesheet" href="../shared/multi-period-table.css?v=7f98517741">
+  <link rel="stylesheet" href="../shared/multi-period-table.css?v=6193e2bbbc">
 </head>
 <body>
 
@@ -1208,6 +1208,7 @@ function _aggregateByBrand(rawProds){
       groups.set(brand, agg);
     }
     if(p.is_sie) agg.is_sie = true;
+    if(p.is_resto) agg.is_resto = true;
     ['monthly_vals','ytd','mat','quarterly_vals'].forEach(f=>{
       Object.entries(p[f]||{}).forEach(([k,v])=>{
         if(v!=null) agg[f][k] = (agg[f][k]||0) + (+v||0);
@@ -1280,7 +1281,7 @@ function renderPerf(){
     return v||0;
   };
   // Build pills always from full prods
-  const _allProds = prods.slice().sort((a,b)=>(_vfn(b)||0)-(_vfn(a)||0));
+  const _allProds = prods.slice().sort((a,b)=>((a.is_resto?1:0)-(b.is_resto?1:0))||(_vfn(b)||0)-(_vfn(a)||0));
   // Filter
   let _filtered = _allProds;
   if(_pf.mode==='top5') _filtered = _allProds.slice(0,5);
@@ -1293,6 +1294,8 @@ function renderPerf(){
   // Always include SIE
   const _sieProds = _allProds.filter(p=>p.is_sie);
   _sieProds.forEach(s=>{ if(!_filtered.find(x=>x.prod===s.prod)) _filtered.push(s); });
+  // Siempre incluir 'Otros (resto del mercado)' para que el top-8 no oculte la cola.
+  _allProds.filter(p=>p.is_resto).forEach(s=>{ if(!_filtered.find(x=>x.prod===s.prod)) _filtered.push(s); });
   prods = _filtered;
 
   // Render pills
@@ -1360,6 +1363,7 @@ function renderPerf(){
   };
 
   const sorted=[...prods].sort((a,b)=>{
+    if(a.is_resto&&!b.is_resto)return 1; if(!a.is_resto&&b.is_resto)return -1;
     if(a.is_sie&&!b.is_sie)return -1; if(!a.is_sie&&b.is_sie)return 1;
     return (getVal(b,lastPK)||0)-(getVal(a,lastPK)||0);
   });
@@ -1368,7 +1372,7 @@ function renderPerf(){
   const ctx=document.getElementById('perfChart').getContext('2d');
   let cIdx=0;
   const datasets=sorted.map(p=>{
-    const color=p.is_sie?'#ef4444':COMP_COLORS[cIdx++%COMP_COLORS.length];
+    const color=p.is_sie?'#ef4444':(p.is_resto?'#9ca3af':COMP_COLORS[cIdx++%COMP_COLORS.length]);
     const data=periodKeys.map(k=>{
       const v=getVal(p,k);
       return v!=null?(pMetric==='ms'?parseFloat(v.toFixed(2)):v):null;
@@ -1418,7 +1422,7 @@ function renderPerf(){
     <thead><tr><th>Producto</th><th>${pMetric==='ms'?'MS% actual':'Unidades'}</th><th>${pMetric==='ms'?'MS% anterior':'Unidades ant.'}</th><th>IE 100</th><th>Δ vs año ant.</th></tr></thead>
     <tbody>${totalRowHtml}${sorted.map(p=>{
       const vNow=getVal(p,lastPK); const vPrev=getVal(p,prevPK);
-      const color2=p.is_sie?'#ef4444':COMP_COLORS[cIdx2++%COMP_COLORS.length];
+      const color2=p.is_sie?'#ef4444':(p.is_resto?'#9ca3af':COMP_COLORS[cIdx2++%COMP_COLORS.length]);
       const delta=(vNow!=null&&vPrev!=null&&vPrev>0)?((vNow/vPrev-1)*100):null;
       const barW=pMetric==='ms'&&vNow?Math.min(Math.round(vNow*2),80):0;
       const valStr=pMetric==='ms'?(vNow!=null?vNow.toFixed(1)+'%':'—'):(vNow!=null?fmt(vNow)+'u':'—');
@@ -2333,7 +2337,7 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
 })();
 
 </script>
-<script src="../shared/multi-period-table.js?v=00db04d1bb"></script>
+<script src="../shared/multi-period-table.js?v=532ab7cc68"></script>
 <script>
 // Multi-period summary tables (added by patch-multi-period-sections.py).
 // Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.

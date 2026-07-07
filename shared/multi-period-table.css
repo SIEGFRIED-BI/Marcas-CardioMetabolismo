@@ -128,6 +128,9 @@
   background: #fff7f7;
 }
 .mp-table tbody tr.mp-comp-row.mp-comp-sie td { background: #fff7f7; }
+/* 'Otros (resto del mercado)': cola agregada, gris e italica, siempre ultima. */
+.mp-table tbody tr.mp-comp-row.mp-comp-resto td.mp-comp-fam { color: #6b7280; font-style: italic; }
+.mp-table tbody tr.mp-comp-row.mp-comp-resto td { color: #6b7280; }
 .mp-table tbody tr.mp-comp-row:hover td { background: #f9fafb; }
 .mp-table tbody tr.mp-comp-row.mp-comp-sie:hover td { background: #ffeaea; }
 .mp-comp-indent {

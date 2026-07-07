@@ -6,7 +6,7 @@
 <title>Línea S.N.C. · Siegfried</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="./data.js?v=a79dcc8beb"></script>
+<script src="./data.js?v=35abe27658"></script>
 <script src="../shared/budget-overrides.js?v=0e5cee0263"></script>
 <style>
 :root{
@@ -267,7 +267,7 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 <link rel="stylesheet" href="../shared/responsive.css?v=357fd002bf">
 <script src="../shared/ux-shared.js?v=75c8f37c8a" defer></script>
 <script src="../shared/guide.js?v=g1" defer></script>
-  <link rel="stylesheet" href="../shared/multi-period-table.css?v=7f98517741">
+  <link rel="stylesheet" href="../shared/multi-period-table.css?v=6193e2bbbc">
 </head>
 <body>
 
@@ -2122,10 +2122,7 @@ document.querySelectorAll('.sec[id], #s-kpi').forEach(s=>{
 
 // ── COBERTURA DE STOCK ─────────────────────────────────────────────────
 
-const COV_LABELS = ['Ene 24','Feb 24','Mar 24','Abr 24','May 24','Jun 24',
-                    'Jul 24','Ago 24','Sep 24','Oct 24','Nov 24','Dic 24',
-                    'Ene 25','Feb 25','Mar 25','Abr 25','May 25','Jun 25',
-                    'Jul 25','Ago 25','Sep 25','Oct 25','Nov 25','Dic 25'];
+const COV_LABELS = D.coverage_labels || [];
 
 function covClassify(d){
   if(d===null||d===undefined) return 'nd';
@@ -2285,7 +2282,7 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
 })();
 
 </script>
-<script src="../shared/multi-period-table.js?v=00db04d1bb"></script>
+<script src="../shared/multi-period-table.js?v=532ab7cc68"></script>
 <script>
 // Multi-period summary tables (added by patch-multi-period-sections.py).
 // Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.

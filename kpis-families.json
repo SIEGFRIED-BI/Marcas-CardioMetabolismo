@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-06",
+  "generated_at": "2026-07-07",
   "as_of_month": "May 2026",
   "as_of_short": "May 2026",
   "period_labels": {
@@ -19,8 +19,8 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 1378789,
-          "market_prev": 1192006,
+          "market_curr": 1507233,
+          "market_prev": 1314548,
           "sie_curr": 2982,
           "sie_prev": 5260,
           "ms_curr": 0.2,
@@ -29,86 +29,86 @@
           "var_pp": -0.2
         },
         "ytd": {
-          "market_curr": 6794865,
-          "market_prev": 5144346,
+          "market_curr": 7422509,
+          "market_prev": 5733692,
           "sie_curr": 15759,
           "sie_prev": 23781,
           "ms_curr": 0.2,
-          "ms_prev": 0.5,
-          "ie": 50.0,
-          "var_pp": -0.3
+          "ms_prev": 0.4,
+          "ie": 51.0,
+          "var_pp": -0.2
         },
         "trimestre": {
-          "market_curr": 4163596,
-          "market_prev": 3351542,
+          "market_curr": 4548773,
+          "market_prev": 3713954,
           "sie_curr": 9572,
           "sie_prev": 15236,
           "ms_curr": 0.2,
-          "ms_prev": 0.5,
+          "ms_prev": 0.4,
           "ie": 51.0,
-          "var_pp": -0.3
+          "var_pp": -0.2
         },
         "mat": {
-          "market_curr": 14755817,
-          "market_prev": 11567627,
+          "market_curr": 16317631,
+          "market_prev": 13029020,
           "sie_curr": 46168,
           "sie_prev": 59662,
           "ms_curr": 0.3,
           "ms_prev": 0.5,
-          "ie": 61.0,
+          "ie": 62.0,
           "var_pp": -0.2
         }
       }
     },
     {
-      "family": "DIOVAN",
-      "display": "DIOVAN",
+      "family": "ROXOLAN",
+      "display": "ROXOLAN",
       "line": "cardio",
       "lineName": "Cardiometabolismo",
       "sie_brands": [
-        "DIOVAN (SIE)",
-        "DIOVAN IC (SIE)"
+        "ROXOLAN (SIE)",
+        "ROXOLAN PLUS (SIE)"
       ],
       "periods": {
         "mes": {
-          "market_curr": 721420,
-          "market_prev": 678238,
-          "sie_curr": 43354,
-          "sie_prev": 46189,
-          "ms_curr": 6.0,
-          "ms_prev": 6.8,
-          "ie": 88.0,
-          "var_pp": -0.8
+          "market_curr": 979420,
+          "market_prev": 895595,
+          "sie_curr": 20896,
+          "sie_prev": 20269,
+          "ms_curr": 2.1,
+          "ms_prev": 2.3,
+          "ie": 94.0,
+          "var_pp": -0.2
         },
         "ytd": {
-          "market_curr": 3528709,
-          "market_prev": 3246349,
-          "sie_curr": 210788,
-          "sie_prev": 226389,
-          "ms_curr": 6.0,
-          "ms_prev": 7.0,
-          "ie": 86.0,
-          "var_pp": -1.0
+          "market_curr": 4762362,
+          "market_prev": 4209057,
+          "sie_curr": 101948,
+          "sie_prev": 89197,
+          "ms_curr": 2.1,
+          "ms_prev": 2.1,
+          "ie": 101.0,
+          "var_pp": 0.0
         },
         "trimestre": {
-          "market_curr": 2189479,
-          "market_prev": 2013416,
-          "sie_curr": 129215,
-          "sie_prev": 137953,
-          "ms_curr": 5.9,
-          "ms_prev": 6.9,
-          "ie": 86.0,
-          "var_pp": -1.0
+          "market_curr": 2963968,
+          "market_prev": 2630822,
+          "sie_curr": 62932,
+          "sie_prev": 56623,
+          "ms_curr": 2.1,
+          "ms_prev": 2.2,
+          "ie": 99.0,
+          "var_pp": -0.1
         },
         "mat": {
-          "market_curr": 8394987,
-          "market_prev": 7874424,
-          "sie_curr": 533814,
-          "sie_prev": 587376,
-          "ms_curr": 6.4,
-          "ms_prev": 7.5,
-          "ie": 85.0,
-          "var_pp": -1.1
+          "market_curr": 11269465,
+          "market_prev": 10712155,
+          "sie_curr": 243032,
+          "sie_prev": 223707,
+          "ms_curr": 2.2,
+          "ms_prev": 2.1,
+          "ie": 103.0,
+          "var_pp": 0.1
         }
       }
     },
@@ -123,44 +123,96 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 644930,
-          "market_prev": 676439,
+          "market_curr": 785350,
+          "market_prev": 827715,
           "sie_curr": 31655,
           "sie_prev": 31130,
-          "ms_curr": 4.9,
-          "ms_prev": 4.6,
+          "ms_curr": 4.0,
+          "ms_prev": 3.8,
           "ie": 107.0,
-          "var_pp": 0.3
+          "var_pp": 0.2
         },
         "ytd": {
-          "market_curr": 3243723,
-          "market_prev": 3315663,
+          "market_curr": 3967543,
+          "market_prev": 4076988,
           "sie_curr": 145014,
           "sie_prev": 148335,
-          "ms_curr": 4.5,
-          "ms_prev": 4.5,
+          "ms_curr": 3.7,
+          "ms_prev": 3.6,
           "ie": 100.0,
-          "var_pp": 0.0
+          "var_pp": 0.1
         },
         "trimestre": {
-          "market_curr": 2002538,
-          "market_prev": 2050645,
+          "market_curr": 2453348,
+          "market_prev": 2498944,
           "sie_curr": 89314,
           "sie_prev": 92858,
-          "ms_curr": 4.5,
-          "ms_prev": 4.5,
+          "ms_curr": 3.6,
+          "ms_prev": 3.7,
           "ie": 98.0,
-          "var_pp": 0.0
+          "var_pp": -0.1
         },
         "mat": {
-          "market_curr": 7889243,
-          "market_prev": 8092875,
+          "market_curr": 9687348,
+          "market_prev": 10044017,
           "sie_curr": 357566,
           "sie_prev": 359235,
-          "ms_curr": 4.5,
-          "ms_prev": 4.4,
-          "ie": 102.0,
+          "ms_curr": 3.7,
+          "ms_prev": 3.6,
+          "ie": 103.0,
           "var_pp": 0.1
+        }
+      }
+    },
+    {
+      "family": "DIOVAN",
+      "display": "DIOVAN",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "DIOVAN (SIE)",
+        "DIOVAN IC (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 730333,
+          "market_prev": 672059,
+          "sie_curr": 43354,
+          "sie_prev": 46189,
+          "ms_curr": 5.9,
+          "ms_prev": 6.9,
+          "ie": 86.0,
+          "var_pp": -1.0
+        },
+        "ytd": {
+          "market_curr": 3555976,
+          "market_prev": 3226142,
+          "sie_curr": 210788,
+          "sie_prev": 226389,
+          "ms_curr": 5.9,
+          "ms_prev": 7.0,
+          "ie": 84.0,
+          "var_pp": -1.1
+        },
+        "trimestre": {
+          "market_curr": 2214243,
+          "market_prev": 1999528,
+          "sie_curr": 129215,
+          "sie_prev": 137953,
+          "ms_curr": 5.8,
+          "ms_prev": 6.9,
+          "ie": 85.0,
+          "var_pp": -1.1
+        },
+        "mat": {
+          "market_curr": 8446465,
+          "market_prev": 7873415,
+          "sie_curr": 533814,
+          "sie_prev": 587376,
+          "ms_curr": 6.3,
+          "ms_prev": 7.5,
+          "ie": 85.0,
+          "var_pp": -1.2
         }
       }
     },
@@ -212,58 +264,6 @@
           "ms_prev": 3.0,
           "ie": 117.0,
           "var_pp": 0.5
-        }
-      }
-    },
-    {
-      "family": "ROXOLAN",
-      "display": "ROXOLAN",
-      "line": "cardio",
-      "lineName": "Cardiometabolismo",
-      "sie_brands": [
-        "ROXOLAN (SIE)",
-        "ROXOLAN PLUS (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 665969,
-          "market_prev": 621712,
-          "sie_curr": 20896,
-          "sie_prev": 20269,
-          "ms_curr": 3.1,
-          "ms_prev": 3.3,
-          "ie": 96.0,
-          "var_pp": -0.2
-        },
-        "ytd": {
-          "market_curr": 3257322,
-          "market_prev": 2931806,
-          "sie_curr": 101948,
-          "sie_prev": 89197,
-          "ms_curr": 3.1,
-          "ms_prev": 3.0,
-          "ie": 103.0,
-          "var_pp": 0.1
-        },
-        "trimestre": {
-          "market_curr": 2021496,
-          "market_prev": 1832701,
-          "sie_curr": 62932,
-          "sie_prev": 56623,
-          "ms_curr": 3.1,
-          "ms_prev": 3.1,
-          "ie": 101.0,
-          "var_pp": 0.0
-        },
-        "mat": {
-          "market_curr": 7767449,
-          "market_prev": 7493168,
-          "sie_curr": 243032,
-          "sie_prev": 223707,
-          "ms_curr": 3.1,
-          "ms_prev": 3.0,
-          "ie": 105.0,
-          "var_pp": 0.1
         }
       }
     },
@@ -328,44 +328,44 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 499918,
-          "market_prev": 490113,
+          "market_curr": 460159,
+          "market_prev": 464665,
           "sie_curr": 28279,
           "sie_prev": 30329,
-          "ms_curr": 5.7,
-          "ms_prev": 6.2,
-          "ie": 91.0,
-          "var_pp": -0.5
-        },
-        "ytd": {
-          "market_curr": 2458916,
-          "market_prev": 2351161,
-          "sie_curr": 140049,
-          "sie_prev": 142973,
-          "ms_curr": 5.7,
-          "ms_prev": 6.1,
+          "ms_curr": 6.1,
+          "ms_prev": 6.5,
           "ie": 94.0,
           "var_pp": -0.4
         },
+        "ytd": {
+          "market_curr": 2273384,
+          "market_prev": 2225740,
+          "sie_curr": 140049,
+          "sie_prev": 142973,
+          "ms_curr": 6.2,
+          "ms_prev": 6.4,
+          "ie": 96.0,
+          "var_pp": -0.2
+        },
         "trimestre": {
-          "market_curr": 1508818,
-          "market_prev": 1449887,
+          "market_curr": 1399515,
+          "market_prev": 1370679,
           "sie_curr": 86623,
           "sie_prev": 87703,
-          "ms_curr": 5.7,
-          "ms_prev": 6.0,
-          "ie": 95.0,
-          "var_pp": -0.3
+          "ms_curr": 6.2,
+          "ms_prev": 6.4,
+          "ie": 97.0,
+          "var_pp": -0.2
         },
         "mat": {
-          "market_curr": 5965006,
-          "market_prev": 6044736,
+          "market_curr": 5563828,
+          "market_prev": 5843298,
           "sie_curr": 341910,
           "sie_prev": 395831,
-          "ms_curr": 5.7,
-          "ms_prev": 6.5,
-          "ie": 88.0,
-          "var_pp": -0.8
+          "ms_curr": 6.1,
+          "ms_prev": 6.8,
+          "ie": 91.0,
+          "var_pp": -0.7
         }
       }
     },
@@ -379,44 +379,44 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 369400,
-          "market_prev": 394444,
+          "market_curr": 385309,
+          "market_prev": 414310,
           "sie_curr": 52657,
           "sie_prev": 61525,
-          "ms_curr": 14.3,
-          "ms_prev": 15.6,
+          "ms_curr": 13.7,
+          "ms_prev": 14.8,
+          "ie": 92.0,
+          "var_pp": -1.1
+        },
+        "ytd": {
+          "market_curr": 1948343,
+          "market_prev": 2040453,
+          "sie_curr": 268464,
+          "sie_prev": 307480,
+          "ms_curr": 13.8,
+          "ms_prev": 15.1,
           "ie": 91.0,
           "var_pp": -1.3
         },
-        "ytd": {
-          "market_curr": 1868990,
-          "market_prev": 1935558,
-          "sie_curr": 268464,
-          "sie_prev": 307480,
-          "ms_curr": 14.4,
-          "ms_prev": 15.9,
-          "ie": 90.0,
-          "var_pp": -1.5
-        },
         "trimestre": {
-          "market_curr": 1139419,
-          "market_prev": 1193120,
+          "market_curr": 1188698,
+          "market_prev": 1254247,
           "sie_curr": 161936,
           "sie_prev": 190519,
-          "ms_curr": 14.2,
-          "ms_prev": 16.0,
-          "ie": 89.0,
-          "var_pp": -1.8
+          "ms_curr": 13.6,
+          "ms_prev": 15.2,
+          "ie": 90.0,
+          "var_pp": -1.6
         },
         "mat": {
-          "market_curr": 4597916,
-          "market_prev": 4918503,
+          "market_curr": 4805538,
+          "market_prev": 5222616,
           "sie_curr": 677911,
           "sie_prev": 781223,
-          "ms_curr": 14.7,
-          "ms_prev": 15.9,
-          "ie": 93.0,
-          "var_pp": -1.2
+          "ms_curr": 14.1,
+          "ms_prev": 15.0,
+          "ie": 94.0,
+          "var_pp": -0.9
         }
       }
     },
@@ -431,44 +431,44 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 369551,
-          "market_prev": 394464,
+          "market_curr": 385309,
+          "market_prev": 414310,
           "sie_curr": 57186,
           "sie_prev": 66482,
-          "ms_curr": 15.5,
-          "ms_prev": 16.9,
+          "ms_curr": 14.8,
+          "ms_prev": 16.0,
           "ie": 92.0,
-          "var_pp": -1.4
+          "var_pp": -1.2
         },
         "ytd": {
-          "market_curr": 1868711,
-          "market_prev": 1935041,
+          "market_curr": 1948343,
+          "market_prev": 2040453,
           "sie_curr": 290443,
           "sie_prev": 329879,
-          "ms_curr": 15.5,
-          "ms_prev": 17.0,
-          "ie": 91.0,
-          "var_pp": -1.5
+          "ms_curr": 14.9,
+          "ms_prev": 16.2,
+          "ie": 92.0,
+          "var_pp": -1.3
         },
         "trimestre": {
-          "market_curr": 1139152,
-          "market_prev": 1192415,
+          "market_curr": 1188698,
+          "market_prev": 1254247,
           "sie_curr": 175097,
           "sie_prev": 204378,
-          "ms_curr": 15.4,
-          "ms_prev": 17.1,
+          "ms_curr": 14.7,
+          "ms_prev": 16.3,
           "ie": 90.0,
-          "var_pp": -1.7
+          "var_pp": -1.6
         },
         "mat": {
-          "market_curr": 4597552,
-          "market_prev": 4919960,
+          "market_curr": 4805538,
+          "market_prev": 5222616,
           "sie_curr": 733634,
           "sie_prev": 834228,
-          "ms_curr": 16.0,
-          "ms_prev": 17.0,
-          "ie": 94.0,
-          "var_pp": -1.0
+          "ms_curr": 15.3,
+          "ms_prev": 16.0,
+          "ie": 96.0,
+          "var_pp": -0.7
         }
       }
     },
@@ -524,57 +524,6 @@
       }
     },
     {
-      "family": "DIOVAN D",
-      "display": "DIOVAN D",
-      "line": "cardio",
-      "lineName": "Cardiometabolismo",
-      "sie_brands": [
-        "DIOVAN-D (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 360543,
-          "market_prev": 331499,
-          "sie_curr": 27233,
-          "sie_prev": 27834,
-          "ms_curr": 7.6,
-          "ms_prev": 8.4,
-          "ie": 90.0,
-          "var_pp": -0.8
-        },
-        "ytd": {
-          "market_curr": 1749920,
-          "market_prev": 1597145,
-          "sie_curr": 132416,
-          "sie_prev": 137044,
-          "ms_curr": 7.6,
-          "ms_prev": 8.6,
-          "ie": 88.0,
-          "var_pp": -1.0
-        },
-        "trimestre": {
-          "market_curr": 1082423,
-          "market_prev": 989283,
-          "sie_curr": 80508,
-          "sie_prev": 83292,
-          "ms_curr": 7.4,
-          "ms_prev": 8.4,
-          "ie": 88.0,
-          "var_pp": -1.0
-        },
-        "mat": {
-          "market_curr": 4161424,
-          "market_prev": 3855563,
-          "sie_curr": 329812,
-          "sie_prev": 354800,
-          "ms_curr": 7.9,
-          "ms_prev": 9.2,
-          "ie": 86.0,
-          "var_pp": -1.3
-        }
-      }
-    },
-    {
       "family": "ACEMUK",
       "display": "ACEMUK",
       "line": "resp",
@@ -623,6 +572,57 @@
           "ms_prev": 88.3,
           "ie": 99.0,
           "var_pp": -0.8
+        }
+      }
+    },
+    {
+      "family": "DIOVAN D",
+      "display": "DIOVAN D",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "DIOVAN-D (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 326566,
+          "market_prev": 298701,
+          "sie_curr": 27233,
+          "sie_prev": 27834,
+          "ms_curr": 8.3,
+          "ms_prev": 9.3,
+          "ie": 89.0,
+          "var_pp": -1.0
+        },
+        "ytd": {
+          "market_curr": 1597498,
+          "market_prev": 1451044,
+          "sie_curr": 132416,
+          "sie_prev": 137044,
+          "ms_curr": 8.3,
+          "ms_prev": 9.4,
+          "ie": 88.0,
+          "var_pp": -1.1
+        },
+        "trimestre": {
+          "market_curr": 987975,
+          "market_prev": 897573,
+          "sie_curr": 80508,
+          "sie_prev": 83292,
+          "ms_curr": 8.1,
+          "ms_prev": 9.3,
+          "ie": 88.0,
+          "var_pp": -1.2
+        },
+        "mat": {
+          "market_curr": 3792376,
+          "market_prev": 3519734,
+          "sie_curr": 329812,
+          "sie_prev": 354800,
+          "ms_curr": 8.7,
+          "ms_prev": 10.1,
+          "ie": 86.0,
+          "var_pp": -1.4
         }
       }
     },
@@ -935,6 +935,58 @@
       }
     },
     {
+      "family": "MACROMAX",
+      "display": "MACROMAX",
+      "line": "antibio",
+      "lineName": "Antibióticos",
+      "sie_brands": [
+        "MACROMAX (SIE)",
+        "MACROMAX PEDIATR (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 228823,
+          "market_prev": 235506,
+          "sie_curr": 19125,
+          "sie_prev": 17450,
+          "ms_curr": 8.4,
+          "ms_prev": 7.4,
+          "ie": 113.0,
+          "var_pp": 1.0
+        },
+        "ytd": {
+          "market_curr": 855919,
+          "market_prev": 933371,
+          "sie_curr": 48194,
+          "sie_prev": 47983,
+          "ms_curr": 5.6,
+          "ms_prev": 5.1,
+          "ie": 110.0,
+          "var_pp": 0.5
+        },
+        "trimestre": {
+          "market_curr": 585704,
+          "market_prev": 670002,
+          "sie_curr": 36652,
+          "sie_prev": 37573,
+          "ms_curr": 6.3,
+          "ms_prev": 5.6,
+          "ie": 112.0,
+          "var_pp": 0.7
+        },
+        "mat": {
+          "market_curr": 2296650,
+          "market_prev": 2605621,
+          "sie_curr": 148033,
+          "sie_prev": 135530,
+          "ms_curr": 6.4,
+          "ms_prev": 5.2,
+          "ie": 124.0,
+          "var_pp": 1.2
+        }
+      }
+    },
+    {
       "family": "TETRALGIN",
       "display": "TETRALGIN",
       "line": "otx",
@@ -1090,58 +1142,6 @@
       }
     },
     {
-      "family": "MACROMAX",
-      "display": "MACROMAX",
-      "line": "antibio",
-      "lineName": "Antibióticos",
-      "sie_brands": [
-        "MACROMAX (SIE)",
-        "MACROMAX PEDIATR (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 201119,
-          "market_prev": 205657,
-          "sie_curr": 19125,
-          "sie_prev": 17450,
-          "ms_curr": 9.5,
-          "ms_prev": 8.5,
-          "ie": 112.0,
-          "var_pp": 1.0
-        },
-        "ytd": {
-          "market_curr": 747279,
-          "market_prev": 791495,
-          "sie_curr": 48194,
-          "sie_prev": 47983,
-          "ms_curr": 6.4,
-          "ms_prev": 6.1,
-          "ie": 106.0,
-          "var_pp": 0.3
-        },
-        "trimestre": {
-          "market_curr": 513028,
-          "market_prev": 571479,
-          "sie_curr": 36652,
-          "sie_prev": 37573,
-          "ms_curr": 7.1,
-          "ms_prev": 6.6,
-          "ie": 109.0,
-          "var_pp": 0.5
-        },
-        "mat": {
-          "market_curr": 1994647,
-          "market_prev": 2188461,
-          "sie_curr": 148033,
-          "sie_prev": 135530,
-          "ms_curr": 7.4,
-          "ms_prev": 6.2,
-          "ie": 120.0,
-          "var_pp": 1.2
-        }
-      }
-    },
-    {
       "family": "EXFORGE",
       "display": "EXFORGE",
       "line": "cardio",
@@ -1151,18 +1151,18 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 171231,
-          "market_prev": 151238,
+          "market_curr": 171425,
+          "market_prev": 151466,
           "sie_curr": 16644,
           "sie_prev": 17031,
           "ms_curr": 9.7,
-          "ms_prev": 11.3,
+          "ms_prev": 11.2,
           "ie": 86.0,
-          "var_pp": -1.6
+          "var_pp": -1.5
         },
         "ytd": {
-          "market_curr": 834371,
-          "market_prev": 729433,
+          "market_curr": 835374,
+          "market_prev": 730413,
           "sie_curr": 80994,
           "sie_prev": 80944,
           "ms_curr": 9.7,
@@ -1171,8 +1171,8 @@
           "var_pp": -1.4
         },
         "trimestre": {
-          "market_curr": 518133,
-          "market_prev": 452032,
+          "market_curr": 518734,
+          "market_prev": 452648,
           "sie_curr": 50769,
           "sie_prev": 49739,
           "ms_curr": 9.8,
@@ -1181,8 +1181,8 @@
           "var_pp": -1.2
         },
         "mat": {
-          "market_curr": 1978632,
-          "market_prev": 1734045,
+          "market_curr": 1981325,
+          "market_prev": 1736268,
           "sie_curr": 200603,
           "sie_prev": 201976,
           "ms_curr": 10.1,
@@ -1202,44 +1202,44 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 129502,
-          "market_prev": 137067,
+          "market_curr": 133058,
+          "market_prev": 142211,
           "sie_curr": 77917,
           "sie_prev": 80990,
-          "ms_curr": 60.2,
-          "ms_prev": 59.1,
-          "ie": 102.0,
-          "var_pp": 1.1
+          "ms_curr": 58.6,
+          "ms_prev": 57.0,
+          "ie": 103.0,
+          "var_pp": 1.6
         },
         "ytd": {
-          "market_curr": 680165,
-          "market_prev": 702335,
+          "market_curr": 700974,
+          "market_prev": 736908,
           "sie_curr": 409219,
           "sie_prev": 409867,
-          "ms_curr": 60.2,
-          "ms_prev": 58.4,
-          "ie": 103.0,
-          "var_pp": 1.8
+          "ms_curr": 58.4,
+          "ms_prev": 55.6,
+          "ie": 105.0,
+          "var_pp": 2.8
         },
         "trimestre": {
-          "market_curr": 405167,
-          "market_prev": 418550,
+          "market_curr": 418185,
+          "market_prev": 436777,
           "sie_curr": 244379,
           "sie_prev": 244176,
-          "ms_curr": 60.3,
-          "ms_prev": 58.3,
-          "ie": 103.0,
-          "var_pp": 2.0
+          "ms_curr": 58.4,
+          "ms_prev": 55.9,
+          "ie": 105.0,
+          "var_pp": 2.5
         },
         "mat": {
-          "market_curr": 1608747,
-          "market_prev": 1633913,
+          "market_curr": 1657500,
+          "market_prev": 1721070,
           "sie_curr": 962244,
           "sie_prev": 944356,
-          "ms_curr": 59.8,
-          "ms_prev": 57.8,
-          "ie": 103.0,
-          "var_pp": 2.0
+          "ms_curr": 58.1,
+          "ms_prev": 54.9,
+          "ie": 106.0,
+          "var_pp": 3.2
         }
       }
     },
@@ -1253,95 +1253,96 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 129502,
-          "market_prev": 137067,
+          "market_curr": 133058,
+          "market_prev": 142211,
           "sie_curr": 77917,
           "sie_prev": 80990,
-          "ms_curr": 60.2,
-          "ms_prev": 59.1,
-          "ie": 102.0,
-          "var_pp": 1.1
+          "ms_curr": 58.6,
+          "ms_prev": 57.0,
+          "ie": 103.0,
+          "var_pp": 1.6
         },
         "ytd": {
-          "market_curr": 680165,
-          "market_prev": 702335,
+          "market_curr": 700974,
+          "market_prev": 736908,
           "sie_curr": 409219,
           "sie_prev": 409867,
-          "ms_curr": 60.2,
-          "ms_prev": 58.4,
-          "ie": 103.0,
-          "var_pp": 1.8
+          "ms_curr": 58.4,
+          "ms_prev": 55.6,
+          "ie": 105.0,
+          "var_pp": 2.8
         },
         "trimestre": {
-          "market_curr": 405167,
-          "market_prev": 418550,
+          "market_curr": 418185,
+          "market_prev": 436777,
           "sie_curr": 244379,
           "sie_prev": 244176,
-          "ms_curr": 60.3,
-          "ms_prev": 58.3,
-          "ie": 103.0,
-          "var_pp": 2.0
+          "ms_curr": 58.4,
+          "ms_prev": 55.9,
+          "ie": 105.0,
+          "var_pp": 2.5
         },
         "mat": {
-          "market_curr": 1608747,
-          "market_prev": 1633913,
+          "market_curr": 1657500,
+          "market_prev": 1721070,
           "sie_curr": 962244,
           "sie_prev": 944356,
-          "ms_curr": 59.8,
-          "ms_prev": 57.8,
-          "ie": 103.0,
-          "var_pp": 2.0
+          "ms_curr": 58.1,
+          "ms_prev": 54.9,
+          "ie": 106.0,
+          "var_pp": 3.2
         }
       }
     },
     {
-      "family": "SILTRAN",
-      "display": "SILTRAN",
-      "line": "cardio",
-      "lineName": "Cardiometabolismo",
+      "family": "ACERPES",
+      "display": "ACERPES",
+      "line": "otx",
+      "lineName": "OTX",
       "sie_brands": [
-        "SILTRAN (SIE)"
+        "ACERPES (SIE)",
+        "ACERPES 5% (SIE)"
       ],
       "periods": {
         "mes": {
-          "market_curr": 135542,
-          "market_prev": 128691,
-          "sie_curr": 2704,
-          "sie_prev": 1945,
-          "ms_curr": 2.0,
-          "ms_prev": 1.5,
-          "ie": 132.0,
-          "var_pp": 0.5
+          "market_curr": 133671,
+          "market_prev": 134554,
+          "sie_curr": 6855,
+          "sie_prev": 8320,
+          "ms_curr": 5.1,
+          "ms_prev": 6.2,
+          "ie": 83.0,
+          "var_pp": -1.1
         },
         "ytd": {
-          "market_curr": 673834,
-          "market_prev": 619253,
-          "sie_curr": 14241,
-          "sie_prev": 8180,
-          "ms_curr": 2.1,
-          "ms_prev": 1.3,
-          "ie": 160.0,
-          "var_pp": 0.8
+          "market_curr": 680978,
+          "market_prev": 640299,
+          "sie_curr": 39093,
+          "sie_prev": 40471,
+          "ms_curr": 5.7,
+          "ms_prev": 6.3,
+          "ie": 91.0,
+          "var_pp": -0.6
         },
         "trimestre": {
-          "market_curr": 410964,
-          "market_prev": 382273,
-          "sie_curr": 8896,
-          "sie_prev": 5448,
-          "ms_curr": 2.2,
-          "ms_prev": 1.4,
-          "ie": 152.0,
-          "var_pp": 0.8
+          "market_curr": 397752,
+          "market_prev": 386593,
+          "sie_curr": 21927,
+          "sie_prev": 24388,
+          "ms_curr": 5.5,
+          "ms_prev": 6.3,
+          "ie": 87.0,
+          "var_pp": -0.8
         },
         "mat": {
-          "market_curr": 1573873,
-          "market_prev": 1493835,
-          "sie_curr": 31855,
-          "sie_prev": 15492,
-          "ms_curr": 2.0,
-          "ms_prev": 1.0,
-          "ie": 195.0,
-          "var_pp": 1.0
+          "market_curr": 1631325,
+          "market_prev": 1527069,
+          "sie_curr": 98658,
+          "sie_prev": 96749,
+          "ms_curr": 6.0,
+          "ms_prev": 6.3,
+          "ie": 95.0,
+          "var_pp": -0.3
         }
       }
     },
@@ -1397,59 +1398,6 @@
       }
     },
     {
-      "family": "BACTRIM FORTE",
-      "display": "BACTRIM FORTE",
-      "line": "antibio",
-      "lineName": "Antibióticos",
-      "sie_brands": [
-        "BACTRIM FORTE (SIE)",
-        "BACTRIM (SIE)",
-        "BACTRIM JARABE (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 127149,
-          "market_prev": 134030,
-          "sie_curr": 111251,
-          "sie_prev": 119383,
-          "ms_curr": 87.5,
-          "ms_prev": 89.1,
-          "ie": 98.0,
-          "var_pp": -1.6
-        },
-        "ytd": {
-          "market_curr": 646864,
-          "market_prev": 649572,
-          "sie_curr": 571799,
-          "sie_prev": 580110,
-          "ms_curr": 88.4,
-          "ms_prev": 89.3,
-          "ie": 99.0,
-          "var_pp": -0.9
-        },
-        "trimestre": {
-          "market_curr": 389898,
-          "market_prev": 394617,
-          "sie_curr": 343657,
-          "sie_prev": 352019,
-          "ms_curr": 88.1,
-          "ms_prev": 89.2,
-          "ie": 99.0,
-          "var_pp": -1.1
-        },
-        "mat": {
-          "market_curr": 1508211,
-          "market_prev": 1481119,
-          "sie_curr": 1331790,
-          "sie_prev": 1321766,
-          "ms_curr": 88.3,
-          "ms_prev": 89.2,
-          "ie": 99.0,
-          "var_pp": -0.9
-        }
-      }
-    },
-    {
       "family": "BACTRIM",
       "display": "BACTRIM",
       "line": "antibio",
@@ -1462,95 +1410,97 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 127092,
-          "market_prev": 133623,
+          "market_curr": 126754,
+          "market_prev": 133480,
           "sie_curr": 111251,
           "sie_prev": 119383,
-          "ms_curr": 87.5,
-          "ms_prev": 89.3,
+          "ms_curr": 87.8,
+          "ms_prev": 89.4,
           "ie": 98.0,
-          "var_pp": -1.8
+          "var_pp": -1.6
         },
         "ytd": {
-          "market_curr": 646631,
-          "market_prev": 647558,
+          "market_curr": 646099,
+          "market_prev": 647877,
           "sie_curr": 571799,
           "sie_prev": 580110,
-          "ms_curr": 88.4,
-          "ms_prev": 89.6,
+          "ms_curr": 88.5,
+          "ms_prev": 89.5,
+          "ie": 99.0,
+          "var_pp": -1.0
+        },
+        "trimestre": {
+          "market_curr": 389123,
+          "market_prev": 393250,
+          "sie_curr": 343657,
+          "sie_prev": 352019,
+          "ms_curr": 88.3,
+          "ms_prev": 89.5,
           "ie": 99.0,
           "var_pp": -1.2
         },
-        "trimestre": {
-          "market_curr": 389766,
-          "market_prev": 393412,
-          "sie_curr": 343657,
-          "sie_prev": 352019,
-          "ms_curr": 88.2,
-          "ms_prev": 89.5,
-          "ie": 99.0,
-          "var_pp": -1.3
-        },
         "mat": {
-          "market_curr": 1505850,
-          "market_prev": 1476303,
+          "market_curr": 1503993,
+          "market_prev": 1474457,
           "sie_curr": 1331790,
           "sie_prev": 1321766,
-          "ms_curr": 88.4,
-          "ms_prev": 89.5,
+          "ms_curr": 88.6,
+          "ms_prev": 89.6,
           "ie": 99.0,
-          "var_pp": -1.1
+          "var_pp": -1.0
         }
       }
     },
     {
-      "family": "TELPRES",
-      "display": "TELPRES",
-      "line": "cardio",
-      "lineName": "Cardiometabolismo",
+      "family": "BACTRIM FORTE",
+      "display": "BACTRIM FORTE",
+      "line": "antibio",
+      "lineName": "Antibióticos",
       "sie_brands": [
-        "TELPRES (SIE)"
+        "BACTRIM FORTE (SIE)",
+        "BACTRIM (SIE)",
+        "BACTRIM JARABE (SIE)"
       ],
       "periods": {
         "mes": {
-          "market_curr": 113506,
-          "market_prev": 123622,
-          "sie_curr": 4271,
-          "sie_prev": 5465,
-          "ms_curr": 3.8,
-          "ms_prev": 4.4,
-          "ie": 85.0,
-          "var_pp": -0.6
+          "market_curr": 126754,
+          "market_prev": 133480,
+          "sie_curr": 111251,
+          "sie_prev": 119383,
+          "ms_curr": 87.8,
+          "ms_prev": 89.4,
+          "ie": 98.0,
+          "var_pp": -1.6
         },
         "ytd": {
-          "market_curr": 579591,
-          "market_prev": 621731,
-          "sie_curr": 19538,
-          "sie_prev": 25485,
-          "ms_curr": 3.4,
-          "ms_prev": 4.1,
-          "ie": 82.0,
-          "var_pp": -0.7
+          "market_curr": 646099,
+          "market_prev": 647877,
+          "sie_curr": 571799,
+          "sie_prev": 580110,
+          "ms_curr": 88.5,
+          "ms_prev": 89.5,
+          "ie": 99.0,
+          "var_pp": -1.0
         },
         "trimestre": {
-          "market_curr": 355364,
-          "market_prev": 376258,
-          "sie_curr": 12933,
-          "sie_prev": 15325,
-          "ms_curr": 3.6,
-          "ms_prev": 4.1,
-          "ie": 89.0,
-          "var_pp": -0.5
+          "market_curr": 389123,
+          "market_prev": 393250,
+          "sie_curr": 343657,
+          "sie_prev": 352019,
+          "ms_curr": 88.3,
+          "ms_prev": 89.5,
+          "ie": 99.0,
+          "var_pp": -1.2
         },
         "mat": {
-          "market_curr": 1441246,
-          "market_prev": 1571797,
-          "sie_curr": 55497,
-          "sie_prev": 62416,
-          "ms_curr": 3.9,
-          "ms_prev": 4.0,
-          "ie": 97.0,
-          "var_pp": -0.1
+          "market_curr": 1503993,
+          "market_prev": 1474457,
+          "sie_curr": 1331790,
+          "sie_prev": 1321766,
+          "ms_curr": 88.6,
+          "ms_prev": 89.6,
+          "ie": 99.0,
+          "var_pp": -1.0
         }
       }
     },
@@ -1763,6 +1713,57 @@
       }
     },
     {
+      "family": "DAURAN",
+      "display": "DAURAN",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "DAURAN (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 118217,
+          "market_prev": 101738,
+          "sie_curr": 1476,
+          "sie_prev": 814,
+          "ms_curr": 1.2,
+          "ms_prev": 0.8,
+          "ie": 156.0,
+          "var_pp": 0.4
+        },
+        "ytd": {
+          "market_curr": 581826,
+          "market_prev": 492689,
+          "sie_curr": 6407,
+          "sie_prev": 2829,
+          "ms_curr": 1.1,
+          "ms_prev": 0.6,
+          "ie": 192.0,
+          "var_pp": 0.5
+        },
+        "trimestre": {
+          "market_curr": 362520,
+          "market_prev": 311478,
+          "sie_curr": 4091,
+          "sie_prev": 2033,
+          "ms_curr": 1.1,
+          "ms_prev": 0.7,
+          "ie": 173.0,
+          "var_pp": 0.4
+        },
+        "mat": {
+          "market_curr": 1318207,
+          "market_prev": 1075439,
+          "sie_curr": 14142,
+          "sie_prev": 4376,
+          "ms_curr": 1.1,
+          "ms_prev": 0.4,
+          "ie": 264.0,
+          "var_pp": 0.7
+        }
+      }
+    },
+    {
       "family": "MAGNUS 36",
       "display": "MAGNUS 36",
       "line": "otx",
@@ -1866,105 +1867,53 @@
       }
     },
     {
-      "family": "DAURAN",
-      "display": "DAURAN",
+      "family": "TELPRES",
+      "display": "TELPRES",
       "line": "cardio",
       "lineName": "Cardiometabolismo",
       "sie_brands": [
-        "DAURAN (SIE)"
+        "TELPRES (SIE)"
       ],
       "periods": {
         "mes": {
-          "market_curr": 105840,
-          "market_prev": 93758,
-          "sie_curr": 1476,
-          "sie_prev": 814,
-          "ms_curr": 1.4,
-          "ms_prev": 0.9,
-          "ie": 161.0,
-          "var_pp": 0.5
+          "market_curr": 93238,
+          "market_prev": 97863,
+          "sie_curr": 4271,
+          "sie_prev": 5465,
+          "ms_curr": 4.6,
+          "ms_prev": 5.6,
+          "ie": 82.0,
+          "var_pp": -1.0
         },
         "ytd": {
-          "market_curr": 526496,
-          "market_prev": 457095,
-          "sie_curr": 6407,
-          "sie_prev": 2829,
-          "ms_curr": 1.2,
-          "ms_prev": 0.6,
-          "ie": 197.0,
-          "var_pp": 0.6
-        },
-        "trimestre": {
-          "market_curr": 326248,
-          "market_prev": 288248,
-          "sie_curr": 4091,
-          "sie_prev": 2033,
-          "ms_curr": 1.3,
-          "ms_prev": 0.7,
-          "ie": 178.0,
-          "var_pp": 0.6
-        },
-        "mat": {
-          "market_curr": 1198946,
-          "market_prev": 1013310,
-          "sie_curr": 14142,
-          "sie_prev": 4376,
-          "ms_curr": 1.2,
-          "ms_prev": 0.4,
-          "ie": 273.0,
-          "var_pp": 0.8
-        }
-      }
-    },
-    {
-      "family": "ACERPES",
-      "display": "ACERPES",
-      "line": "otx",
-      "lineName": "OTX",
-      "sie_brands": [
-        "ACERPES (SIE)",
-        "ACERPES 5% (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 99082,
-          "market_prev": 95644,
-          "sie_curr": 6855,
-          "sie_prev": 8320,
-          "ms_curr": 6.9,
-          "ms_prev": 8.7,
+          "market_curr": 470196,
+          "market_prev": 488097,
+          "sie_curr": 19538,
+          "sie_prev": 25485,
+          "ms_curr": 4.2,
+          "ms_prev": 5.2,
           "ie": 80.0,
-          "var_pp": -1.8
-        },
-        "ytd": {
-          "market_curr": 502402,
-          "market_prev": 453241,
-          "sie_curr": 39093,
-          "sie_prev": 40471,
-          "ms_curr": 7.8,
-          "ms_prev": 8.9,
-          "ie": 87.0,
-          "var_pp": -1.1
+          "var_pp": -1.0
         },
         "trimestre": {
-          "market_curr": 294241,
-          "market_prev": 275506,
-          "sie_curr": 21927,
-          "sie_prev": 24388,
-          "ms_curr": 7.5,
-          "ms_prev": 8.9,
-          "ie": 84.0,
-          "var_pp": -1.4
+          "market_curr": 288962,
+          "market_prev": 296882,
+          "sie_curr": 12933,
+          "sie_prev": 15325,
+          "ms_curr": 4.5,
+          "ms_prev": 5.2,
+          "ie": 87.0,
+          "var_pp": -0.7
         },
         "mat": {
-          "market_curr": 1191373,
-          "market_prev": 1075776,
-          "sie_curr": 98658,
-          "sie_prev": 96749,
-          "ms_curr": 8.3,
-          "ms_prev": 9.0,
-          "ie": 92.0,
-          "var_pp": -0.7
+          "market_curr": 1157462,
+          "market_prev": 1225372,
+          "sie_curr": 55497,
+          "sie_prev": 62416,
+          "ms_curr": 4.8,
+          "ms_prev": 5.1,
+          "ie": 94.0,
+          "var_pp": -0.3
         }
       }
     },
@@ -2016,6 +1965,57 @@
           "ms_prev": 18.6,
           "ie": 102.0,
           "var_pp": 0.3
+        }
+      }
+    },
+    {
+      "family": "SILTRAN",
+      "display": "SILTRAN",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "SILTRAN (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 96417,
+          "market_prev": 89492,
+          "sie_curr": 2704,
+          "sie_prev": 1945,
+          "ms_curr": 2.8,
+          "ms_prev": 2.2,
+          "ie": 129.0,
+          "var_pp": 0.6
+        },
+        "ytd": {
+          "market_curr": 472805,
+          "market_prev": 422662,
+          "sie_curr": 14241,
+          "sie_prev": 8180,
+          "ms_curr": 3.0,
+          "ms_prev": 1.9,
+          "ie": 156.0,
+          "var_pp": 1.1
+        },
+        "trimestre": {
+          "market_curr": 289839,
+          "market_prev": 262770,
+          "sie_curr": 8896,
+          "sie_prev": 5448,
+          "ms_curr": 3.1,
+          "ms_prev": 2.1,
+          "ie": 148.0,
+          "var_pp": 1.0
+        },
+        "mat": {
+          "market_curr": 1101258,
+          "market_prev": 1003060,
+          "sie_curr": 31855,
+          "sie_prev": 15492,
+          "ms_curr": 2.9,
+          "ms_prev": 1.5,
+          "ie": 187.0,
+          "var_pp": 1.4
         }
       }
     },
@@ -2391,44 +2391,44 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 74558,
-          "market_prev": 68556,
+          "market_curr": 80663,
+          "market_prev": 71254,
           "sie_curr": 3236,
           "sie_prev": 2389,
-          "ms_curr": 4.3,
-          "ms_prev": 3.5,
-          "ie": 125.0,
-          "var_pp": 0.8
+          "ms_curr": 4.0,
+          "ms_prev": 3.4,
+          "ie": 120.0,
+          "var_pp": 0.6
         },
         "ytd": {
-          "market_curr": 373820,
-          "market_prev": 325398,
+          "market_curr": 399981,
+          "market_prev": 342014,
           "sie_curr": 15854,
           "sie_prev": 9219,
-          "ms_curr": 4.2,
-          "ms_prev": 2.8,
-          "ie": 150.0,
-          "var_pp": 1.4
+          "ms_curr": 4.0,
+          "ms_prev": 2.7,
+          "ie": 147.0,
+          "var_pp": 1.3
         },
         "trimestre": {
-          "market_curr": 228422,
-          "market_prev": 201712,
+          "market_curr": 245635,
+          "market_prev": 210727,
           "sie_curr": 10035,
           "sie_prev": 5974,
-          "ms_curr": 4.4,
-          "ms_prev": 3.0,
-          "ie": 148.0,
-          "var_pp": 1.4
+          "ms_curr": 4.1,
+          "ms_prev": 2.8,
+          "ie": 144.0,
+          "var_pp": 1.3
         },
         "mat": {
-          "market_curr": 864017,
-          "market_prev": 766027,
+          "market_curr": 922643,
+          "market_prev": 806402,
           "sie_curr": 35667,
           "sie_prev": 16807,
-          "ms_curr": 4.1,
-          "ms_prev": 2.2,
-          "ie": 188.0,
-          "var_pp": 1.9
+          "ms_curr": 3.9,
+          "ms_prev": 2.1,
+          "ie": 185.0,
+          "var_pp": 1.8
         }
       }
     },
@@ -2855,38 +2855,38 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 39432,
-          "market_prev": 34525,
+          "market_curr": 40425,
+          "market_prev": 33377,
           "sie_curr": 2501,
           "sie_prev": 729,
-          "ms_curr": 6.3,
-          "ms_prev": 2.1,
-          "ie": 300.0,
-          "var_pp": 4.2
+          "ms_curr": 6.2,
+          "ms_prev": 2.2,
+          "ie": 283.0,
+          "var_pp": 4.0
         },
         "ytd": {
-          "market_curr": 193275,
-          "market_prev": 168914,
+          "market_curr": 196189,
+          "market_prev": 159635,
           "sie_curr": 11899,
           "sie_prev": 2434,
-          "ms_curr": 6.2,
-          "ms_prev": 1.4,
-          "ie": 427.0,
-          "var_pp": 4.8
+          "ms_curr": 6.1,
+          "ms_prev": 1.5,
+          "ie": 398.0,
+          "var_pp": 4.6
         },
         "trimestre": {
-          "market_curr": 118512,
-          "market_prev": 110323,
+          "market_curr": 121302,
+          "market_prev": 104136,
           "sie_curr": 7575,
           "sie_prev": 2434,
-          "ms_curr": 6.4,
-          "ms_prev": 2.2,
-          "ie": 290.0,
-          "var_pp": 4.2
+          "ms_curr": 6.2,
+          "ms_prev": 2.3,
+          "ie": 267.0,
+          "var_pp": 3.9
         },
         "mat": {
-          "market_curr": 452942,
-          "market_prev": 405977,
+          "market_curr": 449289,
+          "market_prev": 374644,
           "sie_curr": 22890,
           "sie_prev": 2434,
           "ms_curr": 5.1,
@@ -3315,44 +3315,44 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 19537,
-          "market_prev": 15070,
+          "market_curr": 21904,
+          "market_prev": 16640,
           "sie_curr": 2907,
           "sie_prev": 1478,
-          "ms_curr": 14.9,
-          "ms_prev": 9.8,
-          "ie": 152.0,
-          "var_pp": 5.1
+          "ms_curr": 13.3,
+          "ms_prev": 8.9,
+          "ie": 149.0,
+          "var_pp": 4.4
         },
         "ytd": {
-          "market_curr": 86602,
-          "market_prev": 69509,
+          "market_curr": 99057,
+          "market_prev": 76702,
           "sie_curr": 11942,
           "sie_prev": 8072,
-          "ms_curr": 13.8,
-          "ms_prev": 11.6,
-          "ie": 119.0,
-          "var_pp": 2.2
+          "ms_curr": 12.1,
+          "ms_prev": 10.5,
+          "ie": 115.0,
+          "var_pp": 1.6
         },
         "trimestre": {
-          "market_curr": 55159,
-          "market_prev": 43619,
+          "market_curr": 62908,
+          "market_prev": 48638,
           "sie_curr": 7641,
           "sie_prev": 4781,
-          "ms_curr": 13.9,
-          "ms_prev": 11.0,
-          "ie": 126.0,
-          "var_pp": 2.9
+          "ms_curr": 12.1,
+          "ms_prev": 9.8,
+          "ie": 124.0,
+          "var_pp": 2.3
         },
         "mat": {
-          "market_curr": 193167,
-          "market_prev": 162872,
+          "market_curr": 219336,
+          "market_prev": 173445,
           "sie_curr": 25037,
           "sie_prev": 17946,
-          "ms_curr": 13.0,
-          "ms_prev": 11.0,
-          "ie": 118.0,
-          "var_pp": 2.0
+          "ms_curr": 11.4,
+          "ms_prev": 10.3,
+          "ie": 110.0,
+          "var_pp": 1.1
         }
       }
     },

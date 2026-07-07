@@ -1549,6 +1549,56 @@ foreach ($family in $dashboardFamilyOrder) {
     }
   )
 
+  # RESTO DEL MERCADO (cola larga): mercado_completo - suma(productos emitidos top-8).
+  # Restaura el invariante sum(products)=mercado completo para que MS%/IE de TODOS los
+  # consumidores que suman products[] (build-kpis, build-families, fix-brandkpis,
+  # recompute) queden correctos SIN tocarlos. is_sie=false e is_resto=true: nunca entra
+  # al numerador SIE; el render lo muestra como 'Otros' gris, ultimo. Solo si hay cola.
+  $restoMonthly = [ordered]@{}; $restoYtd = [ordered]@{}; $restoMat = [ordered]@{}; $restoQuarterly = [ordered]@{}
+  $restoMsMonthly = [ordered]@{}; $restoMsYtd = [ordered]@{}; $restoMsMat = [ordered]@{}; $restoMsQuarterly = [ordered]@{}
+  $restoHasTail = $false
+  foreach ($key in $pmMonthlyKeys) {
+    $sel = 0.0; foreach ($n in $selectedProductNames) { $sel += $aggregatedProducts[$n].monthly[$key] }
+    $val = $marketMonthly[$key] - $sel; if ($val -lt 0) { $val = 0.0 }
+    if ($val -gt 0.5) { $restoHasTail = $true }
+    $restoMonthly[$key] = [math]::Round($val, 0)
+    $restoMsMonthly[$key] = if ($marketMonthly[$key] -gt 0) { Round-Number (($val / $marketMonthly[$key]) * 100) } else { 0.0 }
+  }
+  foreach ($key in $pmYtdKeys) {
+    $sel = 0.0; foreach ($n in $selectedProductNames) { $sel += $aggregatedProducts[$n].ytd[$key] }
+    $val = $marketYtd[$key] - $sel; if ($val -lt 0) { $val = 0.0 }
+    $restoYtd[$key] = [math]::Round($val, 0)
+    $restoMsYtd[$key] = if ($marketYtd[$key] -gt 0) { Round-Number (($val / $marketYtd[$key]) * 100) } else { 0.0 }
+  }
+  foreach ($key in $pmMatKeys) {
+    $sel = 0.0; foreach ($n in $selectedProductNames) { $sel += $aggregatedProducts[$n].mat[$key] }
+    $val = $marketMat[$key] - $sel; if ($val -lt 0) { $val = 0.0 }
+    $restoMat[$key] = [math]::Round($val, 0)
+    $restoMsMat[$key] = if ($marketMat[$key] -gt 0) { Round-Number (($val / $marketMat[$key]) * 100) } else { 0.0 }
+  }
+  foreach ($key in $pmQuarterKeys) {
+    $sel = 0.0; foreach ($n in $selectedProductNames) { $sel += $aggregatedProducts[$n].quarterly[$key] }
+    $val = $marketQuarterly[$key] - $sel; if ($val -lt 0) { $val = 0.0 }
+    $restoQuarterly[$key] = [math]::Round($val, 0)
+    $restoMsQuarterly[$key] = if ($marketQuarterly[$key] -gt 0) { Round-Number (($val / $marketQuarterly[$key]) * 100) } else { 0.0 }
+  }
+  if ($restoHasTail) {
+    $productsOut = @($productsOut) + @([ordered]@{
+      prod = 'Otros (resto del mercado)'
+      manuf = 'OTROS'
+      is_sie = $false
+      is_resto = $true
+      monthly_vals = $restoMonthly
+      ytd = $restoYtd
+      mat = $restoMat
+      ms_ytd = $restoMsYtd
+      ms_mat = $restoMsMat
+      quarterly_vals = $restoQuarterly
+      ms_monthly = $restoMsMonthly
+      ms_quarterly = $restoMsQuarterly
+    })
+  }
+
   $marketMonthlyOut = [ordered]@{}
   $marketYtdOut = [ordered]@{}
   $marketMatOut = [ordered]@{}
