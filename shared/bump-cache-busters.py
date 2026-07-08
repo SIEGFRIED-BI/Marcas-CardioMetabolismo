@@ -26,6 +26,16 @@ PAGES = [
     'cardio/index.html', 'ATB/index.html', 'OTC/index.html',
     'respiratorio/index.html', 'mujer/index.html', 'SNC/index.html',
     'dermatologia/dermato_dashboard.html', 'kpis.html', 'index.html',
+    # Paginas DDD (cargan ../data.js o ./data.js + ./app.js; sin buster el
+    # navegador sirve un data.js viejo cacheado -> paginas en blanco tras deploys)
+    'cardio/DDD/index.html', 'ATB/DDD/index.html', 'OTC/DDD/index.html',
+    'respiratorio/DDD/index.html', 'mujer/DDD/index.html',
+    'SNC/DDD/psq_ddd.html', 'dermatologia/dermato_ddd.html',
+    # Paginas Competidores (cargan ./competidores-data.js)
+    'cardio/DDD/competidores.html', 'ATB/DDD/competidores.html',
+    'OTC/DDD/competidores.html', 'respiratorio/DDD/competidores.html',
+    'SNC/DDD/competidores.html', 'mujer/DDD/competidores.html',
+    'dermatologia/competidores.html',
 ]
 
 # Assets compartidos a cache-bustear (los que existan).
@@ -48,9 +58,20 @@ def process(text: str, page_path: Path) -> str:
     dj = page_dir / 'data.js'
     if dj.is_file():
         v = fhash(dj)
-        # match ./data.js  o  data.js  con o sin ?v= previo
-        text = re.sub(r'(\.?/?data\.js)(\?v=[0-9A-Za-z]+)?',
+        # match ./data.js  o  data.js  con o sin ?v= previo. El lookbehind evita
+        # falsos matches dentro de '../data.js' (regla 1b) y 'competidores-data.js'.
+        text = re.sub(r'(?<![\w.\-])(\.?/?data\.js)(\?v=[0-9A-Za-z]+)?',
                       lambda m: m.group(1) + '?v=' + v, text)
+    # 1b) refs relativas de las paginas DDD/Competidores: cada una se bustea con
+    #     el hash de SU archivo real (../data.js = data.js de la linea, etc.)
+    for ref, target in [('../data.js', page_dir.parent / 'data.js'),
+                        ('../export.js', page_dir.parent / 'export.js'),
+                        ('./app.js', page_dir / 'app.js'),
+                        ('./competidores-data.js', page_dir / 'competidores-data.js')]:
+        if ref in text and target.is_file():
+            vv = fhash(target)
+            text = re.sub(re.escape(ref) + r'(\?v=[0-9A-Za-z]+)?',
+                          lambda m, r=ref, h=vv: r + '?v=' + h, text)
     # 2) assets compartidos
     for a in SHARED_ASSETS:
         ap = REPO / 'shared' / a

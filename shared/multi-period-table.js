@@ -119,7 +119,10 @@
         if (!sel.has(i)) return;
         var p = c.periods[pk] || {};
         selCurr += p.market_curr || 0; selPrev += p.market_prev || 0;
-        if (c.is_sie) { sieCurr += p.market_curr || 0; siePrev += p.market_prev || 0; }
+        // is_own (IQVIA, mercados compartidos): solo la marca PROPIA de la familia
+        // suma al SIE del total. Fallback a is_sie donde is_own no existe (Recetas).
+        var ownFlag = (c.is_own != null) ? c.is_own : c.is_sie;
+        if (ownFlag) { sieCurr += p.market_curr || 0; siePrev += p.market_prev || 0; }
       });
       var ms_curr = selCurr > 0 ? +(sieCurr / selCurr * 100).toFixed(1) : null;
       var ms_prev = selPrev > 0 ? +(siePrev / selPrev * 100).toFixed(1) : null;
@@ -270,20 +273,32 @@
     if (!latest) return null;
     var windows = windowsFor(latest.y, latest.m);
 
+    // ── Atribución de marca SIE a SU familia (mercados compartidos, ej. TETRALGIN
+    //    y TETRALGIN NOVO comparten el mercado N02C; BACTRIM/BACTRIM FORTE idem):
+    //    la fila de familia debe sumar SOLO sus productos propios, no todo lo SIE
+    //    del mercado (sin esto TETRALGIN y NOVO mostraban ambas la suma de las dos).
+    //    Fuente de verdad: D.budIqviaMap[fam] = lista EXACTA de productos SIE de la
+    //    familia (del config sieProducts; cubre variantes intencionales como
+    //    'DIOVAN IC (SIE)' en DIOVAN o 'DIOVAN-D (SIE)' con guión). Fallback si la
+    //    línea/familia no tiene map (SNC/dermato/mujer): is_sie como siempre. ──
+    var ownMap = (D && D.budIqviaMap) || null;
     var families = [];
     for (var fam in mp) {
       var prods2 = (mp[fam] && mp[fam].products) || [];
+      var ownList = (ownMap && ownMap[fam]) || null;
       var hasSie = false;
-      // Build aggregated monthly_vals for market (all products) and sie (is_sie products)
-      var mktMonthly = {}, sieMonthly = {};
+      // Build aggregated monthly_vals for market (all products) and sie (marcas PROPIAS de la familia)
+      var mktMonthly = {}, sieMonthly = {}, ownFlags = [];
       for (var pp = 0; pp < prods2.length; pp++) {
         var pr = prods2[pp];
         var mv = pr.monthly_vals || {};
+        var own = !!pr.is_sie && (!ownList || ownList.indexOf(pr.prod) !== -1);
+        ownFlags.push(own);
         for (var mk in mv) {
           mktMonthly[mk] = (mktMonthly[mk] || 0) + (+mv[mk] || 0);
-          if (pr.is_sie) sieMonthly[mk] = (sieMonthly[mk] || 0) + (+mv[mk] || 0);
+          if (own) sieMonthly[mk] = (sieMonthly[mk] || 0) + (+mv[mk] || 0);
         }
-        if (pr.is_sie) hasSie = true;
+        if (own) hasSie = true;
       }
       if (!hasSie) continue;
       var periods = {};
@@ -298,6 +313,7 @@
         competitors.push({
           brand: prod.prod || '(sin nombre)',
           is_sie: !!prod.is_sie,
+          is_own: ownFlags[cp],
           is_resto: !!prod.is_resto,
           periods: brandPeriods,
         });
@@ -317,7 +333,7 @@
       period_labels: {
         mes:       ml + ' ' + latest.y + ' vs ' + ml + ' ' + (latest.y-1),
         ytd:       'YTD Ene-' + ml + ' ' + latest.y + ' vs ' + (latest.y-1),
-        trimestre: 'Trim. ' + MES_SHORT[((latest.m-3+11)%12)+1] + '-' + ml + ' ' + latest.y + ' vs ' + (latest.y-1),
+        trimestre: 'Trim. ' + MES_SHORT[((latest.m-2+11)%12)+1] + '-' + ml + ' ' + latest.y + ' vs ' + (latest.y-1),
         mat:       'MAT ' + ml + ' ' + latest.y + ' vs ' + ml + ' ' + (latest.y-1),
       },
       families: families,
@@ -418,7 +434,7 @@
       period_labels: {
         mes:       ml + ' ' + latest.y + ' vs ' + ml + ' ' + (latest.y-1),
         ytd:       'YTD Ene-' + ml + ' ' + latest.y + ' vs ' + (latest.y-1),
-        trimestre: 'Trim. ' + MES_SHORT[((latest.m-3+11)%12)+1] + '-' + ml + ' ' + latest.y + ' vs ' + (latest.y-1),
+        trimestre: 'Trim. ' + MES_SHORT[((latest.m-2+11)%12)+1] + '-' + ml + ' ' + latest.y + ' vs ' + (latest.y-1),
         mat:       'MAT ' + ml + ' ' + latest.y + ' vs ' + ml + ' ' + (latest.y-1),
       },
       families: families,
