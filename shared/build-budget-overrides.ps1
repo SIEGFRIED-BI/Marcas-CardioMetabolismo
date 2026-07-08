@@ -107,6 +107,7 @@ $lineConfigs = @{
       @{ key = 'MICROSONA'; aliases = @('MICROSONA') }
       @{ key = 'PALDAR'; aliases = @('PALDAR') }
       @{ key = 'ROACCUTAN'; aliases = @('ROACCUTAN') }
+      @{ key = 'MOMETAX'; aliases = @('MOMETAX') }
     )
   }
   otc = @{
