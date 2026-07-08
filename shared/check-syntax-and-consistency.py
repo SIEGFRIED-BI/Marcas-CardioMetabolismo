@@ -146,7 +146,7 @@ def check_ddd_hardcoded(t, label):
     m = re.search(r'(?:^|\n|\s|;)const D\s*=\s*\{', t)
     if not m:
         return issues
-    ob = t.index('{', m.end())
+    ob = t.index('{', m.start())
     try:
         D, _ = json.JSONDecoder().raw_decode(t[ob:])
     except Exception:
@@ -169,6 +169,7 @@ def check_ddd_hardcoded(t, label):
         (r'bm\[11\]', "bm[11] — should use bm[bm.length-1]"),
         (r'bm\[10\]', "bm[10] — should use bm[bm.length-2]"),
         (r"['\"]DIC 2025['\"]", "'DIC 2025' hardcoded label"),
+        (r"(?:ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|OCT|NOV|DIC)\s+20\d\d", "mes-ES MAYUS + anio hardcodeado -> usar MO[MO.length-1]"),
     ]:
         for hit in re.finditer(pat, code_after_data):
             if n_months > 12 or n_quarters > 4:

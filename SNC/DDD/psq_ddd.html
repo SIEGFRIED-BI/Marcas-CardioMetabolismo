@@ -507,7 +507,7 @@ function rC3(mk){
 // === Comp Table (active region) ===
 function rComp(mk){
   const ar=activeReg(),tm=mk.total_monthly[ar],rl=ar==='__NAC__'?'A NIVEL NACIONAL':'EN '+ar.replace('_','');
-  document.getElementById('cpe').textContent=`COMPETIDORES ${rl} · MAR 2026`;
+  document.getElementById('cpe').textContent=`COMPETIDORES ${rl} · ${(MO[MO.length-1]||'').toUpperCase().replace('-',' ')}`;
   if(!tm){document.getElementById('cbo').innerHTML='<tr><td colspan="6" style="padding:20px;text-align:center;color:var(--t3)">Sin datos</td></tr>';return}
   const lT=tm[tm.length-1],pT=tm[tm.length-2];let comps=[];
   mk.top_brands.forEach(b=>{const bm=(mk.brand_monthly[b]||{})[ar];if(!bm)return;const uL=bm[bm.length-1],uP=bm[bm.length-2],mL=lT>0?+(uL/lT*100).toFixed(1):0,mP=pT>0?+(uP/pT*100).toFixed(1):0;
