@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07",
+  "generated_at": "2026-07-08",
   "as_of_month": "May 2026",
   "as_of_short": "May 2026",
   "period_labels": {
@@ -473,6 +473,58 @@
       }
     },
     {
+      "family": "ACEMUK",
+      "display": "ACEMUK",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "ACEMUK (SIE)",
+        "ACEMUK VL (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 543013,
+          "market_prev": 459630,
+          "sie_curr": 474191,
+          "sie_prev": 389413,
+          "ms_curr": 87.3,
+          "ms_prev": 84.7,
+          "ie": 103.0,
+          "var_pp": 2.6
+        },
+        "ytd": {
+          "market_curr": 1386809,
+          "market_prev": 1556140,
+          "sie_curr": 1170424,
+          "sie_prev": 1311748,
+          "ms_curr": 84.4,
+          "ms_prev": 84.3,
+          "ie": 100.0,
+          "var_pp": 0.1
+        },
+        "trimestre": {
+          "market_curr": 1111291,
+          "market_prev": 1200519,
+          "sie_curr": 941974,
+          "sie_prev": 1010259,
+          "ms_curr": 84.8,
+          "ms_prev": 84.2,
+          "ie": 101.0,
+          "var_pp": 0.6
+        },
+        "mat": {
+          "market_curr": 4211484,
+          "market_prev": 4414746,
+          "sie_curr": 3601606,
+          "sie_prev": 3771907,
+          "ms_curr": 85.5,
+          "ms_prev": 85.4,
+          "ie": 100.0,
+          "var_pp": 0.1
+        }
+      }
+    },
+    {
       "family": "ALTA DOSIS",
       "display": "ALTA DOSIS",
       "line": "mujer",
@@ -520,58 +572,6 @@
           "ms_prev": 4.5,
           "ie": 110.0,
           "var_pp": 0.4
-        }
-      }
-    },
-    {
-      "family": "ACEMUK",
-      "display": "ACEMUK",
-      "line": "resp",
-      "lineName": "Respiratoria",
-      "sie_brands": [
-        "ACEMUK (SIE)",
-        "ACEMUK VL (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 531693,
-          "market_prev": 447252,
-          "sie_curr": 474191,
-          "sie_prev": 389413,
-          "ms_curr": 89.2,
-          "ms_prev": 87.1,
-          "ie": 102.0,
-          "var_pp": 2.1
-        },
-        "ytd": {
-          "market_curr": 1354153,
-          "market_prev": 1505204,
-          "sie_curr": 1170424,
-          "sie_prev": 1311748,
-          "ms_curr": 86.4,
-          "ms_prev": 87.1,
-          "ie": 99.0,
-          "var_pp": -0.7
-        },
-        "trimestre": {
-          "market_curr": 1084533,
-          "market_prev": 1162480,
-          "sie_curr": 941974,
-          "sie_prev": 1010259,
-          "ms_curr": 86.9,
-          "ms_prev": 86.9,
-          "ie": 100.0,
-          "var_pp": 0.0
-        },
-        "mat": {
-          "market_curr": 4116151,
-          "market_prev": 4271955,
-          "sie_curr": 3601606,
-          "sie_prev": 3771907,
-          "ms_curr": 87.5,
-          "ms_prev": 88.3,
-          "ie": 99.0,
-          "var_pp": -0.8
         }
       }
     },
@@ -729,6 +729,58 @@
       }
     },
     {
+      "family": "ALIDIAL",
+      "display": "ALIDIAL",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "ALIDIAL (SIE)",
+        "ALIDIAL L (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 259264,
+          "market_prev": 239207,
+          "sie_curr": 22983,
+          "sie_prev": 16872,
+          "ms_curr": 8.9,
+          "ms_prev": 7.1,
+          "ie": 126.0,
+          "var_pp": 1.8
+        },
+        "ytd": {
+          "market_curr": 1293621,
+          "market_prev": 1313047,
+          "sie_curr": 88144,
+          "sie_prev": 65825,
+          "ms_curr": 6.8,
+          "ms_prev": 5.0,
+          "ie": 136.0,
+          "var_pp": 1.8
+        },
+        "trimestre": {
+          "market_curr": 898031,
+          "market_prev": 911339,
+          "sie_curr": 59709,
+          "sie_prev": 44074,
+          "ms_curr": 6.6,
+          "ms_prev": 4.8,
+          "ie": 137.0,
+          "var_pp": 1.8
+        },
+        "mat": {
+          "market_curr": 3232045,
+          "market_prev": 3286592,
+          "sie_curr": 213861,
+          "sie_prev": 160808,
+          "ms_curr": 6.6,
+          "ms_prev": 4.9,
+          "ie": 135.0,
+          "var_pp": 1.7
+        }
+      }
+    },
+    {
       "family": "QUETIAPINE",
       "display": "QUETIAPINE",
       "line": "snc",
@@ -776,58 +828,6 @@
           "ms_prev": 0.8,
           "ie": 87.0,
           "var_pp": -0.1
-        }
-      }
-    },
-    {
-      "family": "ALIDIAL",
-      "display": "ALIDIAL",
-      "line": "resp",
-      "lineName": "Respiratoria",
-      "sie_brands": [
-        "ALIDIAL (SIE)",
-        "ALIDIAL L (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 228077,
-          "market_prev": 200138,
-          "sie_curr": 22983,
-          "sie_prev": 16872,
-          "ms_curr": 10.1,
-          "ms_prev": 8.4,
-          "ie": 120.0,
-          "var_pp": 1.7
-        },
-        "ytd": {
-          "market_curr": 1142538,
-          "market_prev": 1104827,
-          "sie_curr": 88144,
-          "sie_prev": 65825,
-          "ms_curr": 7.7,
-          "ms_prev": 6.0,
-          "ie": 129.0,
-          "var_pp": 1.7
-        },
-        "trimestre": {
-          "market_curr": 803125,
-          "market_prev": 788042,
-          "sie_curr": 59709,
-          "sie_prev": 44074,
-          "ms_curr": 7.4,
-          "ms_prev": 5.6,
-          "ie": 133.0,
-          "var_pp": 1.8
-        },
-        "mat": {
-          "market_curr": 2821054,
-          "market_prev": 2691467,
-          "sie_curr": 213861,
-          "sie_prev": 160808,
-          "ms_curr": 7.6,
-          "ms_prev": 6.0,
-          "ie": 127.0,
-          "var_pp": 1.6
         }
       }
     },
@@ -2020,6 +2020,57 @@
       }
     },
     {
+      "family": "AIREAL",
+      "display": "AIREAL",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "AIREAL (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 100763,
+          "market_prev": 107551,
+          "sie_curr": 13123,
+          "sie_prev": 10285,
+          "ms_curr": 13.0,
+          "ms_prev": 9.6,
+          "ie": 136.0,
+          "var_pp": 3.4
+        },
+        "ytd": {
+          "market_curr": 377885,
+          "market_prev": 417000,
+          "sie_curr": 45596,
+          "sie_prev": 37402,
+          "ms_curr": 12.1,
+          "ms_prev": 9.0,
+          "ie": 135.0,
+          "var_pp": 3.1
+        },
+        "trimestre": {
+          "market_curr": 263932,
+          "market_prev": 292905,
+          "sie_curr": 33140,
+          "sie_prev": 26665,
+          "ms_curr": 12.6,
+          "ms_prev": 9.1,
+          "ie": 138.0,
+          "var_pp": 3.5
+        },
+        "mat": {
+          "market_curr": 1054526,
+          "market_prev": 1160553,
+          "sie_curr": 115606,
+          "sie_prev": 99774,
+          "ms_curr": 11.0,
+          "ms_prev": 8.6,
+          "ie": 128.0,
+          "var_pp": 2.4
+        }
+      }
+    },
+    {
       "family": "FLEXINA",
       "display": "FLEXINA",
       "line": "otx",
@@ -2071,65 +2122,14 @@
       }
     },
     {
-      "family": "AIREAL",
-      "display": "AIREAL",
+      "family": "HEXALER BRONQUIAL",
+      "display": "HEXALER BRONQUIAL",
       "line": "resp",
       "lineName": "Respiratoria",
       "sie_brands": [
-        "AIREAL (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 96958,
-          "market_prev": 103124,
-          "sie_curr": 13123,
-          "sie_prev": 10285,
-          "ms_curr": 13.5,
-          "ms_prev": 10.0,
-          "ie": 136.0,
-          "var_pp": 3.5
-        },
-        "ytd": {
-          "market_curr": 361872,
-          "market_prev": 396819,
-          "sie_curr": 45596,
-          "sie_prev": 37402,
-          "ms_curr": 12.6,
-          "ms_prev": 9.4,
-          "ie": 134.0,
-          "var_pp": 3.2
-        },
-        "trimestre": {
-          "market_curr": 253266,
-          "market_prev": 280076,
-          "sie_curr": 33140,
-          "sie_prev": 26665,
-          "ms_curr": 13.1,
-          "ms_prev": 9.5,
-          "ie": 137.0,
-          "var_pp": 3.6
-        },
-        "mat": {
-          "market_curr": 1008491,
-          "market_prev": 1104700,
-          "sie_curr": 115606,
-          "sie_prev": 99774,
-          "ms_curr": 11.5,
-          "ms_prev": 9.0,
-          "ie": 127.0,
-          "var_pp": 2.5
-        }
-      }
-    },
-    {
-      "family": "MOMETASONE",
-      "display": "MOMETASONE",
-      "line": "derma",
-      "lineName": "Dermatología",
-      "sie_brands": [
+        "HEXALER BRONQUIAL (SIE)",
         "HEXALER NASAL (SIE)",
-        "MOMETAX (SIE)",
-        "HEXALER BRONQUIAL (SIE)"
+        "MOMETAX (SIE)"
       ],
       "periods": {
         "mes": {
@@ -2185,97 +2185,97 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 100102,
-          "market_prev": 84037,
+          "market_curr": 103273,
+          "market_prev": 87494,
           "sie_curr": 76433,
           "sie_prev": 62759,
-          "ms_curr": 76.4,
-          "ms_prev": 74.7,
-          "ie": 102.0,
-          "var_pp": 1.7
+          "ms_curr": 74.0,
+          "ms_prev": 71.7,
+          "ie": 103.0,
+          "var_pp": 2.3
         },
         "ytd": {
-          "market_curr": 371307,
-          "market_prev": 336099,
+          "market_curr": 385529,
+          "market_prev": 352019,
           "sie_curr": 275897,
           "sie_prev": 242544,
-          "ms_curr": 74.3,
-          "ms_prev": 72.2,
-          "ie": 103.0,
-          "var_pp": 2.1
+          "ms_curr": 71.6,
+          "ms_prev": 68.9,
+          "ie": 104.0,
+          "var_pp": 2.7
         },
         "trimestre": {
-          "market_curr": 255631,
-          "market_prev": 226121,
+          "market_curr": 264595,
+          "market_prev": 236198,
           "sie_curr": 192808,
           "sie_prev": 166217,
-          "ms_curr": 75.4,
-          "ms_prev": 73.5,
-          "ie": 103.0,
-          "var_pp": 1.9
+          "ms_curr": 72.9,
+          "ms_prev": 70.4,
+          "ie": 104.0,
+          "var_pp": 2.5
         },
         "mat": {
-          "market_curr": 959828,
-          "market_prev": 884925,
+          "market_curr": 997897,
+          "market_prev": 928175,
           "sie_curr": 711944,
           "sie_prev": 628979,
-          "ms_curr": 74.2,
-          "ms_prev": 71.1,
-          "ie": 104.0,
-          "var_pp": 3.1
+          "ms_curr": 71.3,
+          "ms_prev": 67.8,
+          "ie": 105.0,
+          "var_pp": 3.5
         }
       }
     },
     {
-      "family": "HEXALER BRONQUIAL",
-      "display": "HEXALER BRONQUIAL",
-      "line": "resp",
-      "lineName": "Respiratoria",
+      "family": "MOMETASONE",
+      "display": "MOMETASONE",
+      "line": "derma",
+      "lineName": "Dermatología",
       "sie_brands": [
-        "HEXALER BRONQUIAL (SIE)",
         "HEXALER NASAL (SIE)",
-        "MOMETAX (SIE)"
+        "MOMETAX (SIE)",
+        "HEXALER BRONQUIAL (SIE)"
       ],
       "periods": {
         "mes": {
-          "market_curr": 99524,
-          "market_prev": 83611,
+          "market_curr": 103273,
+          "market_prev": 87494,
           "sie_curr": 77424,
           "sie_prev": 63875,
-          "ms_curr": 77.8,
-          "ms_prev": 76.4,
-          "ie": 102.0,
-          "var_pp": 1.4
+          "ms_curr": 75.0,
+          "ms_prev": 73.0,
+          "ie": 103.0,
+          "var_pp": 2.0
         },
         "ytd": {
-          "market_curr": 369720,
-          "market_prev": 334855,
+          "market_curr": 385529,
+          "market_prev": 352019,
           "sie_curr": 279970,
           "sie_prev": 247094,
-          "ms_curr": 75.7,
-          "ms_prev": 73.8,
+          "ms_curr": 72.6,
+          "ms_prev": 70.2,
           "ie": 103.0,
-          "var_pp": 1.9
+          "var_pp": 2.4
         },
         "trimestre": {
-          "market_curr": 254475,
-          "market_prev": 225118,
+          "market_curr": 264595,
+          "market_prev": 236198,
           "sie_curr": 195464,
           "sie_prev": 169207,
-          "ms_curr": 76.8,
-          "ms_prev": 75.2,
-          "ie": 102.0,
-          "var_pp": 1.6
+          "ms_curr": 73.9,
+          "ms_prev": 71.6,
+          "ie": 103.0,
+          "var_pp": 2.3
         },
         "mat": {
-          "market_curr": 954565,
-          "market_prev": 879484,
+          "market_curr": 997897,
+          "market_prev": 928175,
           "sie_curr": 722688,
           "sie_prev": 640988,
-          "ms_curr": 75.7,
-          "ms_prev": 72.9,
-          "ie": 104.0,
-          "var_pp": 2.8
+          "ms_curr": 72.4,
+          "ms_prev": 69.1,
+          "ie": 105.0,
+          "var_pp": 3.3
         }
       }
     },
@@ -2433,6 +2433,113 @@
       }
     },
     {
+      "family": "DECADRON",
+      "display": "DECADRON",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "DECADRON (SIE)",
+        "DECADRON SHOCK (SIE)",
+        "DECADRON. (SIE)",
+        "DUO-DECADRON (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 79852,
+          "market_prev": 73180,
+          "sie_curr": 41862,
+          "sie_prev": 38529,
+          "ms_curr": 52.4,
+          "ms_prev": 52.6,
+          "ie": 100.0,
+          "var_pp": -0.2
+        },
+        "ytd": {
+          "market_curr": 343002,
+          "market_prev": 338083,
+          "sie_curr": 185533,
+          "sie_prev": 178191,
+          "ms_curr": 54.1,
+          "ms_prev": 52.7,
+          "ie": 103.0,
+          "var_pp": 1.4
+        },
+        "trimestre": {
+          "market_curr": 219271,
+          "market_prev": 215124,
+          "sie_curr": 115857,
+          "sie_prev": 113268,
+          "ms_curr": 52.8,
+          "ms_prev": 52.7,
+          "ie": 100.0,
+          "var_pp": 0.1
+        },
+        "mat": {
+          "market_curr": 838248,
+          "market_prev": 886676,
+          "sie_curr": 446998,
+          "sie_prev": 470682,
+          "ms_curr": 53.3,
+          "ms_prev": 53.1,
+          "ie": 100.0,
+          "var_pp": 0.2
+        }
+      }
+    },
+    {
+      "family": "DUO-DECADRON",
+      "display": "DUO-DECADRON",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "DUO-DECADRON (SIE)",
+        "DECADRON (SIE)",
+        "DECADRON. (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 79852,
+          "market_prev": 73180,
+          "sie_curr": 41699,
+          "sie_prev": 38300,
+          "ms_curr": 52.2,
+          "ms_prev": 52.3,
+          "ie": 100.0,
+          "var_pp": -0.1
+        },
+        "ytd": {
+          "market_curr": 343002,
+          "market_prev": 338083,
+          "sie_curr": 184604,
+          "sie_prev": 177278,
+          "ms_curr": 53.8,
+          "ms_prev": 52.4,
+          "ie": 103.0,
+          "var_pp": 1.4
+        },
+        "trimestre": {
+          "market_curr": 219271,
+          "market_prev": 215124,
+          "sie_curr": 115313,
+          "sie_prev": 112674,
+          "ms_curr": 52.6,
+          "ms_prev": 52.4,
+          "ie": 100.0,
+          "var_pp": 0.2
+        },
+        "mat": {
+          "market_curr": 838248,
+          "market_prev": 886676,
+          "sie_curr": 444678,
+          "sie_prev": 468425,
+          "ms_curr": 53.0,
+          "ms_prev": 52.8,
+          "ie": 100.0,
+          "var_pp": 0.2
+        }
+      }
+    },
+    {
       "family": "HEXALER",
       "display": "HEXALER",
       "line": "resp",
@@ -2442,8 +2549,8 @@
       ],
       "periods": {
         "mes": {
-          "market_curr": 83712,
-          "market_prev": 76404,
+          "market_curr": 83928,
+          "market_prev": 76796,
           "sie_curr": 12054,
           "sie_prev": 10805,
           "ms_curr": 14.4,
@@ -2452,32 +2559,32 @@
           "var_pp": 0.3
         },
         "ytd": {
-          "market_curr": 290048,
-          "market_prev": 315420,
+          "market_curr": 291095,
+          "market_prev": 317233,
           "sie_curr": 39389,
           "sie_prev": 42447,
-          "ms_curr": 13.6,
-          "ms_prev": 13.5,
+          "ms_curr": 13.5,
+          "ms_prev": 13.4,
           "ie": 101.0,
           "var_pp": 0.1
         },
         "trimestre": {
-          "market_curr": 205103,
-          "market_prev": 225765,
+          "market_curr": 205760,
+          "market_prev": 226887,
           "sie_curr": 28743,
           "sie_prev": 30221,
           "ms_curr": 14.0,
-          "ms_prev": 13.4,
+          "ms_prev": 13.3,
           "ie": 105.0,
-          "var_pp": 0.6
+          "var_pp": 0.7
         },
         "mat": {
-          "market_curr": 816193,
-          "market_prev": 895307,
+          "market_curr": 819514,
+          "market_prev": 899889,
           "sie_curr": 115499,
           "sie_prev": 128096,
-          "ms_curr": 14.2,
-          "ms_prev": 14.3,
+          "ms_curr": 14.1,
+          "ms_prev": 14.2,
           "ie": 99.0,
           "var_pp": -0.1
         }
@@ -2531,113 +2638,6 @@
           "ms_prev": 1.6,
           "ie": 108.0,
           "var_pp": 0.1
-        }
-      }
-    },
-    {
-      "family": "DUO-DECADRON",
-      "display": "DUO-DECADRON",
-      "line": "resp",
-      "lineName": "Respiratoria",
-      "sie_brands": [
-        "DUO-DECADRON (SIE)",
-        "DECADRON (SIE)",
-        "DECADRON. (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 76814,
-          "market_prev": 68586,
-          "sie_curr": 41699,
-          "sie_prev": 38300,
-          "ms_curr": 54.3,
-          "ms_prev": 55.8,
-          "ie": 97.0,
-          "var_pp": -1.5
-        },
-        "ytd": {
-          "market_curr": 327951,
-          "market_prev": 309412,
-          "sie_curr": 184604,
-          "sie_prev": 177278,
-          "ms_curr": 56.3,
-          "ms_prev": 57.3,
-          "ie": 98.0,
-          "var_pp": -1.0
-        },
-        "trimestre": {
-          "market_curr": 208848,
-          "market_prev": 199385,
-          "sie_curr": 115313,
-          "sie_prev": 112674,
-          "ms_curr": 55.2,
-          "ms_prev": 56.5,
-          "ie": 98.0,
-          "var_pp": -1.3
-        },
-        "mat": {
-          "market_curr": 805508,
-          "market_prev": 822141,
-          "sie_curr": 444678,
-          "sie_prev": 468425,
-          "ms_curr": 55.2,
-          "ms_prev": 57.0,
-          "ie": 97.0,
-          "var_pp": -1.8
-        }
-      }
-    },
-    {
-      "family": "DECADRON",
-      "display": "DECADRON",
-      "line": "resp",
-      "lineName": "Respiratoria",
-      "sie_brands": [
-        "DECADRON (SIE)",
-        "DECADRON SHOCK (SIE)",
-        "DECADRON. (SIE)",
-        "DUO-DECADRON (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 76880,
-          "market_prev": 68176,
-          "sie_curr": 41862,
-          "sie_prev": 38529,
-          "ms_curr": 54.5,
-          "ms_prev": 56.5,
-          "ie": 96.0,
-          "var_pp": -2.0
-        },
-        "ytd": {
-          "market_curr": 324913,
-          "market_prev": 308716,
-          "sie_curr": 185533,
-          "sie_prev": 178191,
-          "ms_curr": 57.1,
-          "ms_prev": 57.7,
-          "ie": 99.0,
-          "var_pp": -0.6
-        },
-        "trimestre": {
-          "market_curr": 208756,
-          "market_prev": 198597,
-          "sie_curr": 115857,
-          "sie_prev": 113268,
-          "ms_curr": 55.5,
-          "ms_prev": 57.0,
-          "ie": 97.0,
-          "var_pp": -1.5
-        },
-        "mat": {
-          "market_curr": 791835,
-          "market_prev": 818649,
-          "sie_curr": 446998,
-          "sie_prev": 470682,
-          "ms_curr": 56.5,
-          "ms_prev": 57.5,
-          "ie": 98.0,
-          "var_pp": -1.0
         }
       }
     },
