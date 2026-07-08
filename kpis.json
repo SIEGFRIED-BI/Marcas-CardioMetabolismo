@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T14:12:58",
+  "generated_at": "2026-07-08T14:58:37",
   "as_of_month": "May 2026",
   "periods": [
     "mensual",
@@ -1324,7 +1324,7 @@
       "icon": "🩹",
       "color": "#D97706",
       "href": "dermatologia/",
-      "owner": "Javier Rodríguez",
+      "owner": "Felipe Mendizábal",
       "recetas_through": "May 2026",
       "iqvia_through": "May 2026",
       "venta_through": "Jun 2026",

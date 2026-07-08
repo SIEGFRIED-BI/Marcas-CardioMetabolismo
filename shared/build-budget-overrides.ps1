@@ -98,7 +98,6 @@ $lineConfigs = @{
       @{ key = 'ACNECLIN AP'; aliases = @('ACNECLIN 100 AP') }
       @{ key = 'ACNECLIN PBA'; aliases = @('ACNECLIN PBA') }
       @{ key = 'MICOMAZOL B'; aliases = @('MICOMAZOL B') }
-      @{ key = 'MICROSONA BB'; aliases = @('MICROSONA BB') }
       @{ key = 'MICROSONA C'; aliases = @('MICROSONA C') }
       @{ key = 'PALDAR H'; aliases = @('PALDAR H') }
       @{ key = 'ACNECLIN'; aliases = @('ACNECLIN') }
