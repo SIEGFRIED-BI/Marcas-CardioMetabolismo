@@ -138,6 +138,11 @@ Step 'OTC MAGNUS estimado'   { & $py (Join-Path $PSScriptRoot 'fix-otc-magnus-es
 # Stock + Cobertura desde 'Laboratorio - Familia - Producto*' del hub (18 meses).
 # Solo familias/presentaciones del tablero. Skipea si falta el xlsx.
 Step 'stock + cobertura'     { & $py (Join-Path $PSScriptRoot 'build-stock-from-laboratorio.py') }
+# Convenios (obras sociales) dermato desde CloseUp "Detalle consumos y aportes por convenio".
+# Fuente MANUAL: depositar los 2 exports como 'Convenios dermato <AÑO>.xlsx' (current=closeYear,
+# prev=closeYear-1) en el hub o _inbox/<closeMonth>. El script auto-resuelve y SKIPEA (exit 0) si
+# faltan -> conserva lo que ya esta. Ver shared/merge-convenios-dermato.py + close-manifest convenios.
+Step 'convenios dermato'     { & $py (Join-Path $PSScriptRoot 'merge-convenios-dermato.py') }
 
 # 12. Competidores (panel regional; su carpeta = cycleFolder).
 # OPT-IN (-Competidores): el generador de paginas (build-competidores-pages /

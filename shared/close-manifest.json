@@ -35,6 +35,14 @@
       "consumedBy": ["SNC"],
       "cutPolicy": "iqvia-native",
       "legacyDir": "_iqvia-master\\{cycleFolder}"
+    },
+    "convenios_dermato": {
+      "glob": "Convenios dermato *.xlsx",
+      "kind": "closeup-convenio",
+      "consumedBy": ["dermato"],
+      "byYear": true,
+      "legacyDir": "",
+      "note": "Export CloseUp 'Detalle consumos y aportes por convenio' (100% Siegfried, metrica Consumo uni, por ObraSocial). Los crudos se llaman igual entre si (sin anio) -> renombrar/depositar como 'Convenios dermato <YYYY>.xlsx' en hubRoot o _inbox/<closeMonth>: current=closeYear, prev=closeYear-1. Lo consume shared/merge-convenios-dermato.py (filtra dermato por convenios.dermato.productAliases). Seccion antes legacy/manual."
     }
   },
 
@@ -88,6 +96,21 @@
       "hubFolder": null, "fuentesSub": null,
       "useCentralIqvia": true, "useSlicedIqvia": false, "overrideBaseDir": null,
       "segmentations": []
+    }
+  },
+
+  "convenios": {
+    "_docs": "Config de la pestana Convenios (obras sociales) por linea. Producto->familia via productAliases (ORDENADO: especifico ANTES que base, igual criterio que build-budget-overrides). delta=null ('nuevo') si la base del anio previo < minBaseForDelta. Fuente = source convenios_<linea>. Hoy solo dermato productizado (otras lineas siguen legacy).",
+    "dermato": {
+      "line": "dermato",
+      "minBaseForDelta": 5,
+      "productAliases": [
+        ["ACNECLIN AP", "ACNECLIN 100 AP"], ["ACNECLIN PBA", "ACNECLIN PBA"],
+        ["MICOMAZOL B", "MICOMAZOL B"], ["MICROSONA C", "MICROSONA C"],
+        ["PALDAR H", "PALDAR H"], ["ACNECLIN", "ACNECLIN"], ["CLOBESOL", "CLOBESOL"],
+        ["MICOMAZOL", "MICOMAZOL"], ["MICROSONA", "MICROSONA"], ["PALDAR", "PALDAR"],
+        ["ROACCUTAN", "ROACCUTAN"], ["MOMETAX", "MOMETAX"]
+      ]
     }
   },
 
