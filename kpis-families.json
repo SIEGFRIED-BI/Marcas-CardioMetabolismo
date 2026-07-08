@@ -66,49 +66,48 @@
       "line": "cardio",
       "lineName": "Cardiometabolismo",
       "sie_brands": [
-        "ROXOLAN (SIE)",
-        "ROXOLAN PLUS (SIE)"
+        "ROXOLAN (SIE)"
       ],
       "periods": {
         "mes": {
-          "market_curr": 979420,
-          "market_prev": 895595,
-          "sie_curr": 20896,
-          "sie_prev": 20269,
-          "ms_curr": 2.1,
-          "ms_prev": 2.3,
-          "ie": 94.0,
+          "market_curr": 851341,
+          "market_prev": 811799,
+          "sie_curr": 17076,
+          "sie_prev": 17933,
+          "ms_curr": 2.0,
+          "ms_prev": 2.2,
+          "ie": 91.0,
           "var_pp": -0.2
         },
         "ytd": {
-          "market_curr": 4762362,
-          "market_prev": 4209057,
-          "sie_curr": 101948,
-          "sie_prev": 89197,
-          "ms_curr": 2.1,
+          "market_curr": 4182778,
+          "market_prev": 3836257,
+          "sie_curr": 84502,
+          "sie_prev": 79661,
+          "ms_curr": 2.0,
           "ms_prev": 2.1,
-          "ie": 101.0,
-          "var_pp": 0.0
+          "ie": 97.0,
+          "var_pp": -0.1
         },
         "trimestre": {
-          "market_curr": 2963968,
-          "market_prev": 2630822,
-          "sie_curr": 62932,
-          "sie_prev": 56623,
-          "ms_curr": 2.1,
-          "ms_prev": 2.2,
-          "ie": 99.0,
+          "market_curr": 2591341,
+          "market_prev": 2391515,
+          "sie_curr": 51962,
+          "sie_prev": 50347,
+          "ms_curr": 2.0,
+          "ms_prev": 2.1,
+          "ie": 95.0,
           "var_pp": -0.1
         },
         "mat": {
-          "market_curr": 11269465,
-          "market_prev": 10712155,
-          "sie_curr": 243032,
-          "sie_prev": 223707,
-          "ms_curr": 2.2,
+          "market_curr": 10009855,
+          "market_prev": 9821883,
+          "sie_curr": 204893,
+          "sie_prev": 203583,
+          "ms_curr": 2.0,
           "ms_prev": 2.1,
-          "ie": 103.0,
-          "var_pp": 0.1
+          "ie": 99.0,
+          "var_pp": -0.1
         }
       }
     },
@@ -1863,6 +1862,57 @@
           "ms_prev": 23.8,
           "ie": 108.0,
           "var_pp": 1.8
+        }
+      }
+    },
+    {
+      "family": "ROXOLAN PLUS",
+      "display": "ROXOLAN PLUS",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "ROXOLAN PLUS (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 128079,
+          "market_prev": 83796,
+          "sie_curr": 3820,
+          "sie_prev": 2336,
+          "ms_curr": 3.0,
+          "ms_prev": 2.8,
+          "ie": 107.0,
+          "var_pp": 0.2
+        },
+        "ytd": {
+          "market_curr": 579584,
+          "market_prev": 372800,
+          "sie_curr": 17446,
+          "sie_prev": 9536,
+          "ms_curr": 3.0,
+          "ms_prev": 2.6,
+          "ie": 118.0,
+          "var_pp": 0.4
+        },
+        "trimestre": {
+          "market_curr": 372627,
+          "market_prev": 239307,
+          "sie_curr": 10970,
+          "sie_prev": 6276,
+          "ms_curr": 2.9,
+          "ms_prev": 2.6,
+          "ie": 112.0,
+          "var_pp": 0.3
+        },
+        "mat": {
+          "market_curr": 1259610,
+          "market_prev": 890272,
+          "sie_curr": 38139,
+          "sie_prev": 20124,
+          "ms_curr": 3.0,
+          "ms_prev": 2.3,
+          "ie": 134.0,
+          "var_pp": 0.7
         }
       }
     },

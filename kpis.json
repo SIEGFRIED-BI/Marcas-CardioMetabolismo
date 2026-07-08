@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-08T08:22:29",
+  "generated_at": "2026-07-08T12:17:52",
   "as_of_month": "May 2026",
   "periods": [
     "mensual",
@@ -60,16 +60,16 @@
           "recetas_sie": {
             "curr": 46311,
             "prev": 46274,
-            "ie": 90.2
+            "ie": 89.7
           },
           "ms_recetas": {
-            "curr": 7.62,
-            "prev": 8.45
+            "curr": 7.58,
+            "prev": 8.46
           },
           "mercado_recetas": {
-            "curr": 607674,
-            "prev": 547716,
-            "ie": 110.9
+            "curr": 610581,
+            "prev": 546975,
+            "ie": 111.6
           },
           "units_sie": {
             "curr": 329118,
@@ -95,16 +95,16 @@
           "recetas_sie": {
             "curr": 221958,
             "prev": 234731,
-            "ie": 88.3
+            "ie": 88.0
           },
           "ms_recetas": {
-            "curr": 7.61,
+            "curr": 7.58,
             "prev": 8.61
           },
           "mercado_recetas": {
-            "curr": 2916672,
-            "prev": 2725134,
-            "ie": 107.0
+            "curr": 2928641,
+            "prev": 2725186,
+            "ie": 107.5
           },
           "units_sie": {
             "curr": 1617594,
@@ -130,16 +130,16 @@
           "recetas_sie": {
             "curr": 136161,
             "prev": 139031,
-            "ie": 89.7
+            "ie": 89.2
           },
           "ms_recetas": {
-            "curr": 7.62,
-            "prev": 8.49
+            "curr": 7.58,
+            "prev": 8.5
           },
           "mercado_recetas": {
-            "curr": 1787485,
-            "prev": 1637999,
-            "ie": 109.1
+            "curr": 1795988,
+            "prev": 1635690,
+            "ie": 109.8
           },
           "units_sie": {
             "curr": 994937,
@@ -165,16 +165,16 @@
           "recetas_sie": {
             "curr": 266356,
             "prev": 285366,
-            "ie": 87.8
+            "ie": 87.6
           },
           "ms_recetas": {
-            "curr": 7.63,
-            "prev": 8.69
+            "curr": 7.6,
+            "prev": 8.68
           },
           "mercado_recetas": {
-            "curr": 3488656,
-            "prev": 3282542,
-            "ie": 106.3
+            "curr": 3503006,
+            "prev": 3286100,
+            "ie": 106.6
           },
           "units_sie": {
             "curr": 1972226,
@@ -203,13 +203,13 @@
             "ie": 87.6
           },
           "ms_recetas": {
-            "curr": 7.9,
-            "prev": 9.02
+            "curr": 7.89,
+            "prev": 9.0
           },
           "mercado_recetas": {
-            "curr": 6791393,
-            "prev": 6599780,
-            "ie": 102.9
+            "curr": 6803597,
+            "prev": 6617537,
+            "ie": 102.8
           },
           "units_sie": {
             "curr": 4008103,
@@ -2615,58 +2615,58 @@
       "family": "ROXOLAN",
       "periods": {
         "mensual": {
-          "rec_curr": 3903,
-          "rec_prev": 3382,
-          "rec_ie": 100.0,
+          "rec_curr": 3967,
+          "rec_prev": 3639,
+          "rec_ie": 97.0,
           "units_curr": 17076,
           "units_prev": 17933,
-          "units_ie": 87.1,
-          "int_curr": 17168,
-          "int_prev": 18811,
+          "units_ie": 90.8,
+          "int_curr": 18163,
+          "int_prev": 19900,
           "int_ie": 91.3
         },
         "ytd": {
-          "rec_curr": 18521,
-          "rec_prev": 15802,
-          "rec_ie": 104.7,
+          "rec_curr": 18507,
+          "rec_prev": 17199,
+          "rec_ie": 99.6,
           "units_curr": 84502,
           "units_prev": 79661,
-          "units_ie": 93.8,
-          "int_curr": 84010,
-          "int_prev": 72008,
+          "units_ie": 97.3,
+          "int_curr": 87623,
+          "int_prev": 75104,
           "int_ie": 116.7
         },
         "trimestre": {
-          "rec_curr": 11456,
-          "rec_prev": 9609,
-          "rec_ie": 104.6,
+          "rec_curr": 11466,
+          "rec_prev": 10397,
+          "rec_ie": 99.6,
           "units_curr": 51962,
           "units_prev": 50347,
-          "units_ie": 91.6,
-          "int_curr": 50307,
-          "int_prev": 47388,
+          "units_ie": 95.2,
+          "int_curr": 52674,
+          "int_prev": 49616,
           "int_ie": 106.2
         },
         "semestre": {
-          "rec_curr": 22249,
-          "rec_prev": 19113,
-          "rec_ie": 104.7,
+          "rec_curr": 22274,
+          "rec_prev": 20846,
+          "rec_ie": 100.0,
           "units_curr": 102323,
           "units_prev": 95113,
-          "units_ie": 95.3,
-          "int_curr": 98309,
-          "int_prev": 72015,
+          "units_ie": 98.9,
+          "int_curr": 102528,
+          "int_prev": 75104,
           "int_ie": 136.5
         },
         "mat": {
-          "rec_curr": 44486,
-          "rec_prev": 39964,
-          "rec_ie": 104.1,
+          "rec_curr": 44364,
+          "rec_prev": 43646,
+          "rec_ie": 99.8,
           "units_curr": 204893,
           "units_prev": 203583,
-          "units_ie": 95.7,
-          "int_curr": 193996,
-          "int_prev": 73242,
+          "units_ie": 98.8,
+          "int_curr": 198934,
+          "int_prev": 75104,
           "int_ie": 264.9
         }
       }
@@ -4250,62 +4250,62 @@
       "name": "ROXOLAN PLUS (SIE)",
       "line": "cardio",
       "lineName": "CardioMetabólica",
-      "family": "ROXOLAN",
+      "family": "ROXOLAN PLUS",
       "periods": {
         "mensual": {
-          "rec_curr": 873,
-          "rec_prev": 757,
-          "rec_ie": 99.9,
+          "rec_curr": 809,
+          "rec_prev": 500,
+          "rec_ie": 96.4,
           "units_curr": 3820,
           "units_prev": 2336,
-          "units_ie": 149.5,
-          "int_curr": 3841,
-          "int_prev": 4208,
-          "int_ie": 91.3
+          "units_ie": 107.0,
+          "int_curr": 2846,
+          "int_prev": 3119,
+          "int_ie": 91.2
         },
         "ytd": {
-          "rec_curr": 3824,
-          "rec_prev": 3262,
-          "rec_ie": 104.7,
+          "rec_curr": 3838,
+          "rec_prev": 1865,
+          "rec_ie": 123.4,
           "units_curr": 17446,
           "units_prev": 9536,
-          "units_ie": 161.7,
-          "int_curr": 17344,
-          "int_prev": 14867,
+          "units_ie": 117.7,
+          "int_curr": 13731,
+          "int_prev": 11771,
           "int_ie": 116.7
         },
         "trimestre": {
-          "rec_curr": 2418,
-          "rec_prev": 2029,
-          "rec_ie": 104.6,
+          "rec_curr": 2408,
+          "rec_prev": 1241,
+          "rec_ie": 115.2,
           "units_curr": 10970,
           "units_prev": 6276,
-          "units_ie": 155.1,
-          "int_curr": 10621,
-          "int_prev": 10004,
-          "int_ie": 106.2
+          "units_ie": 112.3,
+          "int_curr": 8254,
+          "int_prev": 7776,
+          "int_ie": 106.1
         },
         "semestre": {
-          "rec_curr": 4591,
-          "rec_prev": 3944,
-          "rec_ie": 104.7,
+          "rec_curr": 4566,
+          "rec_prev": 2211,
+          "rec_ie": 124.3,
           "units_curr": 21114,
           "units_prev": 11255,
-          "units_ie": 166.2,
-          "int_curr": 20286,
-          "int_prev": 14860,
+          "units_ie": 121.1,
+          "int_curr": 16067,
+          "int_prev": 11771,
           "int_ie": 136.5
         },
         "mat": {
-          "rec_curr": 8281,
-          "rec_prev": 7439,
-          "rec_ie": 104.1,
+          "rec_curr": 8403,
+          "rec_prev": 3757,
+          "rec_ie": 139.2,
           "units_curr": 38139,
           "units_prev": 20124,
-          "units_ie": 180.1,
-          "int_curr": 36111,
-          "int_prev": 13633,
-          "int_ie": 264.9
+          "units_ie": 133.9,
+          "int_curr": 31173,
+          "int_prev": 11771,
+          "int_ie": 264.8
         }
       }
     },
