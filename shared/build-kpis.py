@@ -44,7 +44,7 @@ LINES_NO_RECETAS = set()
 # Definicion de lineas: como cargar la data
 LINES = [
     {'key':'cardio',  'name':'CardioMetabólica', 'icon':'❤️', 'color':'#B01E1E',
-     'href':'cardio/',        'owner':'Diego Fernández',
+     'href':'cardio/',        'owner':'Romina De Nigris',
      'source':('data.js','cardio/data.js')},
     {'key':'antibio', 'name':'Antibióticos',     'icon':'🦠', 'color':'#16A34A',
      'href':'ATB/',           'owner':'Antonella Mariani',
