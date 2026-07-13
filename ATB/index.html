@@ -961,6 +961,8 @@ function renderBudget(){
   // Ventana YTD = meses transcurridos (con venta real en alguna marca de la linea)
   var ytdLast = -1;
   for(var yi=0;yi<12;yi++){ if(totalsReal[yi]>0) ytdLast = yi; }
+  // __SORT_VENTA_YTD__ : ordenar familias por venta interna acumulada YTD (real) desc
+  rows.sort(function(a,b){ var ay=0,by=0; for(var si=0;si<=ytdLast;si++){ if(a.real[si]!=null) ay+=+a.real[si]||0; if(b.real[si]!=null) by+=+b.real[si]||0; } return by-ay; });
   var ytdLabel = ytdLast>=0 ? ('YTD '+MESES_L[ytdLast]) : 'YTD';
   // Colgroup: distribuye anchos para responsive sin scroll horizontal
   var cg = document.getElementById('bud-table-cols');
@@ -2214,7 +2216,7 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
 })();
 
 </script>
-<script src="../shared/multi-period-table.js?v=a997428b03"></script>
+<script src="../shared/multi-period-table.js?v=4c8da0645b"></script>
 <script>
 // Multi-period summary tables (added by patch-multi-period-sections.py).
 // Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.

@@ -945,7 +945,7 @@ function renderKpis(){
 
 // ── BUDGET ────────────────────────────────────────────────────────────
 let bChart=null, bProd='VALIUM', bYear='2026';
-const BUD_PRODS = Object.keys(D.budget);
+const BUD_PRODS = Object.keys(D.budget).sort(function(a,b){ /* __SORT_VENTA_YTD__ orden por venta YTD 2026 desc */ function y(p){var r=((D.budget[p]||{})['2026']||{}).real||[],s=0;for(var i=0;i<r.length;i++){if(r[i]!=null)s+=+r[i]||0;}return s;} return y(b)-y(a); });
 
 function renderBudPills(){
   const totalPill = `<button class="pill ${'__TOTAL__'===bProd?'on':''}" onclick="setBP('__TOTAL__')"
@@ -2282,7 +2282,7 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
 })();
 
 </script>
-<script src="../shared/multi-period-table.js?v=a997428b03"></script>
+<script src="../shared/multi-period-table.js?v=4c8da0645b"></script>
 <script>
 // Multi-period summary tables (added by patch-multi-period-sections.py).
 // Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.

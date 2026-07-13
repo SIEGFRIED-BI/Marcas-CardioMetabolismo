@@ -167,7 +167,7 @@
     if (btn) { btn.textContent = 'Generando…'; btn.style.pointerEvents = 'none'; btn.style.opacity = '0.7'; }
     function famLbl(f){ return (typeof window !== 'undefined' && window.FAM_LABEL && window.FAM_LABEL[f]) || f; }
     return loadXlsx().then(function(XLSX){
-      var periods = [['mat','MAT'],['ytd','YTD'],['mes','MES'],['trimestre','TRIM']];
+      var periods = [['mat','MAT'],['ytd','YTD'],['trimestre','TRIM'],['mes','MES']];
       var header = ['Mercado','Detalle'];
       periods.forEach(function(p){ header.push(p[1]+' U Ant', p[1]+' U Act', p[1]+' MS% Ant', p[1]+' MS% Act', p[1]+' IE', p[1]+' Var pp'); });
       var aoa = [header];
@@ -492,8 +492,8 @@
         + '<td class="mp-fam" title="' + escapeHtml(famLbl) + '">' + caret + escapeHtml(famLbl) + '</td>'
         + periodCells(f.periods.mat,       false, true)
         + periodCells(f.periods.ytd,       false, true)
-        + periodCells(f.periods.mes,       false, true)
-        + periodCells(f.periods.trimestre, true,  true)
+        + periodCells(f.periods.trimestre, false, true)
+        + periodCells(f.periods.mes,       true,  true)
         + '</tr>';
     }).join('');
 
@@ -515,11 +515,11 @@
       +   '<th rowspan="2" class="mp-fam-th">Mercado</th>'
       +   '<th colspan="4" class="mp-g mp-g-mat">MAT <span class="mp-lbl">' + lbls.mat + '</span></th>'
       +   '<th colspan="4" class="mp-g mp-g-ytd">YTD <span class="mp-lbl">' + lbls.ytd + '</span></th>'
-      +   '<th colspan="4" class="mp-g mp-g-mes">MES <span class="mp-lbl">' + lbls.mes + '</span></th>'
       +   '<th colspan="4" class="mp-g mp-g-trim">TRIM <span class="mp-lbl">' + lbls.trimestre + '</span></th>'
+      +   '<th colspan="4" class="mp-g mp-g-mes">MES <span class="mp-lbl">' + lbls.mes + '</span></th>'
       + '</tr>'
       + '<tr class="mp-sub-row">'
-      +   ['mat','ytd','mes','trim'].map(function(grp){
+      +   ['mat','ytd','trim','mes'].map(function(grp){
             return ['<th class="mp-sh mp-sh-'+grp+'" title="Unidades / Recetas período actual (con flecha vs anterior)">Units</th>',
                     '<th class="mp-sh mp-sh-'+grp+'" title="Market Share % período actual (con flecha vs anterior)">MS%</th>',
                     '<th class="mp-sh mp-sh-'+grp+'" title="IE (Índice de Evolución): crecimiento de tu market share vs el del mercado, base 100. 100 = creciste igual que el mercado; arriba de 100 ganás share, abajo lo perdés.">IE</th>',
@@ -553,8 +553,8 @@
         + totalFirstCell(sel.size, n, false)
         + periodCells(tot.mat,       false, false)
         + periodCells(tot.ytd,       false, false)
-        + periodCells(tot.mes,       false, false)
-        + periodCells(tot.trimestre, true,  false)
+        + periodCells(tot.trimestre, false, false)
+        + periodCells(tot.mes,       true,  false)
         + '</tr>';
     }
 
@@ -574,8 +574,8 @@
           + '</td>'
           + periodCells(c.periods.mat,       false)
           + periodCells(c.periods.ytd,       false)
-          + periodCells(c.periods.mes,       false)
-          + periodCells(c.periods.trimestre, true)
+          + periodCells(c.periods.trimestre, false)
+          + periodCells(c.periods.mes,       true)
           + '</tr>';
       }).join('');
       var all = new Set();
@@ -617,8 +617,8 @@
       tmp.innerHTML = '<tr>' + totalFirstCell(sel.size, n, revealMode)
         + periodCells(tot.mat,       false, false)
         + periodCells(tot.ytd,       false, false)
-        + periodCells(tot.mes,       false, false)
-        + periodCells(tot.trimestre, true,  false) + '</tr>';
+        + periodCells(tot.trimestre, false, false)
+        + periodCells(tot.mes,       true,  false) + '</tr>';
       var tr = tmp.querySelector('tr');
       if (tr) totalRow.innerHTML = tr.innerHTML;
       var tg = totalRow.querySelector('.mp-reveal-toggle');
