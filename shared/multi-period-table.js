@@ -446,6 +446,25 @@
       container.innerHTML = '<div style="padding:24px;text-align:center;color:#9ca3af;font-size:11px;">Sin datos disponibles</div>';
       return;
     }
+    // Orden por columna (click en header de Units/MS%/IE/Var pp): data._sort={period,metric,dir}.
+    // Reordena las filas de mercado/familia; los competidores quedan anidados (se re-expanden).
+    if (data._sort) {
+      var _s = data._sort;
+      var _sv = function(f){
+        var p = f.periods && f.periods[_s.period]; if (!p) return null;
+        return _s.metric === 'units' ? p.sie_curr : _s.metric === 'ms' ? p.ms_curr
+             : _s.metric === 'ie' ? p.ie : _s.metric === 'varpp' ? p.var_pp : null;
+      };
+      data.families.sort(function(a, b){
+        var va = _sv(a), vb = _sv(b);
+        va = (va == null) ? -Infinity : va; vb = (vb == null) ? -Infinity : vb;
+        return _s.dir === 'asc' ? va - vb : vb - va;
+      });
+    }
+    var _sa = function(per, m){
+      var s = data._sort;
+      return (s && s.period === per && s.metric === m) ? (s.dir === 'asc' ? ' ▲' : ' ▼') : '';
+    };
     var lbls = data.period_labels;
     var sourceLabel = (opts && opts.source === 'recetas') ? 'Recetas' : 'Unidades IQVIA';
 
@@ -520,10 +539,16 @@
       + '</tr>'
       + '<tr class="mp-sub-row">'
       +   ['mat','ytd','trim','mes'].map(function(grp){
-            return ['<th class="mp-sh mp-sh-'+grp+'" title="Unidades / Recetas período actual (con flecha vs anterior)">Units</th>',
-                    '<th class="mp-sh mp-sh-'+grp+'" title="Market Share % período actual (con flecha vs anterior)">MS%</th>',
-                    '<th class="mp-sh mp-sh-'+grp+'" title="IE (Índice de Evolución): crecimiento de tu market share vs el del mercado, base 100. 100 = creciste igual que el mercado; arriba de 100 ganás share, abajo lo perdés.">IE</th>',
-                    '<th class="mp-sh mp-sh-'+grp+' mp-sep" title="Variación en puntos porcentuales del MS% (Act - Ant)">Var pp</th>'].join('');
+            var per = grp === 'trim' ? 'trimestre' : grp;
+            function sh(m, lbl, tip){
+              return '<th class="mp-sh mp-sh-'+grp+' mp-sortable'+(m==='varpp'?' mp-sep':'')+'"'
+                   + ' data-p="'+per+'" data-m="'+m+'" style="cursor:pointer"'
+                   + ' title="'+tip+' · click para ordenar mayor→menor">'+lbl+_sa(per,m)+'</th>';
+            }
+            return sh('units','Units','Unidades / Recetas período actual (con flecha vs anterior)')
+                 + sh('ms','MS%','Market Share % período actual (con flecha vs anterior)')
+                 + sh('ie','IE','IE (Índice de Evolución): crecimiento de tu market share vs el del mercado, base 100. 100 = creciste igual que el mercado; arriba de 100 ganás share, abajo lo perdés.')
+                 + sh('varpp','Var pp','Variación en puntos porcentuales del MS% (Act - Ant)');
           }).join('')
       + '</tr>'
       + '</thead>'
@@ -669,6 +694,18 @@
       tr.addEventListener('click', function(){ toggleExpand(tr); });
       tr.addEventListener('keydown', function(e){
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpand(tr); }
+      });
+    });
+
+    // Ordenar por columna: click en un header (Units/MS%/IE/Var pp de cualquier período)
+    // ordena las filas de mercado mayor→menor; segundo click invierte. Re-render completo
+    // (re-cablea expand/checkbox/export; colapsa lo expandido).
+    container.querySelectorAll('th.mp-sortable').forEach(function(th){
+      th.addEventListener('click', function(){
+        var p = th.getAttribute('data-p'), m = th.getAttribute('data-m'), s = data._sort;
+        var dir = (s && s.period === p && s.metric === m && s.dir === 'desc') ? 'asc' : 'desc';
+        data._sort = { period: p, metric: m, dir: dir };
+        renderTable(container, data, opts);
       });
     });
 

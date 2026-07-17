@@ -789,6 +789,7 @@ function setBudFilterAll(){ window.__bSelected = null; renderBudget(); }
 function setBudFilterClear(){ window.__bSelected = new Set(); renderBudget(); }
 function setBY(y){bYear=y;renderBudYr();renderBudget();}
 
+var budSort = {col:'ytd', dir:'desc'};  // orden de la tabla de venta por columna
 function renderBudget(){
   // Filtro de productos: window.__bSelected = null (todos) o Set de prods seleccionados
   var ALL_PRODS = Object.keys(D.budget||{});
@@ -853,8 +854,14 @@ function renderBudget(){
   // Ventana YTD = meses transcurridos (con venta real en alguna marca de la linea)
   var ytdLast = -1;
   for(var yi=0;yi<12;yi++){ if(totalsReal[yi]>0) ytdLast = yi; }
-  // __SORT_VENTA_YTD__ : ordenar familias por venta interna acumulada YTD (real) desc
-  rows.sort(function(a,b){ var ay=0,by=0; for(var si=0;si<=ytdLast;si++){ if(a.real[si]!=null) ay+=+a.real[si]||0; if(b.real[si]!=null) by+=+b.real[si]||0; } return by-ay; });
+  // __SORT_VENTA_YTD__ : ordenar familias por la columna elegida (budSort) sobre la VENTA (real). Default YTD desc.
+  rows.sort(function(a,b){
+    var av, bv;
+    if(budSort.col==='total'){ av=a.totR; bv=b.totR; }
+    else if(budSort.col==='ytd'){ av=0;bv=0; for(var si=0;si<=ytdLast;si++){ if(a.real[si]!=null)av+=+a.real[si]||0; if(b.real[si]!=null)bv+=+b.real[si]||0; } }
+    else { var ci=+budSort.col; av=(a.real[ci]!=null)?+a.real[ci]||0:0; bv=(b.real[ci]!=null)?+b.real[ci]||0:0; }
+    return budSort.dir==='asc' ? av-bv : bv-av;
+  });
   var ytdLabel = ytdLast>=0 ? ('YTD '+MESES_L[ytdLast]) : 'YTD';
   // Colgroup: distribuye anchos para responsive sin scroll horizontal
   var cg = document.getElementById('bud-table-cols');
@@ -872,13 +879,21 @@ function renderBudget(){
     var hh = '<tr style="border-bottom:1px solid #e5e7eb;">';
     hh += '<th style="text-align:left;padding:5px 6px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.06em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;">Producto</th>';
     hh += '<th style="text-align:left;padding:5px 2px;font-size:8px;font-weight:600;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;"></th>';
-    MESES_L.forEach(function(m){
-      hh += '<th style="text-align:right;padding:5px 4px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.04em;text-transform:uppercase;">'+m+'</th>';
+    MESES_L.forEach(function(m,mi){
+      var ar=(budSort.col==mi)?(budSort.dir==='asc'?' ▲':' ▼'):'';
+      hh += '<th data-bcol="'+mi+'" style="cursor:pointer;text-align:right;padding:5px 4px;font-size:9px;font-weight:700;color:#374151;letter-spacing:.04em;text-transform:uppercase;">'+m+ar+'</th>';
     });
-    hh += '<th style="text-align:right;padding:5px 5px;font-size:9px;font-weight:800;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #dbeafe;">'+ytdLabel+'</th>';
-    hh += '<th style="text-align:right;padding:5px 6px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total</th>';
+    hh += '<th data-bcol="ytd" style="cursor:pointer;text-align:right;padding:5px 5px;font-size:9px;font-weight:800;color:#1f4ba6;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #dbeafe;">'+ytdLabel+((budSort.col==='ytd')?(budSort.dir==='asc'?' ▲':' ▼'):'')+'</th>';
+    hh += '<th data-bcol="total" style="cursor:pointer;text-align:right;padding:5px 6px;font-size:9px;font-weight:700;color:#b01e1e;letter-spacing:.04em;text-transform:uppercase;border-left:2px solid #fde2e2;">Total'+((budSort.col==='total')?(budSort.dir==='asc'?' ▲':' ▼'):'')+'</th>';
     hh += '</tr>';
     head.innerHTML = hh;
+    head.querySelectorAll('th[data-bcol]').forEach(function(th){
+      th.addEventListener('click', function(){
+        var raw=th.getAttribute('data-bcol'); var c=(raw==='ytd'||raw==='total')?raw:+raw;
+        budSort={col:c, dir:(budSort.col===c && budSort.dir==='desc')?'asc':'desc'};
+        renderBudget();
+      });
+    });
   }
   // Body: 3 filas por producto
   var body = document.getElementById('bud-table-body');
@@ -2055,7 +2070,7 @@ window.__sfPF = window.__sfPF || { mode:'top10', selected:new Set(), search:'' }
 })();
 
 </script>
-<script src="../shared/multi-period-table.js?v=4c8da0645b"></script>
+<script src="../shared/multi-period-table.js?v=8389c4cde7"></script>
 <script>
 // Multi-period summary tables (added by patch-multi-period-sections.py).
 // Pasa D directamente para soportar tanto window.OTC_DASHBOARD como const D inline.
