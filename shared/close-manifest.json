@@ -3,7 +3,7 @@
   "_docs": "Fuente UNICA de configuracion del cierre mensual. La unica perilla normal es global.closeMonth (corte real de datos IQVIA/venta). cycleFolder = nombre de carpeta legacy donde hoy viven los inputs (puede diferir de closeMonth). Las rutas con ${OneDrive} se expanden con la env var. Los scripts leen segmentaciones de aca (antes duplicadas). Ver shared/manifest.py.",
 
   "global": {
-    "closeMonth": "2026-05",
+    "closeMonth": "2026-06",
     "ventaCutoff": "2026-06",
     "_ventaCutoff_docs": "Ultimo mes COMPLETO de venta interna. Puede ir ADELANTE de closeMonth porque IQVIA reporta con atraso (~2 meses) y la venta SAP/Qlik esta al dia. La tabla Venta vs Estimado y el KPI de venta usan este corte; el resto (IQVIA/IE de mercado) usa closeMonth. Si se omite, cae a closeMonth.",
     "closeYear": 2026,

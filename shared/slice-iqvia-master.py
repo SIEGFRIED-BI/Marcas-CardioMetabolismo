@@ -96,34 +96,53 @@ def slice_for_line(
     wb_in = openpyxl.load_workbook(master_path, read_only=True, data_only=True)
     ws_in = wb_in.active
 
-    # Headers en row 1 del AR_PM:
-    # col 1: Manufacturer
-    # col 2: Product
-    # col 3: Pack
-    # col 4: ATC IV   (ej. 'A12A0 - CALCIO')
-    # col 5: Ph. Forms III
-    # col 6: Molecules Long
-    # col 7+: data con header 'Units\\nMMM YYYY'
+    # Detectar columnas de entrada POR HEADER (no por posicion): IQVIA cambia el
+    # orden entre entregas. El 'AR_PM Premium' estandar viene
+    # Manuf|Product|Pack|ATC IV|Ph.Forms|Molecules|..., pero el export
+    # 'Ateneo Total - MAT Movil' viene Pack|Manuf|ATC IV|Ph.Forms|Product|Molecules|...
+    # y ademas trae DOS columnas ATC ('ATC IV' 5-char + 'ATC III' 4-char). Detectar
+    # por nombre + preferir 'ATC IV' (el nivel de 5 chars, ej. G03A1, que usa mujer)
+    # lo hace robusto a cualquiera de los dos layouts.
     headers_in = list(next(ws_in.iter_rows(min_row=1, max_row=1, values_only=True)))
+    ci = {'manuf': None, 'product': None, 'pack': None, 'atc': None, 'mol': None}
+    ci_atc_iv = None
+    for idx, raw in enumerate(headers_in):
+        h = str(raw or '').strip().lower()
+        if h.startswith('manufacturer') and ci['manuf'] is None: ci['manuf'] = idx
+        elif h.startswith('product') and ci['product'] is None: ci['product'] = idx
+        elif h.startswith('pack') and ci['pack'] is None: ci['pack'] = idx
+        elif h.startswith('molecules') and ci['mol'] is None: ci['mol'] = idx
+        if h.startswith('atc iv'): ci_atc_iv = idx
+        elif h.startswith('atc') and ci['atc'] is None: ci['atc'] = idx
+    if ci_atc_iv is not None: ci['atc'] = ci_atc_iv
+    faltan = [k for k, v in ci.items() if v is None]
+    if faltan:
+        raise SystemExit(f'[{line_name}] No encontre columnas por header: {faltan}. '
+                         f'Headers: {[str(x) for x in headers_in[:8]]}')
 
-    # Identificar columnas de data del master (1-based) y su header normalizado
+    # Columnas de data mensual (0-based): header 'Units' cuyo label sea 'MMM YYYY'
+    # exacto (excluye MAT/YTD). Output normalizado 'MMM YYYY\\nUnits' que el parser espera.
     data_cols: list[tuple[int, str]] = []
-    for col_idx_1based, raw in enumerate(headers_in[6:], start=7):
-        norm = _normalize_data_header(raw)
-        if norm:
-            data_cols.append((col_idx_1based, norm))
+    for idx, raw in enumerate(headers_in):
+        s = str(raw or '')
+        if not s.startswith('Units'):
+            continue
+        lastline = s.split('\n')[-1].strip()
+        if re.match(r'^[A-Z][a-z]{2} \d{4}$', lastline):
+            data_cols.append((idx, f'{lastline}\nUnits'))
 
     if not data_cols:
         print(f'[{line_name}] WARN: no se detectaron columnas de data en el master.')
 
-    # Filtrar rows por ATC-4
+    # Filtrar rows por ATC-4 (usando la col ATC detectada por header)
     keepers: list[tuple] = []
     total_rows = 0
+    ci_atc = ci['atc']
     for row in ws_in.iter_rows(min_row=2, values_only=True):
         total_rows += 1
-        if len(row) < 6:
+        if not row:
             continue
-        atc4 = _extract_atc4(row[3])
+        atc4 = _extract_atc4(row[ci_atc] if ci_atc < len(row) else None)
         if atc4 and atc4 in atc4_set:
             keepers.append(row)
     wb_in.close()
@@ -146,17 +165,18 @@ def slice_for_line(
     new_headers.extend(h for _, h in data_cols)
     ws_out.append(new_headers)
 
+    def _g(row, i):
+        return row[i] if i is not None and i < len(row) else None
     for row in keepers:
         new_row = [
-            row[0],  # mfg
-            row[1],  # prod
-            row[2],  # pack
-            row[3],  # ATC IV -> ATC-4 column
-            row[5] if len(row) > 5 else None,  # Molecules Long
-            'POPULAR',  # placeholder Market Type
+            _g(row, ci['manuf']),   # Manufacturer
+            _g(row, ci['product']), # Product
+            _g(row, ci['pack']),    # Pack
+            _g(row, ci['atc']),     # ATC IV crudo -> col ATC-4
+            _g(row, ci['mol']),     # Molecules Long
+            'POPULAR',              # placeholder Market Type
         ]
-        for col_idx_1based, _ in data_cols:
-            zero_idx = col_idx_1based - 1
+        for zero_idx, _ in data_cols:
             new_row.append(row[zero_idx] if zero_idx < len(row) else None)
         ws_out.append(new_row)
 

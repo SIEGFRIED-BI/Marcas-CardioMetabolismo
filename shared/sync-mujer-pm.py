@@ -79,12 +79,15 @@ def load_pm(path, atc_filter=None):
         if not h: continue
         s = str(h).strip()
         s_norm = s.replace('\n', ' ').strip()
-        # Campos categoricos
-        if s_norm.lower().startswith('manufacturer'): col_manuf = i
-        elif s_norm.lower().startswith('product'):    col_product = i
-        elif s_norm.lower().startswith('pack'):       col_pack = i
-        elif s_norm.lower().startswith('atc'):        col_atc = i
-        elif s_norm.lower().startswith('molecules'):  col_mol = i
+        # Campos categoricos (first-wins; ATC prefiere 'ATC IV' = nivel 5-char G03A1
+        # que usa mujer, porque el master 'Ateneo Total' trae tambien 'ATC III' 4-char)
+        sl = s_norm.lower()
+        if sl.startswith('manufacturer') and col_manuf is None: col_manuf = i
+        elif sl.startswith('product') and col_product is None:  col_product = i
+        elif sl.startswith('pack') and col_pack is None:        col_pack = i
+        elif sl.startswith('molecules') and col_mol is None:    col_mol = i
+        if sl.startswith('atc iv'):                             col_atc = i
+        elif sl.startswith('atc') and col_atc is None:          col_atc = i
         # Units monthly: matcheo 'Units' + newline + 'Mes YYYY' (sin MAT/YTD)
         if s.startswith('Units') and ('\n' in s or len(s.split()) >= 2):
             after = s.split('\n', 1)[-1] if '\n' in s else s[len('Units'):].strip()

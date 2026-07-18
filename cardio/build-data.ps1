@@ -47,6 +47,7 @@ $dashboardFamilyOrder = @(
   'METGLUCON DUO',
   'PIXABAN',
   'ROXOLAN',
+  'ROXOLAN PLUS',
   'SILTRAN',
   'SILTRAN MET',
   'SINTROM',
@@ -70,6 +71,7 @@ $dashboardColors = [ordered]@{
   'METGLUCON DUO' = '#0369a1'
   'PIXABAN' = '#16a34a'
   'ROXOLAN' = '#65a30d'
+  'ROXOLAN PLUS' = '#4d7c0f'
   'SILTRAN' = '#0891b2'
   'SILTRAN MET' = '#0f766e'
   'SINTROM' = '#92400e'
@@ -92,7 +94,8 @@ $dashboardMarketConfig = [ordered]@{
   'METGLUCON AP' = @{ label = 'Metformina'; group = 'METGLUCON AP'; filters = @(@{ molecules = @('METFORMIN'); atcStarts = @('A10J'); productsLike = @('METGLUCON AP', 'METGLUCON') }); sieProducts = @('METGLUCON AP (SIE)', 'METGLUCON (SIE)') }
   'METGLUCON DUO' = @{ label = 'Glibenclamida + Metformina'; group = 'METGLUCON DUO'; filters = @(@{ molecules = @('GLIBENCLAMIDE_METFORMIN'); atcStarts = @('A10M'); productsLike = @('METGLUCON DUO') }); sieProducts = @('METGLUCON DUO (SIE)') }
   'PIXABAN' = @{ label = 'Apixaban'; group = 'PIXABAN'; filters = @(@{ molecules = @('APIXABAN'); atcStarts = @('B01F'); productsLike = @('PIXABAN') }); sieProducts = @('PIXABAN (SIE)') }
-  'ROXOLAN' = @{ label = 'Rosuvastatina'; group = 'ROXOLAN'; filters = @(@{ molecules = @('ROSUVASTATIN', 'EZETIMIBE_ROSUVASTATIN'); atcStarts = @('C10A','C10B'); productsLike = @('ROXOLAN') }); sieProducts = @('ROXOLAN (SIE)', 'ROXOLAN PLUS (SIE)') }
+  'ROXOLAN' = @{ label = 'Rosuvastatina'; group = 'ROXOLAN'; filters = @(@{ molecules = @('ROSUVASTATIN'); atcStarts = @('C10A','C10B'); productsLike = @('ROXOLAN') }); sieProducts = @('ROXOLAN (SIE)') }
+  'ROXOLAN PLUS' = @{ label = 'Rosuvastatina + Ezetimibe'; group = 'ROXOLAN PLUS'; filters = @(@{ molecules = @('EZETIMIBE_ROSUVASTATIN'); atcStarts = @('C10C') }); sieProducts = @('ROXOLAN PLUS (SIE)') }
   'SILTRAN' = @{ label = 'Sitagliptina'; group = 'SILTRAN'; filters = @(@{ molecules = @('SITAGLIPTIN'); atcStarts = @('A10H'); productsLike = @('SILTRAN') }); sieProducts = @('SILTRAN (SIE)') }
   'SILTRAN MET' = @{ label = 'Sitagliptina + Metformina'; group = 'SILTRAN MET'; filters = @(@{ molecules = @('METFORMIN_SITAGLIPTIN'); atcStarts = @('A10M'); productsLike = @('SILTRAN MET') }); sieProducts = @('SILTRAN MET (SIE)') }
   'SINTROM' = @{ label = 'Acenocumarol'; group = 'SINTROM'; filters = @(@{ molecules = @('ACENOCOUMAROL'); atcStarts = @('B01A'); productsLike = @('SINTROM') }); sieProducts = @('SINTROM (SIE)') }
@@ -102,7 +105,7 @@ $dashboardMarketConfig = [ordered]@{
 
 $familyOrder = @(
   'Totales',
-  'DAURAN','DILATREND','DILATREND AP','DILATREND D','DIOVAN','DIOVAN D','EMPAX','EMPAX MET','ENTRESTO','EXFORGE','EXFORGE D','METGLUCON AP','METGLUCON DUO','PIXABAN','ROXOLAN','SILTRAN','SILTRAN MET','SINTROM','TELPRES','TERLOC'
+  'DAURAN','DILATREND','DILATREND AP','DILATREND D','DIOVAN','DIOVAN D','EMPAX','EMPAX MET','ENTRESTO','EXFORGE','EXFORGE D','METGLUCON AP','METGLUCON DUO','PIXABAN','ROXOLAN','ROXOLAN PLUS','SILTRAN','SILTRAN MET','SINTROM','TELPRES','TERLOC'
 )
 
 $dddMarketConfig = [ordered]@{
@@ -115,6 +118,7 @@ $dddMarketConfig = [ordered]@{
   'Dilatrend (Carvedilol)' = @{ family = 'DILATREND'; keywords = @('DILATREND') }
   'Apixaban (Pixaban)' = @{ family = 'PIXABAN'; keywords = @('PIXABAN') }
   'Roxolan (Rosuvastatina)' = @{ family = 'ROXOLAN'; keywords = @('ROXOLAN') }
+  'Roxolan Plus' = @{ family = 'ROXOLAN PLUS'; keywords = @('ROXOLAN') }
   'Metglucon' = @{ family = 'METGLUCON AP'; keywords = @('METGLUCON') }
   'Telpres' = @{ family = 'TELPRES'; keywords = @('TELPRES') }
   'Exforge' = @{ family = 'EXFORGE'; keywords = @('EXFORGE') }
@@ -457,6 +461,7 @@ function Resolve-InternalSalesFamily {
       'METGLUCON DUO' { return 'METGLUCON DUO' }
       'PIXABAN' { return 'PIXABAN' }
       'ROXOLAN' { return 'ROXOLAN' }
+      'ROXOLAN PLUS' { return 'ROXOLAN PLUS' }
       'SILTRAN' { return 'SILTRAN' }
       'SILTRAN MET' { return 'SILTRAN MET' }
       'SINTROM' { return 'SINTROM' }
