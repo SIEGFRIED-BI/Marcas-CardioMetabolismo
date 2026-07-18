@@ -3970,6 +3970,57 @@
       }
     },
     {
+      "family": "45",
+      "display": "45",
+      "line": "mujer",
+      "lineName": "Mujer",
+      "sie_brands": [
+        "TRIP +45 (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 7321,
+          "market_prev": 3009,
+          "sie_curr": 2890,
+          "sie_prev": 0,
+          "ms_curr": 39.5,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 39.5
+        },
+        "ytd": {
+          "market_curr": 42155,
+          "market_prev": 17501,
+          "sie_curr": 13902,
+          "sie_prev": 0,
+          "ms_curr": 33.0,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 33.0
+        },
+        "trimestre": {
+          "market_curr": 24197,
+          "market_prev": 10076,
+          "sie_curr": 8171,
+          "sie_prev": 0,
+          "ms_curr": 33.8,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 33.8
+        },
+        "mat": {
+          "market_curr": 71438,
+          "market_prev": 23987,
+          "sie_curr": 20734,
+          "sie_prev": 0,
+          "ms_curr": 29.0,
+          "ms_prev": 0.0,
+          "ie": null,
+          "var_pp": 29.0
+        }
+      }
+    },
+    {
       "family": "LURASIDONE",
       "display": "LURASIDONE",
       "line": "snc",
@@ -4119,57 +4170,6 @@
           "ms_prev": 100.0,
           "ie": 100.0,
           "var_pp": 0.0
-        }
-      }
-    },
-    {
-      "family": "45",
-      "display": "45",
-      "line": "mujer",
-      "lineName": "Mujer",
-      "sie_brands": [
-        "TRIP +45 (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 0,
-          "market_prev": 3007,
-          "sie_curr": 0,
-          "sie_prev": 0,
-          "ms_curr": null,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": null
-        },
-        "ytd": {
-          "market_curr": 24409,
-          "market_prev": 17489,
-          "sie_curr": 8263,
-          "sie_prev": 0,
-          "ms_curr": 33.9,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 33.9
-        },
-        "trimestre": {
-          "market_curr": 6445,
-          "market_prev": 10069,
-          "sie_curr": 2521,
-          "sie_prev": 0,
-          "ms_curr": 39.1,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 39.1
-        },
-        "mat": {
-          "market_curr": 53692,
-          "market_prev": 23970,
-          "sie_curr": 15096,
-          "sie_prev": 0,
-          "ms_curr": 28.1,
-          "ms_prev": 0.0,
-          "ie": null,
-          "var_pp": 28.1
         }
       }
     },

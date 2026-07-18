@@ -31,7 +31,7 @@ REPO = Path(__file__).resolve().parent.parent
 # index.html. El regex de abajo acepta ambos anchors, pero el archivo a
 # leer/escribir es data.js.
 DATA_FILE = REPO / 'mujer' / 'data.js'
-MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-04\Ateneo Total - MAT Movil_May-19-2026 (3).xlsx')
+MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-06\AR_PM_FV_Standard_Jul-2026.xlsx')
 
 # Productos que SI deben ir en el mercado '45':
 # (Product, ATC prefix, molecule_must_contain or None)
@@ -49,7 +49,7 @@ INCLUDED = [
 MES_INV = {'Jan':1,'Feb':2,'Mar':3,'Apr':4,'May':5,'Jun':6,
            'Jul':7,'Aug':8,'Sep':9,'Oct':10,'Nov':11,'Dec':12}
 NUM_TO_MES = {v:k for k,v in MES_INV.items()}
-CIERRE = 4   # Apr 2026
+CIERRE = 6   # Jun 2026
 
 
 def quarter_key(mk):
@@ -123,10 +123,13 @@ def main():
         if not h: continue
         s = str(h).strip()
         s_norm = s.replace('\n', ' ').strip().lower()
-        if s_norm.startswith('manufacturer'): col_mfr = i
-        elif s_norm.startswith('product'): col_prod = i
-        elif s_norm.startswith('atc'): col_atc = i
-        elif s_norm.startswith('molecules'): col_mol = i
+        if s_norm.startswith('manufacturer') and col_mfr is None: col_mfr = i
+        elif s_norm.startswith('product') and col_prod is None: col_prod = i
+        elif s_norm.startswith('molecules') and col_mol is None: col_mol = i
+        # ATC: preferir 'ATC IV' (5-char, ej G02X9/V03X0 que usa el filtro '45');
+        # el master 'Ateneo Total' trae tambien 'ATC III' (4-char) y last-wins lo agarraba.
+        if s_norm.startswith('atc iv'): col_atc = i
+        elif s_norm.startswith('atc') and col_atc is None: col_atc = i
         if s.startswith('Units') and ('\n' in s or len(s.split()) >= 2):
             after = s.split('\n', 1)[-1] if '\n' in s else s[len('Units'):].strip()
             after = after.strip()
