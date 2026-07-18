@@ -171,7 +171,12 @@ def patch(check_only=False):
                 new_alerts[fam] = a
             else:  # conservar lo que habia si la planilla no lo trae
                 new_stock[fam] = D['stock'][fam]
-                new_alerts[fam] = D.get('stock_alerts', {}).get(fam, {})
+                prev = D.get('stock_alerts', {}).get(fam, {})
+                # No arrastrar entries vacios/malformados ({} sin alert_indices):
+                # rompian la seccion Cobertura (TypeError). Familia sin dato de stock
+                # simplemente no va en stock_alerts.
+                if isinstance(prev, dict) and prev.get('alert_indices') is not None:
+                    new_alerts[fam] = prev
         for pr in cur_pres:
             if pr in pres_data:
                 a = alerts_from_series(pres_data[pr], months12, pr); a['familia'] = D['stock_pres'][pr].get('familia', '')

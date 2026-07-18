@@ -31,9 +31,11 @@ function renderCobertura(){
   const SA_all = isPresView ? (D.stock_pres||{}) : (D.stock_alerts||{});
   // Apply brand filter
   const SA = covBrand
-    ? Object.fromEntries(Object.entries(SA_all).filter(([,v])=>v.familia===covBrand))
+    ? Object.fromEntries(Object.entries(SA_all).filter(([,v])=>v && v.familia===covBrand))
     : SA_all;
-  const prods = Object.keys(SA);
+  // Guard: ignorar entries malformados/vacios (p.ej. familias sin dato de stock que
+  // el builder emite como {}), asi un entry incompleto no rompe toda la seccion.
+  const prods = Object.keys(SA).filter(p => SA[p] && Array.isArray(SA[p].alert_indices));
 
   // Summary counts
   let q=0,b=0,a=0,ok=0;
