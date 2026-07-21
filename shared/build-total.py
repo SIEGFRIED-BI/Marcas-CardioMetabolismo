@@ -115,7 +115,7 @@ def company_iqvia(master_path):
         txt = (prod + ' ' + mol + ' ' + atc).upper()
         if atc.upper().startswith('V06') or any(w in txt for w in LECHE):  # sin leches / nutrición
             n_leche += 1; continue
-        issie = 'SIEGFRIED' in mf or 'SIDUS' in mf
+        issie = 'SIEGFRIED' in mf   # en el AR_PM los productos Siegfried ya vienen como SIEGFRIED; SIDUS/BIOSIDUS son otras compañías
         pv = {per: (wsum(row, cw), wsum(row, pw)) for per, (cw, pw) in WIN.items()}
         rows.append((issie, mol, prod, atc, pv))
         if issie and mol: sie_mols.add(mol)
@@ -138,7 +138,7 @@ def company_iqvia(master_path):
                     'growth': round((sc / sp - 1) * 100, 1) if sp else None,
                     'mkt_growth': round((mc / mp - 1) * 100, 1) if mp else None,
                     'mkt_adr_curr': round(adr_c), 'ms_adr': pct(sc, adr_c)}  # mercado direccionable
-    agg['_universe'] = 'ETICO sin leches · Siegfried = SIEGFRIED+SIDUS · MS% sobre ético total'
+    agg['_universe'] = 'ETICO sin leches · Siegfried = manufacturer SIEGFRIED · MS% sobre ético total'
     # productos Siegfried (TODOS), agregados por nombre, con IE/MS por su mercado-molécula
     pd = defaultdict(lambda: {'mol': None, 'atc': None, 'per': {per: [0.0, 0.0] for per in WIN}})
     for issie, mol, prod, atc, pv in rows:

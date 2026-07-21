@@ -134,7 +134,7 @@ body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--g50);colo
   </div>
 </div>
 
-<script src="./data.js?v=b0acf8e429"></script>
+<script src="./data.js?v=42def8ee3c"></script>
 <script>
 const T = window.TOTAL_SIEGFRIED || {};
 const PERIOD_LABEL = {mensual:'Mensual', ytd:'YTD', trimestre:'Trimestre', semestre:'Semestre', mat:'MAT'};
@@ -186,7 +186,7 @@ function renderCards(){
          lbl:`${fmtU(ve.real)} de ${fmtU(ve.estimado)} u`, pill:'VTA INT'}),
   ];
   document.getElementById('resumen-note').innerHTML = cf
-    ? 'IQVIA = <b>compañía completa</b> (todos los productos Siegfried, manufacturer SIEGFRIED+SIDUS). <b>MS% sobre el mercado ÉTICO total sin leches</b> ('+fmtU(u.mkt_curr)+' u) → '+fmtP(u.ms)+'; en los mercados donde compite, '+(u.ms_adr!=null?u.ms_adr.toFixed(1)+'%':'—')+'. IE '+(u.ie||'')+' (crec. propio / crec. mercado). Recetas y Venta = marcas en tableros.'
+    ? 'IQVIA = <b>compañía completa</b> (todos los productos manufacturer SIEGFRIED en IQVIA). <b>MS% sobre el mercado ÉTICO total sin leches</b> ('+fmtU(u.mkt_curr)+' u) → '+fmtP(u.ms)+'; en los mercados donde compite, '+(u.ms_adr!=null?u.ms_adr.toFixed(1)+'%':'—')+'. IE '+(u.ie||'')+' (crec. propio / crec. mercado). Recetas y Venta = marcas en tableros.'
     : 'IQVIA = marcas en tableros (deduplicado). IE = crec. propio / crec. mercado.';
   document.getElementById('cards').innerHTML = cards.map(k=>`
     <div class="card ${k.cls||''}">
