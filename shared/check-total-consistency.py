@@ -99,6 +99,19 @@ def main():
         ve = comp[p].get('venta_est', {}).get('real'); vi = comp[p]['venta']['curr']; checks += 1
         if ve is not None and vi and abs(ve-vi)/max(vi,1) > 0.02: errs.append(f'D {p}/venta {ve} vs kpis {vi}')
 
+    # E: company_full (IQVIA compañía ético) — IE/MS salen de sus propias sumas
+    cf = total.get('company_full')
+    if cf:
+        for p, u in cf.items():
+            if not isinstance(u, dict) or 'sie_curr' not in u: continue
+            checks += 2
+            exp_ms = round(u['sie_curr'] / u['mkt_curr'] * 100, 2) if u.get('mkt_curr') else None
+            if not close(exp_ms, u.get('ms'), 0.1): errs.append(f'E company_full/{p}.ms {u.get("ms")} != {exp_ms}')
+            if u.get('sie_prev') and u.get('mkt_prev') and u['sie_curr']/u['sie_prev'] <= 4:
+                exp_ie = round((u['sie_curr']/u['sie_prev'])/(u['mkt_curr']/u['mkt_prev'])*100, 1)
+                if u.get('ie') is not None and abs(exp_ie - u['ie']) > 0.2:
+                    errs.append(f'E company_full/{p}.ie {u.get("ie")} != {exp_ie}')
+
     # C: kpis.json == kpiStrip (display) por linea
     FIELDS = [('ytd','units_sie.curr','units_ytd',2),('ytd','mercado_units.curr','mkt_ytd26',2),
               ('ytd','ms_units.curr','ms_ytd',0.1),('ytd','units_sie.ie','ie_ytd',0.2),

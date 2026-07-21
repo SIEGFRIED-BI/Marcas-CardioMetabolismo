@@ -196,7 +196,7 @@ Step 'brandKpis rec.ms' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-rec.py')
 
 # 15-16. Etiquetas + Total Siegfried (consolidado) + cache-busters
 Step 'finalize-labels' { & $py (Join-Path $PSScriptRoot 'finalize-labels.py') }
-Step 'total-siegfried' { & $py (Join-Path $PSScriptRoot 'build-total.py') }
+Step 'total-siegfried' { & $py (Join-Path $PSScriptRoot 'build-total.py') --master $master }
 Step 'cache-busters'   { & $py (Join-Path $PSScriptRoot 'bump-cache-busters.py') }
 
 # 17. Gates

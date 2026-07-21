@@ -93,6 +93,7 @@ body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--g50);colo
   <div class="sec" data-sec="resumen">
     <h2 id="resumen-h">Resumen · Compañía</h2>
     <div class="cards" id="cards"></div>
+    <div class="foot-note" id="resumen-note"></div>
   </div>
 
   <div class="sec" data-sec="venta" style="display:none">
@@ -133,7 +134,7 @@ body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--g50);colo
   </div>
 </div>
 
-<script src="./data.js?v=3a555d083c"></script>
+<script src="./data.js?v=c4dcc6afd7"></script>
 <script>
 const T = window.TOTAL_SIEGFRIED || {};
 const PERIOD_LABEL = {mensual:'Mensual', ytd:'YTD', trimestre:'Trimestre', semestre:'Semestre', mat:'MAT'};
@@ -160,9 +161,13 @@ function renderPeriods(){
 
 function renderCards(){
   const c = (T.company||{})[period] || {};
-  const u=c.units||{}, r=c.recetas||{}, ve=c.venta_est||{};
+  // IQVIA = compañía completa (ético, todos los productos Siegfried) si hay master → matchea Market Intelligence.
+  // Si no, cae al subset de tableros (deduplicado).
+  const cf = (T.company_full||{})[period];
+  const u = cf || c.units || {};
+  const r=c.recetas||{}, ve=c.venta_est||{};
   const pl = PERIOD_LABEL[period]||period;
-  document.getElementById('resumen-h').textContent = 'Resumen · Compañía · ' + pl;
+  document.getElementById('resumen-h').textContent = 'Resumen · Compañía · ' + pl + (cf?' · IQVIA compañía (ético)':'');
   const growthCls = (g)=> g==null?'':(g>=0?'up':'down');
   const cards = [
     {tag:'IQVIA · IE vs mercado', big:(u.ie==null?'s/d':u.ie.toFixed(1)), cls:ieCls(u.ie),
@@ -180,6 +185,9 @@ function renderCards(){
          cls:(ve.pct==null?'':(ve.pct>=100?'g':ve.pct>=90?'y':'r')),
          lbl:`${fmtU(ve.real)} de ${fmtU(ve.estimado)} u`, pill:'VTA INT'}),
   ];
+  document.getElementById('resumen-note').innerHTML = cf
+    ? 'IQVIA = <b>compañía completa</b>: todos los productos Siegfried en el mercado <b>ético</b> (manufacturer SIEGFRIED+SIDUS, mercados donde compite) — coincide con Market Intelligence (IE '+(u.ie||'')+'). Recetas y Venta = marcas en tableros. IE = crec. propio / crec. mercado.'
+    : 'IQVIA = marcas en tableros (deduplicado). IE = crec. propio / crec. mercado.';
   document.getElementById('cards').innerHTML = cards.map(k=>`
     <div class="card ${k.cls||''}">
       ${k.pill?`<span class="pill">${k.pill}</span>`:''}
