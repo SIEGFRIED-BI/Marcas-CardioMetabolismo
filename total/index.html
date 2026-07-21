@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Total Siegfried · Consolidado</title>
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+<link rel="shortcut icon" href="../assets/favicon/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/design-tokens.css?v=68547efd83">
+<style>
+:root{
+  --red:#B01E1E; --red-dark:#8B1515; --red-pale:#FEF2F2;
+  --green:#16a34a; --yellow:#d97706; --blue:#1f4ba6;
+  --g50:#F9FAFB; --g100:#F3F4F6; --g200:#E5E7EB; --g300:#D1D5DB;
+  --g400:#9CA3AF; --g500:#6B7280; --g600:#4B5563; --g700:#374151; --g900:#111827;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--g50);color:var(--g900);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+/* top bar */
+.topbar{background:linear-gradient(100deg,var(--red-dark),var(--red));color:#fff;padding:14px 0}
+.topbar .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.topbar a.back{color:#fff;text-decoration:none;font-weight:600;font-size:13px;opacity:.9}
+.topbar a.back:hover{opacity:1}
+.topbar h1{font-size:19px;font-weight:700;letter-spacing:.01em}
+.topbar .sub{font-size:12px;opacity:.85;font-weight:400}
+.topbar .asof{margin-left:auto;font-size:12px;opacity:.9;font-family:'IBM Plex Mono',monospace}
+/* period toggle */
+.periods{display:flex;gap:6px;padding:16px 0 4px;flex-wrap:wrap}
+.periods button{font-family:inherit;font-size:12px;font-weight:600;padding:7px 14px;border:1px solid var(--g300);
+  background:#fff;color:var(--g600);border-radius:8px;cursor:pointer;transition:.12s}
+.periods button:hover{border-color:var(--red);color:var(--red)}
+.periods button.on{background:var(--red);color:#fff;border-color:var(--red)}
+.periods .note{margin-left:auto;font-size:11px;color:var(--g500);align-self:center}
+/* section nav */
+.secnav{display:flex;gap:4px;border-bottom:2px solid var(--g200);margin:14px 0 4px;flex-wrap:wrap}
+.secnav button{font-family:inherit;font-size:13px;font-weight:600;padding:9px 16px;border:none;background:none;
+  color:var(--g500);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:.12s}
+.secnav button:hover{color:var(--g900)}
+.secnav button.on{color:var(--red);border-bottom-color:var(--red)}
+/* section */
+.sec{margin:8px 0 26px;overflow-x:auto}
+.sec h2{font-size:12px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.08em;margin:20px 0 12px;
+  display:flex;align-items:center;gap:8px}
+.sec h2::before{content:'';width:4px;height:14px;background:var(--red);border-radius:2px}
+/* kpi cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px}
+.card{background:#fff;border:1px solid var(--g200);border-radius:12px;padding:15px 16px;position:relative;overflow:hidden}
+.card .tag{font-size:9.5px;font-weight:700;color:var(--g400);letter-spacing:.06em;text-transform:uppercase}
+.card .big{font-size:30px;font-weight:700;line-height:1.05;margin:7px 0 3px;font-family:'IBM Plex Mono',monospace}
+.card .lbl{font-size:11px;color:var(--g500);font-weight:500}
+.card .foot{font-size:11px;color:var(--g600);margin-top:6px}
+.card.g .big{color:var(--green)} .card.y .big{color:var(--yellow)} .card.r .big{color:var(--red)}
+.card .pill{position:absolute;top:12px;right:12px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;
+  background:var(--g100);color:var(--g500);letter-spacing:.04em}
+.badge{font-size:11px;font-weight:600}
+.up{color:var(--green)} .down{color:var(--red)}
+/* line table */
+.ltbl{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--g200);border-radius:12px;overflow:hidden;font-size:13px}
+.ltbl thead th{background:var(--g50);color:var(--g600);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  padding:10px 12px;text-align:right;cursor:pointer;white-space:nowrap;border-bottom:2px solid var(--g200)}
+.ltbl thead th.l{text-align:left}
+.ltbl thead th:hover{color:var(--red)}
+.ltbl tbody td{padding:11px 12px;text-align:right;border-bottom:1px solid var(--g100);font-family:'IBM Plex Mono',monospace}
+.ltbl tbody td.l{text-align:left;font-family:'IBM Plex Sans',sans-serif;font-weight:600}
+.ltbl tbody tr:hover{background:var(--g50)}
+.ltbl tbody tr.tot{background:var(--red-pale);font-weight:700}
+.ltbl tbody tr.tot td{border-top:2px solid var(--red);border-bottom:none}
+.ltbl a{color:var(--g900);text-decoration:none} .ltbl a:hover{color:var(--red)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle}
+.ie-b{display:inline-block;min-width:44px;padding:2px 6px;border-radius:6px;font-weight:700;font-size:12px}
+.ie-g{background:#dcfce7;color:#15803d}.ie-y{background:#fef3c7;color:#b45309}.ie-r{background:#fee2e2;color:#b91c1c}
+.muted{color:var(--g400)}
+.foot-note{font-size:11px;color:var(--g500);margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <a class="back" href="../index.html">← HUB</a>
+  <div>
+    <h1>TOTAL SIEGFRIED <span class="sub">· consolidado 7 líneas</span></h1>
+  </div>
+  <div class="asof" id="asof"></div>
+</div></div>
+
+<div class="wrap">
+  <div class="periods" id="periods"></div>
+  <div class="secnav" id="secnav"></div>
+
+  <div class="sec" data-sec="resumen">
+    <h2 id="resumen-h">Resumen · Compañía</h2>
+    <div class="cards" id="cards"></div>
+  </div>
+
+  <div class="sec" data-sec="venta" style="display:none">
+    <h2 id="venta-h">Venta Interna · real vs Estimado</h2>
+    <table class="ltbl" id="vtbl"></table>
+    <div class="foot-note" id="vtbl-note"></div>
+  </div>
+
+  <div class="sec" data-sec="comparativa" style="display:none">
+    <h2>Comparativa por línea</h2>
+    <table class="ltbl" id="ltbl"></table>
+    <div class="foot-note" id="ltbl-note"></div>
+  </div>
+
+  <div class="sec" data-sec="mercado" style="display:none">
+    <h2 id="merc-h">Mercado IQVIA · Top marcas SIE</h2>
+    <table class="ltbl" id="mtbl"></table>
+    <div class="foot-note">Marcas SIE de toda la compañía, ordenables. Unidades e IE (relativo al mercado) IQVIA del período. Fuente IQVIA (AR_PM).</div>
+  </div>
+
+  <div class="sec" data-sec="recetas" style="display:none">
+    <h2 id="rec-h">Recetas · Top marcas SIE</h2>
+    <table class="ltbl" id="rtbl"></table>
+    <div class="foot-note">Recetas SIE por marca (CloseUp), ordenables. IE = crecimiento de recetas relativo al mercado. Recetas cierran en mayo 2026.</div>
+  </div>
+
+  <div class="sec" data-sec="stock" style="display:none">
+    <h2>Stock · Cobertura consolidada</h2>
+    <div class="cards" id="stock-cards"></div>
+    <table class="ltbl" id="stbl" style="margin-top:14px"></table>
+    <div class="foot-note" id="stbl-note"></div>
+  </div>
+
+  <div class="sec" data-sec="convenios" style="display:none">
+    <h2>Convenios · por Obra Social</h2>
+    <table class="ltbl" id="ctbl"></table>
+    <div class="foot-note">Unidades por obra social sumadas de las 7 líneas (nombres normalizados). El ranking por unidades es robusto; el Δ vs período anterior es indicativo (dermato usa ventana productizada distinta al resto).</div>
+  </div>
+</div>
+
+<script src="./data.js?v=3a555d083c"></script>
+<script>
+const T = window.TOTAL_SIEGFRIED || {};
+const PERIOD_LABEL = {mensual:'Mensual', ytd:'YTD', trimestre:'Trimestre', semestre:'Semestre', mat:'MAT'};
+const PERIODS = (T.periods||['mensual','ytd','trimestre','mat']).filter(p=>p!=='semestre');
+let period = PERIODS.includes('ytd') ? 'ytd' : PERIODS[0];
+let sort = {col:'ms_units', dir:'desc'};
+
+const fmtN = n => n==null ? '—' : Math.round(n).toLocaleString('es-AR');
+const fmtU = n => n==null ? '—' : (Math.abs(n)>=1e6 ? (n/1e6).toFixed(2)+'M' : Math.round(n).toLocaleString('es-AR'));
+const fmtP = n => n==null ? '—' : n.toFixed(1)+'%';
+const ieCls = ie => ie==null ? '' : (ie>=100?'ie-g':ie>=90?'ie-y':'ie-r');
+const ieBadge = ie => ie==null ? '<span class="muted">s/d</span>' : `<span class="ie-b ${ieCls(ie)}">${ie.toFixed(1)}</span>`;
+const asofIQVIA = (T.byLine&&T.byLine[0]&&T.byLine[0].iqvia_through)||T.as_of_month||'';
+const asofRec = (T.byLine&&T.byLine[0]&&T.byLine[0].recetas_through)||'';
+
+document.getElementById('asof').textContent = 'IQVIA ' + asofIQVIA + (asofRec?('  ·  Recetas '+asofRec):'');
+
+function renderPeriods(){
+  const el=document.getElementById('periods');
+  el.innerHTML = PERIODS.map(p=>`<button data-p="${p}" class="${p===period?'on':''}">${PERIOD_LABEL[p]||p}</button>`).join('')
+    + `<span class="note">Share = del mercado direccionable (unión de los 7 mercados) · IE relativo al mercado</span>`;
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{period=b.dataset.p;renderAll();});
+}
+
+function renderCards(){
+  const c = (T.company||{})[period] || {};
+  const u=c.units||{}, r=c.recetas||{}, ve=c.venta_est||{};
+  const pl = PERIOD_LABEL[period]||period;
+  document.getElementById('resumen-h').textContent = 'Resumen · Compañía · ' + pl;
+  const growthCls = (g)=> g==null?'':(g>=0?'up':'down');
+  const cards = [
+    {tag:'IQVIA · IE vs mercado', big:(u.ie==null?'s/d':u.ie.toFixed(1)), cls:ieCls(u.ie),
+     lbl: u.ie==null?'sin comparable':(u.ie>=100?'▲ sobre el mercado':'▼ bajo el mercado'), pill:'IQVIA'},
+    {tag:'IQVIA · MS%', big:fmtP(u.ms), lbl:'del mercado direccionable',
+     foot:`mercado ${fmtU(u.mkt_curr)} u`, pill:'IQVIA'},
+    {tag:'IQVIA · Unidades SIE', big:fmtU(u.sie_curr), lbl:pl,
+     foot:`<span class="badge ${growthCls(u.growth)}">${u.growth==null?'':(u.growth>=0?'+':'')+u.growth+'%'}</span> vs año ant.`, pill:'IQVIA'},
+    {tag:'Recetas · MS%', big:fmtP(r.ms), lbl:'del mercado',
+     foot:`IE ${ieBadge(r.ie)} · ${fmtN(r.sie_curr)} rec`, pill:'RECETAS'},
+    (period==='mat'
+      ? {tag:'Venta interna (real)', big:fmtU(ve.real)+' u', lbl:'MAT · '+pl,
+         foot:'<span class="muted">% vs estimado no disponible en MAT (estimado 2025 parcial)</span>', pill:'VTA INT'}
+      : {tag:'Venta vs Estimado', big:(ve.pct==null?'—':ve.pct.toFixed(1)+'%'),
+         cls:(ve.pct==null?'':(ve.pct>=100?'g':ve.pct>=90?'y':'r')),
+         lbl:`${fmtU(ve.real)} de ${fmtU(ve.estimado)} u`, pill:'VTA INT'}),
+  ];
+  document.getElementById('cards').innerHTML = cards.map(k=>`
+    <div class="card ${k.cls||''}">
+      ${k.pill?`<span class="pill">${k.pill}</span>`:''}
+      <div class="tag">${k.tag}</div>
+      <div class="big">${k.big}</div>
+      <div class="lbl">${k.lbl||''}</div>
+      ${k.foot?`<div class="foot">${k.foot}</div>`:''}
+    </div>`).join('');
+}
+
+function lineRow(L){
+  const k=(L.kpis||{})[period]||{};
+  const u=k.units_sie||{}, mu=k.mercado_units||{}, ms=k.ms_units||{}, rec=k.ms_recetas||{}, ur=k.units_sie;
+  const ve=(L.venta_est||{})[period]||{};
+  const iqIe = u.ie!=null?u.ie:null;
+  // IE de la linea: viene por linea en kpis (units_sie.ie es relativo? usar el del build). Usamos ie del units_sie.
+  return {
+    key:L.key, name:L.name, color:L.color||'#999', href:L.href,
+    ie: (k.units_sie||{}).ie, ms_units:(k.ms_units||{}).curr,
+    growth: (u.curr&&u.prev)? (u.curr/u.prev-1)*100 : null,
+    sie: u.curr, ms_rec:(k.ms_recetas||{}).curr, venta_pct: ve.pct, venta_real: ve.real
+  };
+}
+
+function renderTable(){
+  const rows = (T.byLine||[]).map(lineRow);
+  const c=(T.company||{})[period]||{};
+  const cols = [
+    {k:'name', t:'Línea', l:true},
+    {k:'ie', t:'IE IQVIA'},
+    {k:'ms_units', t:'MS% IQVIA'},
+    {k:'growth', t:'Crec. SIE'},
+    {k:'sie', t:'Unid. SIE'},
+    {k:'ms_rec', t:'MS% Rec'},
+    {k:'venta_pct', t:'Vta/Est'},
+  ];
+  rows.sort((a,b)=>{
+    let av=a[sort.col], bv=b[sort.col];
+    if(sort.col==='name'){ return sort.dir==='asc'? a.name.localeCompare(b.name): b.name.localeCompare(a.name); }
+    av=av==null?-Infinity:av; bv=bv==null?-Infinity:bv;
+    return sort.dir==='asc'? av-bv : bv-av;
+  });
+  const arrow = k => sort.col===k ? (sort.dir==='asc'?' ▲':' ▼') : '';
+  const head = '<thead><tr>'+cols.map(c=>`<th data-c="${c.k}" class="${c.l?'l':''}">${c.t}${arrow(c.k)}</th>`).join('')+'</tr></thead>';
+  const body = rows.map(r=>`<tr>
+      <td class="l"><span class="dot" style="background:${r.color}"></span><a href="../${r.href||''}">${r.name}</a></td>
+      <td>${ieBadge(r.ie)}</td>
+      <td>${fmtP(r.ms_units)}</td>
+      <td class="${r.growth==null?'':(r.growth>=0?'up':'down')}">${r.growth==null?'—':(r.growth>=0?'+':'')+r.growth.toFixed(1)+'%'}</td>
+      <td>${fmtN(r.sie)}</td>
+      <td>${fmtP(r.ms_rec)}</td>
+      <td>${r.venta_pct==null?'<span class="muted">—</span>':fmtP(r.venta_pct)}</td>
+    </tr>`).join('');
+  const u=c.units||{}, r=c.recetas||{}, ve=c.venta_est||{};
+  const totRow = `<tr class="tot">
+      <td class="l">TOTAL SIEGFRIED</td>
+      <td>${ieBadge(u.ie)}</td>
+      <td>${fmtP(u.ms)}</td>
+      <td class="${u.growth==null?'':(u.growth>=0?'up':'down')}">${u.growth==null?'—':(u.growth>=0?'+':'')+u.growth+'%'}</td>
+      <td>${fmtN(u.sie_curr)}</td>
+      <td>${fmtP(r.ms)}</td>
+      <td>${period==='mat'?'<span class="muted">s/d</span>':fmtP(ve.pct)}</td>
+    </tr>`;
+  const tbl=document.getElementById('ltbl');
+  tbl.innerHTML = head + '<tbody>'+body+totRow+'</tbody>';
+  tbl.querySelectorAll('th[data-c]').forEach(th=>th.onclick=()=>{
+    const c=th.dataset.c; sort={col:c, dir:(sort.col===c&&sort.dir==='desc')?'asc':'desc'}; renderTable();
+  });
+  var shared = (T.dedup_info&&T.dedup_info.sie_shared)||[];
+  document.getElementById('ltbl-note').innerHTML =
+    'IE = crecimiento propio relativo al del mercado (100 = igual que el mercado). MS% = participación en el mercado direccionable. '
+    + '<b>El TOTAL deduplica</b>: cada producto y mercado se cuenta una sola vez (cifra real de compañía), por eso puede ser menor que la suma de las filas '
+    + (shared.length?('— respi y dermato comparten el mercado de mometasona ('+shared.join(', ')+'). '):'. ')
+    + (period==='mat'?'Vta/Est en MAT no se muestra: el estimado 2025 está parcial.':'Vta/Est = venta real vs estimado del período.');
+}
+
+// ---- section nav ----
+let section = 'resumen';
+const SECTIONS = [{k:'resumen',t:'Resumen'},{k:'comparativa',t:'Comparativa'},
+  {k:'mercado',t:'Mercado IQVIA'},{k:'recetas',t:'Recetas'},{k:'venta',t:'Venta Interna'},
+  {k:'stock',t:'Stock'},{k:'convenios',t:'Convenios'}];
+function renderSecnav(){
+  const el=document.getElementById('secnav');
+  el.innerHTML=SECTIONS.map(s=>`<button data-s="${s.k}" class="${s.k===section?'on':''}">${s.t}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=>b.onclick=()=>{section=b.dataset.s; applySection(); renderSecnav();});
+}
+function applySection(){
+  document.querySelectorAll('.sec[data-sec]').forEach(d=>{ d.style.display=(d.dataset.sec===section)?'':'none'; });
+}
+
+// ---- Venta Interna (tabla mensual por línea) ----
+const MES_AR=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+let vsort={col:'ytd',dir:'desc'};
+function lastVentaIdx(){ const r=(T.company_venta_monthly||{}).real||[]; let l=-1; for(let i=0;i<r.length;i++) if(r[i]) l=i; return l<0?5:l; }
+function renderVenta(){
+  const li=lastVentaIdx();
+  document.getElementById('venta-h').textContent='Venta Interna · real vs Estimado · 2026 (Ene–'+MES_AR[li]+')';
+  const cols=[]; for(let i=0;i<=li;i++) cols.push({k:''+i,t:MES_AR[i]});
+  const rows=(T.byLine||[]).map(L=>{ const mo=L.venta_monthly||{real:[]}; const ve=(L.venta_est||{}).ytd||{};
+    return {name:L.name,color:L.color||'#999',href:L.href,real:mo.real||[],ytd:ve.real,est:ve.estimado,pct:ve.pct}; });
+  rows.sort((a,b)=>{ let av,bv;
+    if(vsort.col==='name') return vsort.dir==='asc'?a.name.localeCompare(b.name):b.name.localeCompare(a.name);
+    if(vsort.col==='ytd'){av=a.ytd;bv=b.ytd;} else if(vsort.col==='pct'){av=a.pct;bv=b.pct;} else if(vsort.col==='est'){av=a.est;bv=b.est;}
+    else {const i=+vsort.col; av=a.real[i];bv=b.real[i];}
+    av=av==null?-Infinity:av;bv=bv==null?-Infinity:bv; return vsort.dir==='asc'?av-bv:bv-av; });
+  const ar=c=>vsort.col==c?(vsort.dir==='asc'?' ▲':' ▼'):'';
+  const cell=v=>v==null?'—':Math.round(v).toLocaleString('es-AR');
+  const pc=p=>p==null?'':(p>=100?'up':(p>=90?'':'down'));
+  const head='<thead><tr><th data-v="name" class="l">Línea'+ar('name')+'</th>'
+    +cols.map(c=>`<th data-v="${c.k}">${c.t}${ar(c.k)}</th>`).join('')
+    +`<th data-v="ytd">YTD${ar('ytd')}</th><th data-v="est">Estimado${ar('est')}</th><th data-v="pct">%${ar('pct')}</th></tr></thead>`;
+  const body=rows.map(r=>`<tr>
+    <td class="l"><span class="dot" style="background:${r.color}"></span><a href="../${r.href||''}">${r.name}</a></td>
+    ${cols.map(c=>`<td>${cell(r.real[+c.k])}</td>`).join('')}
+    <td><b>${cell(r.ytd)}</b></td><td>${cell(r.est)}</td>
+    <td class="${pc(r.pct)}">${r.pct==null?'—':r.pct.toFixed(1)+'%'}</td></tr>`).join('');
+  const cm=T.company_venta_monthly||{real:[]}, cve=((T.company||{}).ytd||{}).venta_est||{};
+  const tot=`<tr class="tot"><td class="l">TOTAL SIEGFRIED</td>
+    ${cols.map(c=>`<td>${cell((cm.real||[])[+c.k])}</td>`).join('')}
+    <td>${cell(cve.real)}</td><td>${cell(cve.estimado)}</td>
+    <td class="${pc(cve.pct)}">${cve.pct==null?'—':cve.pct.toFixed(1)+'%'}</td></tr>`;
+  const t=document.getElementById('vtbl'); t.innerHTML=head+'<tbody>'+body+tot+'</tbody>';
+  t.querySelectorAll('th[data-v]').forEach(th=>th.onclick=()=>{const c=th.dataset.v; vsort={col:c,dir:(vsort.col===c&&vsort.dir==='desc')?'asc':'desc'}; renderVenta();});
+  document.getElementById('vtbl-note').innerHTML='Venta interna (unidades): <b>real</b> desde Qlik (Rofina) · <b>Estimado</b> desde el archivo de MKT (Estimados VENTA vigentes MKT). La venta no se solapa entre líneas → el TOTAL es la suma exacta de las 7.';
+}
+
+// ---- Mercado IQVIA · top marcas ----
+let msort2={col:'units',dir:'desc'};
+function prodRows(metricKeys){
+  return (T.products||[]).map(p=>{ const d=(p.periods||{})[period]||(p.periods||{}).ytd||{};
+    return {name:p.name,line:p.lineName,units:d.units_curr,uie:d.units_ie,vta:d.int_curr,rec:d.rec_curr,rie:d.rec_ie}; });
+}
+function sortRows(rows,s){ rows.sort((a,b)=>{ if(s.col==='name'||s.col==='line'){var x=''+(a[s.col]||''),y=''+(b[s.col]||'');return s.dir==='asc'?x.localeCompare(y):y.localeCompare(x);}
+  var av=a[s.col],bv=b[s.col]; av=av==null?-Infinity:av;bv=bv==null?-Infinity:bv; return s.dir==='asc'?av-bv:bv-av; }); }
+function sortableTable(elId, cols, rows, s, onsort){
+  const ar=k=>s.col===k?(s.dir==='asc'?' ▲':' ▼'):'';
+  const head='<thead><tr>'+cols.map(c=>`<th data-c="${c.k}" class="${c.l?'l':''}">${c.t}${ar(c.k)}</th>`).join('')+'</tr></thead>';
+  const body=rows.map(r=>'<tr>'+cols.map(c=>c.render(r)).join('')+'</tr>').join('');
+  const t=document.getElementById(elId); t.innerHTML=head+'<tbody>'+body+'</tbody>';
+  t.querySelectorAll('th[data-c]').forEach(th=>th.onclick=()=>{const c=th.dataset.c; onsort({col:c,dir:(s.col===c&&s.dir==='desc')?'asc':'desc'});});
+}
+function renderMercado(){
+  document.getElementById('merc-h').textContent='Mercado IQVIA · Top marcas SIE · '+(PERIOD_LABEL[period]||period);
+  const rows=prodRows().filter(r=>r.units!=null); sortRows(rows,msort2);
+  sortableTable('mtbl',[
+    {k:'name',t:'Marca',l:true,render:r=>`<td class="l">${r.name}</td>`},
+    {k:'line',t:'Línea',l:true,render:r=>`<td class="l"><span class="muted">${r.line||''}</span></td>`},
+    {k:'units',t:'Unid. SIE',render:r=>`<td>${fmtN(r.units)}</td>`},
+    {k:'uie',t:'IE IQVIA',render:r=>`<td>${ieBadge(r.uie)}</td>`},
+    {k:'vta',t:'Venta int.',render:r=>`<td>${fmtN(r.vta)}</td>`},
+    {k:'rec',t:'Recetas',render:r=>`<td>${fmtN(r.rec)}</td>`},
+  ],rows,msort2,ns=>{msort2=ns;renderMercado();});
+}
+// ---- Recetas · top marcas ----
+let rsort={col:'rec',dir:'desc'};
+function renderRecetasTop(){
+  document.getElementById('rec-h').textContent='Recetas · Top marcas SIE · '+(PERIOD_LABEL[period]||period);
+  const rows=prodRows().filter(r=>r.rec!=null&&r.rec>0); sortRows(rows,rsort);
+  sortableTable('rtbl',[
+    {k:'name',t:'Marca',l:true,render:r=>`<td class="l">${r.name}</td>`},
+    {k:'line',t:'Línea',l:true,render:r=>`<td class="l"><span class="muted">${r.line||''}</span></td>`},
+    {k:'rec',t:'Recetas SIE',render:r=>`<td>${fmtN(r.rec)}</td>`},
+    {k:'rie',t:'IE Recetas',render:r=>`<td>${ieBadge(r.rie)}</td>`},
+    {k:'units',t:'Unid. IQVIA',render:r=>`<td>${fmtN(r.units)}</td>`},
+  ],rows,rsort,ns=>{rsort=ns;renderRecetasTop();});
+}
+// ---- Stock / Cobertura ----
+function renderStock(){
+  const st=T.stock||{totals:{},by_line:[],alerts:[]}; const tt=st.totals||{};
+  const CS={quiebre:['Quiebre','r'],critico:['Crítico','r'],bajo:['Bajo','y'],alerta:['Alerta',''],ok:['OK','g']};
+  document.getElementById('stock-cards').innerHTML=Object.keys(CS).map(k=>`
+    <div class="card ${CS[k][1]}"><div class="tag">${CS[k][0]}</div><div class="big">${tt[k]||0}</div><div class="lbl">familias</div></div>`).join('');
+  // tabla por linea
+  const cols=['quiebre','critico','bajo','alerta','ok','total'];
+  const head='<thead><tr><th class="l">Línea</th>'+cols.map(c=>`<th>${CS[c]?CS[c][0]:'Total'}</th>`).join('')+'</tr></thead>';
+  const body=(st.by_line||[]).map(l=>`<tr><td class="l">${l.name}</td>`+cols.map(c=>`<td>${l[c]||0}</td>`).join('')+'</tr>').join('');
+  const totRow='<tr class="tot"><td class="l">TOTAL</td>'+cols.map(c=>`<td>${c==='total'?Object.values(tt).reduce((a,b)=>a+b,0):(tt[c]||0)}</td>`).join('')+'</tr>';
+  document.getElementById('stbl').innerHTML=head+'<tbody>'+body+totRow+'</tbody>';
+  const al=(st.alerts||[]).slice(0,20).map(a=>`<span class="ie-b ${a.status==='bajo'?'ie-y':'ie-r'}" style="margin:2px 4px 2px 0;display:inline-block">${a.familia} · ${a.line}</span>`).join('');
+  document.getElementById('stbl-note').innerHTML='Familias por peor-estado de cobertura, consolidado de las 7 líneas. En alerta (quiebre/crítico/bajo): '+al;
+}
+// ---- Convenios por OS ----
+let cvsort={col:'unid',dir:'desc'};
+function renderConvenios(){
+  const rows=(T.convenios||[]).map(c=>({os:c.os,unid:c.unid,unid24:c.unid24,delta:c.delta})); sortRows(rows,cvsort);
+  sortableTable('ctbl',[
+    {k:'os',t:'Obra Social',l:true,render:r=>`<td class="l">${r.os}</td>`},
+    {k:'unid',t:'Unidades',render:r=>`<td>${fmtN(r.unid)}</td>`},
+    {k:'unid24',t:'Período ant.',render:r=>`<td>${fmtN(r.unid24)}</td>`},
+    {k:'delta',t:'Δ %',render:r=>`<td class="${r.delta==null?'':(r.delta>=0?'up':'down')}">${r.delta==null?'—':(r.delta>=0?'+':'')+r.delta+'%'}</td>`},
+  ],rows,cvsort,ns=>{cvsort=ns;renderConvenios();});
+}
+
+function renderAll(){ renderPeriods(); renderSecnav(); renderCards(); renderVenta(); renderTable();
+  renderMercado(); renderRecetasTop(); renderStock(); renderConvenios(); applySection(); }
+renderAll();
+</script>
+</body>
+</html>

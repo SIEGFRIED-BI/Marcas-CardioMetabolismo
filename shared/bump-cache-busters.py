@@ -26,6 +26,7 @@ PAGES = [
     'cardio/index.html', 'ATB/index.html', 'OTC/index.html',
     'respiratorio/index.html', 'mujer/index.html', 'SNC/index.html',
     'dermatologia/dermato_dashboard.html', 'kpis.html', 'index.html',
+    'total/index.html',   # Total Siegfried (consolidado) — versiona su ./data.js
     # Paginas DDD (cargan ../data.js o ./data.js + ./app.js; sin buster el
     # navegador sirve un data.js viejo cacheado -> paginas en blanco tras deploys)
     'cardio/DDD/index.html', 'ATB/DDD/index.html', 'OTC/DDD/index.html',

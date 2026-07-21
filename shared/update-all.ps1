@@ -194,8 +194,9 @@ Step 'canales trimestral' { & $py (Join-Path $PSScriptRoot 'build-canales-quarte
 # brandKpis[marca].rec.ms: rellena desde rec_ms si quedó en 0 con dato (MOMETAX). Idempotente.
 Step 'brandKpis rec.ms' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-rec.py') }
 
-# 15-16. Etiquetas + cache-busters
+# 15-16. Etiquetas + Total Siegfried (consolidado) + cache-busters
 Step 'finalize-labels' { & $py (Join-Path $PSScriptRoot 'finalize-labels.py') }
+Step 'total-siegfried' { & $py (Join-Path $PSScriptRoot 'build-total.py') }
 Step 'cache-busters'   { & $py (Join-Path $PSScriptRoot 'bump-cache-busters.py') }
 
 # 17. Gates
@@ -215,6 +216,7 @@ foreach ($g in @(
     @{n='conv-dup';s='dedup-convenios-exact.py';        a=@('--check')},
     @{n='bk-rec';  s='fix-brandkpis-rec.py';            a=@('--check')},
     @{n='audit';   s='audit-full.py';                   a=@()},
+    @{n='total';   s='check-total-consistency.py';      a=@()},
     @{n='history'; s='verify-history-preserved.py';     a=@('--baseline','HEAD','--strict')}
 )) {
   $gp = Join-Path $PSScriptRoot $g.s
