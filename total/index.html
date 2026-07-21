@@ -222,7 +222,7 @@ function renderTable(){
     {k:'growth', t:'Crec. SIE'},
     {k:'sie', t:'Unid. SIE'},
     {k:'ms_rec', t:'MS% Rec'},
-    {k:'venta_pct', t:'Vta/Est'},
+    {k:'venta_pct', t:(period==='mat'?'Venta real':'Vta/Est')},
   ];
   rows.sort((a,b)=>{
     let av=a[sort.col], bv=b[sort.col];
@@ -239,29 +239,34 @@ function renderTable(){
       <td class="${r.growth==null?'':(r.growth>=0?'up':'down')}">${r.growth==null?'—':(r.growth>=0?'+':'')+r.growth.toFixed(1)+'%'}</td>
       <td>${fmtN(r.sie)}</td>
       <td>${fmtP(r.ms_rec)}</td>
-      <td>${r.venta_pct==null?'<span class="muted">—</span>':fmtP(r.venta_pct)}</td>
+      <td>${period==='mat' ? (r.venta_real!=null?fmtU(r.venta_real):'<span class="muted">—</span>') : (r.venta_pct==null?'<span class="muted">—</span>':fmtP(r.venta_pct))}</td>
     </tr>`).join('');
   const u=c.units||{}, r=c.recetas||{}, ve=c.venta_est||{};
+  const cf=(T.company_full||{})[period]||null;
+  // TOTAL = compañía real Siegfried en IQVIA (company_full) → coincide con Resumen y Market Intelligence.
+  // MS% del total sobre el mercado direccionable (ms_adr) para ser comparable con el MS% por línea.
+  const tu = cf ? {ie:cf.ie, ms:(cf.ms_adr!=null?cf.ms_adr:cf.ms), growth:cf.growth, sie_curr:cf.sie_curr} : u;
   const totRow = `<tr class="tot">
-      <td class="l">TOTAL SIEGFRIED</td>
-      <td>${ieBadge(u.ie)}</td>
-      <td>${fmtP(u.ms)}</td>
-      <td class="${u.growth==null?'':(u.growth>=0?'up':'down')}">${u.growth==null?'—':(u.growth>=0?'+':'')+u.growth+'%'}</td>
-      <td>${fmtN(u.sie_curr)}</td>
+      <td class="l">TOTAL SIEGFRIED${cf?' <span class="muted" style="font-weight:400">· compañía IQVIA</span>':''}</td>
+      <td>${ieBadge(tu.ie)}</td>
+      <td>${fmtP(tu.ms)}</td>
+      <td class="${tu.growth==null?'':(tu.growth>=0?'up':'down')}">${tu.growth==null?'—':(tu.growth>=0?'+':'')+tu.growth+'%'}</td>
+      <td>${fmtN(tu.sie_curr)}</td>
       <td>${fmtP(r.ms)}</td>
-      <td>${period==='mat'?'<span class="muted">s/d</span>':fmtP(ve.pct)}</td>
+      <td>${period==='mat'? (ve.real!=null?fmtU(ve.real):'<span class="muted">s/d</span>') : fmtP(ve.pct)}</td>
     </tr>`;
   const tbl=document.getElementById('ltbl');
   tbl.innerHTML = head + '<tbody>'+body+totRow+'</tbody>';
   tbl.querySelectorAll('th[data-c]').forEach(th=>th.onclick=()=>{
     const c=th.dataset.c; sort={col:c, dir:(sort.col===c&&sort.dir==='desc')?'asc':'desc'}; renderTable();
   });
-  var shared = (T.dedup_info&&T.dedup_info.sie_shared)||[];
   document.getElementById('ltbl-note').innerHTML =
     'IE = crecimiento propio relativo al del mercado (100 = igual que el mercado). MS% = participación en el mercado direccionable. '
-    + '<b>El TOTAL deduplica</b>: cada producto y mercado se cuenta una sola vez (cifra real de compañía), por eso puede ser menor que la suma de las filas '
-    + (shared.length?('— respi y dermato comparten el mercado de mometasona ('+shared.join(', ')+'). '):'. ')
-    + (period==='mat'?'Vta/Est en MAT no se muestra: el estimado 2025 está parcial.':'Vta/Est = venta real vs estimado del período.');
+    + (cf
+        ? '<b>El TOTAL = compañía real Siegfried en IQVIA</b> (todos los productos manufacturer SIEGFRIED del ético) → coincide con el Resumen y con Market Intelligence (IE '+(cf.ie!=null?cf.ie.toFixed(1):'s/d')+'). Por eso <b>supera la suma de las 7 líneas</b> de tablero, que son un subconjunto: la suma deduplicada de esas 7 líneas es '+fmtU((u.sie_curr)||0)+' u (IE '+(u.ie!=null?u.ie.toFixed(1):'s/d')+'). '
+        : '<b>El TOTAL deduplica</b>: cada producto y mercado se cuenta una sola vez, por eso puede ser menor que la suma de las filas. ')
+    + 'Recetas y Venta = marcas en tableros. '
+    + (period==='mat'?'En MAT la última columna muestra la <b>venta real</b> (el estimado 2025 está parcial, no permite calcular % de cumplimiento).':'Vta/Est = venta real vs estimado del período.');
 }
 
 // ---- section nav ----
