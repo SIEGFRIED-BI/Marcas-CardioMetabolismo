@@ -134,7 +134,7 @@ body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--g50);colo
   </div>
 </div>
 
-<script src="./data.js?v=971b27884f"></script>
+<script src="./data.js?v=b0acf8e429"></script>
 <script>
 const T = window.TOTAL_SIEGFRIED || {};
 const PERIOD_LABEL = {mensual:'Mensual', ytd:'YTD', trimestre:'Trimestre', semestre:'Semestre', mat:'MAT'};
@@ -172,8 +172,8 @@ function renderCards(){
   const cards = [
     {tag:'IQVIA · IE vs mercado', big:(u.ie==null?'s/d':u.ie.toFixed(1)), cls:ieCls(u.ie),
      lbl: u.ie==null?'sin comparable':(u.ie>=100?'▲ sobre el mercado':'▼ bajo el mercado'), pill:'IQVIA'},
-    {tag:'IQVIA · MS%', big:fmtP(u.ms), lbl:'del mercado direccionable',
-     foot:`mercado ${fmtU(u.mkt_curr)} u`, pill:'IQVIA'},
+    {tag:'IQVIA · MS%', big:fmtP(u.ms), lbl:'del mercado ético total',
+     foot:`ético ${fmtU(u.mkt_curr)} u`+(u.ms_adr!=null?` · en sus mercados ${u.ms_adr.toFixed(1)}%`:''), pill:'IQVIA'},
     {tag:'IQVIA · Unidades SIE', big:fmtU(u.sie_curr), lbl:pl,
      foot:`<span class="badge ${growthCls(u.growth)}">${u.growth==null?'':(u.growth>=0?'+':'')+u.growth+'%'}</span> vs año ant.`, pill:'IQVIA'},
     {tag:'Recetas · MS%', big:fmtP(r.ms), lbl:'del mercado',
@@ -186,7 +186,7 @@ function renderCards(){
          lbl:`${fmtU(ve.real)} de ${fmtU(ve.estimado)} u`, pill:'VTA INT'}),
   ];
   document.getElementById('resumen-note').innerHTML = cf
-    ? 'IQVIA = <b>compañía completa</b>: todos los productos Siegfried en el mercado <b>ético</b> (manufacturer SIEGFRIED+SIDUS, mercados donde compite) — coincide con Market Intelligence (IE '+(u.ie||'')+'). Recetas y Venta = marcas en tableros. IE = crec. propio / crec. mercado.'
+    ? 'IQVIA = <b>compañía completa</b> (todos los productos Siegfried, manufacturer SIEGFRIED+SIDUS). <b>MS% sobre el mercado ÉTICO total sin leches</b> ('+fmtU(u.mkt_curr)+' u) → '+fmtP(u.ms)+'; en los mercados donde compite, '+(u.ms_adr!=null?u.ms_adr.toFixed(1)+'%':'—')+'. IE '+(u.ie||'')+' (crec. propio / crec. mercado). Recetas y Venta = marcas en tableros.'
     : 'IQVIA = marcas en tableros (deduplicado). IE = crec. propio / crec. mercado.';
   document.getElementById('cards').innerHTML = cards.map(k=>`
     <div class="card ${k.cls||''}">

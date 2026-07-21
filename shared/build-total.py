@@ -106,30 +106,39 @@ def company_iqvia(master_path):
                   [f'{m} 2024' for m in M[6:]]+[f'{m} 2025' for m in M[:6]])}
     def wsum(row, keys): return sum((row[col[k]] or 0) for k in keys if k in col and col[k] < len(row) and isinstance(row[col[k]], (int, float)))
     rows = []; sie_mols = set()
+    LECHE = ('LECHE', 'MILK', 'INFANT', 'MATERNIZ', 'FORMULA INFANT', 'NUTRIC')
+    n_leche = 0
     for row in ws.iter_rows(min_row=2, values_only=True):
         if str(row[ci['mkt']] or '').strip().upper() != 'ETICO': continue
         mf = str(row[ci['mf']] or '').upper(); mol = str(row[ci['mol']] or '').strip().upper()
         prod = str(row[ci['prod']] or '').strip(); atc = str(row[ci.get('atc', -1)] or '').strip() if 'atc' in ci else ''
+        txt = (prod + ' ' + mol + ' ' + atc).upper()
+        if atc.upper().startswith('V06') or any(w in txt for w in LECHE):  # sin leches / nutrición
+            n_leche += 1; continue
         issie = 'SIEGFRIED' in mf or 'SIDUS' in mf
         pv = {per: (wsum(row, cw), wsum(row, pw)) for per, (cw, pw) in WIN.items()}
         rows.append((issie, mol, prod, atc, pv))
         if issie and mol: sie_mols.add(mol)
     wb.close()
-    # mercado por molécula (todos los ético) + agregado (mercados donde Siegfried compite)
+    # mercado por molécula (todos los ético sin leches)
     mol_mkt = defaultdict(lambda: {per: [0.0, 0.0] for per in WIN})
     for issie, mol, prod, atc, pv in rows:
         for per in WIN:
             mol_mkt[mol][per][0] += pv[per][0]; mol_mkt[mol][per][1] += pv[per][1]
     agg = {}
     for per in WIN:
-        mc = sum(mol_mkt[m][per][0] for m in sie_mols); mp = sum(mol_mkt[m][per][1] for m in sie_mols)
+        # MERCADO = ÉTICO SIN LECHES COMPLETO (todos los productos, no solo donde Siegfried compite)
+        mc = sum(mol_mkt[m][per][0] for m in mol_mkt); mp = sum(mol_mkt[m][per][1] for m in mol_mkt)
+        # secundario: mercado direccionable (moléculas donde Siegfried compite)
+        adr_c = sum(mol_mkt[m][per][0] for m in sie_mols); adr_p = sum(mol_mkt[m][per][1] for m in sie_mols)
         sc = sum(pv[per][0] for issie, mol, prod, atc, pv in rows if issie)
         sp = sum(pv[per][1] for issie, mol, prod, atc, pv in rows if issie)
         agg[per] = {'sie_curr': round(sc), 'sie_prev': round(sp), 'mkt_curr': round(mc), 'mkt_prev': round(mp),
                     'ie': ie_rel(sc, sp, mc, mp), 'ms': pct(sc, mc), 'ms_prev': pct(sp, mp),
                     'growth': round((sc / sp - 1) * 100, 1) if sp else None,
-                    'mkt_growth': round((mc / mp - 1) * 100, 1) if mp else None}
-    agg['_universe'] = 'ETICO · manufacturer SIEGFRIED+SIDUS · mercados-molécula Siegfried'
+                    'mkt_growth': round((mc / mp - 1) * 100, 1) if mp else None,
+                    'mkt_adr_curr': round(adr_c), 'ms_adr': pct(sc, adr_c)}  # mercado direccionable
+    agg['_universe'] = 'ETICO sin leches · Siegfried = SIEGFRIED+SIDUS · MS% sobre ético total'
     # productos Siegfried (TODOS), agregados por nombre, con IE/MS por su mercado-molécula
     pd = defaultdict(lambda: {'mol': None, 'atc': None, 'per': {per: [0.0, 0.0] for per in WIN}})
     for issie, mol, prod, atc, pv in rows:
