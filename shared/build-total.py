@@ -70,16 +70,17 @@ IQV_WINDOWS = {
 }
 
 
-def company_iqvia_full(master_path):
-    """IQVIA COMPAÑÍA COMPLETA (no solo los productos de los tableros), replicando
-    el tablero Market Intelligence: universo ÉTICO, Siegfried = manufacturer
-    SIEGFRIED+SIDUS ('Con Sidus'), mercado = las moléculas donde Siegfried compite.
-    IE = crec. propio / crec. mercado; MS% = propio/mercado. Da IE MAT 99 / YTD 97
-    (jun-2026), = MI. Devuelve por período o None si no hay master."""
+def company_iqvia(master_path):
+    """IQVIA sobre el REAL Siegfried (TODOS sus productos en IQVIA, no solo los de
+    los tableros), replicando Market Intelligence: universo ÉTICO, Siegfried =
+    manufacturer SIEGFRIED+SIDUS ('Con Sidus'), mercado = las moléculas donde
+    Siegfried compite. Devuelve {'agg': {periodo: {...}}, 'products': [...todos los
+    productos SIE con IE/MS por su mercado-molécula...]} o None si no hay master."""
     from pathlib import Path as _P
     if not master_path or not _P(master_path).exists():
         return None
     import openpyxl
+    from collections import defaultdict
     wb = openpyxl.load_workbook(master_path, read_only=True, data_only=True); ws = wb.active
     r1 = list(next(ws.iter_rows(min_row=1, max_row=1, values_only=True)))
     lab = lambda h: str(h).split('\n')[-1].strip() if h else ''
@@ -87,12 +88,14 @@ def company_iqvia_full(master_path):
     for i, h in enumerate(r1):
         z = str(h or '').strip().lower()
         if z.startswith('manufacturer'): ci['mf'] = i
+        elif z.startswith('product'): ci.setdefault('prod', i)
         elif z.startswith('molecules'): ci['mol'] = i
         elif z.startswith('market (e'): ci['mkt'] = i
+        if z.startswith('atc iv'): ci['atc'] = i
     col = {}
     for i, h in enumerate(r1):
         if h and str(h).startswith('Units') and _re.match(r'^[A-Z][a-z]{2} \d{4}$', lab(h)): col[lab(h)] = i
-    if 'mkt' not in ci:  # sin columna Market (E/OTC) no se puede filtrar etico
+    if 'mkt' not in ci or 'prod' not in ci:
         wb.close(); return None
     M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     WIN = {'mensual':(['Jun 2026'],['Jun 2025']),
@@ -101,30 +104,49 @@ def company_iqvia_full(master_path):
            'trimestre':(['Apr 2026','May 2026','Jun 2026'],['Apr 2025','May 2025','Jun 2025']),
            'mat':([f'{m} 2025' for m in M[6:]]+[f'{m} 2026' for m in M[:6]],
                   [f'{m} 2024' for m in M[6:]]+[f'{m} 2025' for m in M[:6]])}
-    ws_rows = []
-    sie_mols = set()
+    def wsum(row, keys): return sum((row[col[k]] or 0) for k in keys if k in col and col[k] < len(row) and isinstance(row[col[k]], (int, float)))
+    rows = []; sie_mols = set()
     for row in ws.iter_rows(min_row=2, values_only=True):
         if str(row[ci['mkt']] or '').strip().upper() != 'ETICO': continue
         mf = str(row[ci['mf']] or '').upper(); mol = str(row[ci['mol']] or '').strip().upper()
+        prod = str(row[ci['prod']] or '').strip(); atc = str(row[ci.get('atc', -1)] or '').strip() if 'atc' in ci else ''
         issie = 'SIEGFRIED' in mf or 'SIDUS' in mf
-        ws_rows.append((issie, mol, row))
+        pv = {per: (wsum(row, cw), wsum(row, pw)) for per, (cw, pw) in WIN.items()}
+        rows.append((issie, mol, prod, atc, pv))
         if issie and mol: sie_mols.add(mol)
     wb.close()
-    def wsum(row, keys): return sum((row[col[k]] or 0) for k in keys if k in col and col[k] < len(row) and isinstance(row[col[k]], (int, float)))
-    out = {}
-    for per, (cw, pw) in WIN.items():
-        sc = sp = mc = mp = 0.0
-        for issie, mol, row in ws_rows:
-            if mol not in sie_mols: continue          # mercado = moléculas donde Siegfried compite
-            c = wsum(row, cw); p = wsum(row, pw)
-            mc += c; mp += p
-            if issie: sc += c; sp += p
-        out[per] = {'sie_curr': round(sc), 'sie_prev': round(sp), 'mkt_curr': round(mc), 'mkt_prev': round(mp),
+    # mercado por molécula (todos los ético) + agregado (mercados donde Siegfried compite)
+    mol_mkt = defaultdict(lambda: {per: [0.0, 0.0] for per in WIN})
+    for issie, mol, prod, atc, pv in rows:
+        for per in WIN:
+            mol_mkt[mol][per][0] += pv[per][0]; mol_mkt[mol][per][1] += pv[per][1]
+    agg = {}
+    for per in WIN:
+        mc = sum(mol_mkt[m][per][0] for m in sie_mols); mp = sum(mol_mkt[m][per][1] for m in sie_mols)
+        sc = sum(pv[per][0] for issie, mol, prod, atc, pv in rows if issie)
+        sp = sum(pv[per][1] for issie, mol, prod, atc, pv in rows if issie)
+        agg[per] = {'sie_curr': round(sc), 'sie_prev': round(sp), 'mkt_curr': round(mc), 'mkt_prev': round(mp),
                     'ie': ie_rel(sc, sp, mc, mp), 'ms': pct(sc, mc), 'ms_prev': pct(sp, mp),
                     'growth': round((sc / sp - 1) * 100, 1) if sp else None,
                     'mkt_growth': round((mc / mp - 1) * 100, 1) if mp else None}
-    out['_universe'] = 'ETICO · manufacturer SIEGFRIED+SIDUS · mercados-molécula Siegfried'
-    return out
+    agg['_universe'] = 'ETICO · manufacturer SIEGFRIED+SIDUS · mercados-molécula Siegfried'
+    # productos Siegfried (TODOS), agregados por nombre, con IE/MS por su mercado-molécula
+    pd = defaultdict(lambda: {'mol': None, 'atc': None, 'per': {per: [0.0, 0.0] for per in WIN}})
+    for issie, mol, prod, atc, pv in rows:
+        if not issie or not prod: continue
+        d = pd[prod]; d['mol'] = d['mol'] or mol; d['atc'] = d['atc'] or atc
+        for per in WIN:
+            d['per'][per][0] += pv[per][0]; d['per'][per][1] += pv[per][1]
+    products = []
+    for name, d in pd.items():
+        mol = d['mol']; entry = {'name': name, 'mol': mol, 'atc': d['atc'], 'periods': {}}
+        for per in WIN:
+            c, p = d['per'][per]; mc, mp = mol_mkt[mol][per]
+            entry['periods'][per] = {'units_curr': round(c), 'units_prev': round(p),
+                                     'ie': ie_rel(c, p, mc, mp), 'ms': pct(c, mc)}
+        products.append(entry)
+    products.sort(key=lambda x: -(x['periods'].get('mat', {}).get('units_curr') or 0))
+    return {'agg': agg, 'products': products}
 
 
 STOCK_STATUS = ['quiebre', 'critico', 'bajo', 'alerta', 'ok']
@@ -393,10 +415,12 @@ def main():
             'venta_through': L.get('venta_through'), 'has_recetas': L.get('has_recetas'),
         })
 
-    # ---- IQVIA COMPAÑÍA COMPLETA (ético, todos los productos Siegfried) — matchea Market Intelligence ----
+    # ---- IQVIA sobre el REAL Siegfried (ético, TODOS sus productos) — matchea Market Intelligence ----
     master = a.master or resolve_master()
-    company_full = company_iqvia_full(master)
-    cf_universe = (company_full or {}).pop('_universe', None) if company_full else None
+    ci_full = company_iqvia(master)
+    company_full = ci_full['agg'] if ci_full else None
+    company_products = ci_full['products'] if ci_full else None
+    cf_universe = company_full.pop('_universe', None) if company_full else None
 
     total = {
         'generated_at': k.get('generated_at'),
@@ -404,8 +428,9 @@ def main():
         'periods': periods,
         'period_labels': k.get('period_labels'),
         'aggregation': 'dedup',   # IQVIA cuenta cada producto/mercado 1 vez (cifra real de compania)
-        'company_full': company_full,     # IQVIA compañía completa (ético) — None si falta master
+        'company_full': company_full,     # IQVIA real Siegfried (ético) — None si falta master
         'company_full_universe': cf_universe,
+        'company_products': company_products,   # TODOS los productos SIE del master (Mercado IQVIA)
         'dedup_info': dedup_info,
         'venta_months': [f'{m} 2026' for m in ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']],
         'company_venta_monthly': company_venta_monthly,

@@ -134,7 +134,7 @@ body{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--g50);colo
   </div>
 </div>
 
-<script src="./data.js?v=c4dcc6afd7"></script>
+<script src="./data.js?v=971b27884f"></script>
 <script>
 const T = window.TOTAL_SIEGFRIED || {};
 const PERIOD_LABEL = {mensual:'Mensual', ytd:'YTD', trimestre:'Trimestre', semestre:'Semestre', mat:'MAT'};
@@ -330,6 +330,23 @@ function sortableTable(elId, cols, rows, s, onsort){
   t.querySelectorAll('th[data-c]').forEach(th=>th.onclick=()=>{const c=th.dataset.c; onsort({col:c,dir:(s.col===c&&s.dir==='desc')?'asc':'desc'});});
 }
 function renderMercado(){
+  const full=T.company_products;
+  if(full && full.length){
+    // TODOS los productos Siegfried del master (real Siegfried, ético)
+    document.getElementById('merc-h').textContent='Mercado IQVIA · Productos Siegfried (compañía) · '+(PERIOD_LABEL[period]||period);
+    const rows=full.map(p=>{const d=(p.periods||{})[period]||(p.periods||{}).ytd||{};
+      return {name:p.name,mol:p.mol||'',units:d.units_curr,uie:d.ie,ms:d.ms};}).filter(r=>r.units);
+    sortRows(rows,msort2);
+    sortableTable('mtbl',[
+      {k:'name',t:'Producto',l:true,render:r=>`<td class="l">${r.name}</td>`},
+      {k:'mol',t:'Molécula',l:true,render:r=>`<td class="l"><span class="muted">${(r.mol||'').slice(0,26)}</span></td>`},
+      {k:'units',t:'Unid. SIE',render:r=>`<td>${fmtN(r.units)}</td>`},
+      {k:'uie',t:'IE IQVIA',render:r=>`<td>${ieBadge(r.uie)}</td>`},
+      {k:'ms',t:'MS%',render:r=>`<td>${r.ms==null?'—':r.ms.toFixed(1)+'%'}</td>`},
+    ],rows,msort2,ns=>{msort2=ns;renderMercado();});
+    return;
+  }
+  // fallback: marcas de los tableros (63)
   document.getElementById('merc-h').textContent='Mercado IQVIA · Top marcas SIE · '+(PERIOD_LABEL[period]||period);
   const rows=prodRows().filter(r=>r.units!=null); sortRows(rows,msort2);
   sortableTable('mtbl',[
