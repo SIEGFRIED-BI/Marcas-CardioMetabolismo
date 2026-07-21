@@ -43,19 +43,51 @@ def _load_dashboard(path):
     return json.JSONDecoder().raw_decode(t[ob:])[0]
 
 
-# Estimados de MKT (fuente autoritativa del presupuesto): shared/budget-overrides.js
-# (OVERRIDES[linea][marca] = [12 meses], generado de 'Estimados VENTA vigentes MKT sidus.xlsx').
-# mujer NO tiene override MKT -> usa su budget propio del data.js.
-OV_LINE_KEY = {'cardio':'cardio','antibio':'atb','otx':'otc','resp':'respiratorio',
-               'mujer':None,'snc':'snc','derma':'dermatologia'}
+# ESTIMADO = archivo de MKT vigente (hubRoot/Estimados VENTA vigentes MKT sidus.xlsx),
+# hoja 'Estimados 2026': Tipo|Linea|Codigo|Producto|<meses 2026>, por SKU. Se suman las
+# filas CON Linea (todos los tipos: Vigente/Lanzamiento/Sidus/Adquisicion); se EXCLUYEN
+# las filas en blanco (son totales/spacers que duplican). NO usar budget-overrides.js
+# (estaba viejo -> inflaba el % de cumplimiento).
+MKT_LINE_MAP = {'CARDIO MET': 'cardio', 'CARDIO': 'cardio', 'ATB': 'antibio', 'OTC': 'otx',
+                'RESPI': 'resp', 'RESP': 'resp', 'MUJER': 'mujer', 'NEURO': 'snc',
+                'DERMATO': 'derma', 'DERMA': 'derma'}
 
-def load_mkt_overrides():
-    p = REPO / 'shared' / 'budget-overrides.js'
-    if not p.exists(): return {}
-    t = p.read_text(encoding='utf-8')
-    m = _re.search(r'const OVERRIDES\s*=\s*(\{.*?\})\s*;', t, _re.S)
-    try: return json.loads(m.group(1)) if m else {}
-    except Exception: return {}
+def resolve_mkt_file():
+    try:
+        mani = json.loads((REPO / 'shared' / 'close-manifest.json').read_text(encoding='utf-8'))
+        hub = mani['global']['hubRoot'].replace('${OneDrive}', __import__('os').environ.get('OneDrive', ''))
+        import glob
+        c = glob.glob(str(Path(hub) / 'Estimados*MKT*.xlsx'))
+        return c[0] if c else None
+    except Exception:
+        return None
+
+def mkt_estimado_by_line():
+    """Estimado MKT por línea de tablero -> [12 meses 2026]. None si no está el archivo."""
+    f = resolve_mkt_file()
+    if not f: return None
+    import openpyxl
+    from collections import defaultdict
+    wb = openpyxl.load_workbook(f, read_only=True, data_only=True)
+    ws = wb['Estimados 2026'] if 'Estimados 2026' in wb.sheetnames else wb.active
+    r1 = list(next(ws.iter_rows(min_row=1, max_row=1, values_only=True)))
+    lin_i = next((i for i, h in enumerate(r1) if str(h or '').strip().lower().startswith('linea')), None)
+    mcols = []
+    for i, h in enumerate(r1):
+        s = str(h)
+        if s.startswith('2026-'):
+            try: mcols.append((i, int(s[5:7]) - 1))
+            except Exception: pass
+    if lin_i is None or not mcols: wb.close(); return None
+    out = defaultdict(lambda: [0.0] * 12)
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        lin = str(row[lin_i] or '').strip().upper()
+        key = MKT_LINE_MAP.get(lin)
+        if not key: continue           # blanco / Otros / Gastro -> no tablero
+        for c, mi in mcols:
+            if c < len(row) and isinstance(row[c], (int, float)): out[key][mi] += row[c]
+    wb.close()
+    return {k: [round(x) for x in v] for k, v in out.items()}
 
 
 # --- Ventanas IQVIA por periodo (cierre = Jun 2026) para el recompute deduplicado ---
@@ -258,11 +290,11 @@ def iqvia_dedup():
 
 
 def budget_by_line():
-    """Por linea: venta real y estimado (budget) desde D.budget (sumando familias).
-    Devuelve {'per': {periodo: {real,estimado,pct}}, 'monthly': {real[12], est[12]}}
-    para 2026. Consistente con la tabla Venta vs Estimado de cada linea (misma fuente
-    Qlik)."""
-    OV = load_mkt_overrides()
+    """Por línea: venta REAL (D.budget[fam]['2026'].real, fuente Qlik) vs ESTIMADO del
+    archivo de MKT vigente (por línea). Estimado solo 2026 (el archivo no tiene 2025) ->
+    MAT no tiene % (solo unidades). Devuelve {'per': {periodo:{real,estimado,pct}},
+    'monthly': {real[12], est[12]}}."""
+    mkt = mkt_estimado_by_line()   # {key:[12]} o None
     res = {}
     for key, path in LINE_FILES.items():
         try:
@@ -270,38 +302,37 @@ def budget_by_line():
         except Exception:
             continue
         bud = D.get('budget') or {}
-        ov_line = OV.get(OV_LINE_KEY.get(key) or '', {})  # estimados MKT (vacio p/ mujer)
-        def est2026(fam, yrs):
-            # ESTIMADO 2026: usar el archivo de MKT (override) si existe la marca;
-            # sino, el budget del data.js (caso mujer / marcas sin estimado MKT).
-            return ov_line.get(fam) or ((yrs or {}).get('2026') or {}).get('budget') or []
-        per = {}
-        for pname, idxs in PERIOD_IDX.items():
-            real = est = 0.0
-            for fam, yrs in bud.items():
-                ea = est2026(fam, yrs)
-                for (yr, mi) in idxs:
-                    y = (yrs or {}).get(str(yr)) or {}
-                    rv = (y.get('real') or [])
-                    if mi < len(rv) and isinstance(rv[mi], (int, float)): real += rv[mi]
-                    if yr == 2026:  # estimado del ano corriente = MKT
-                        if mi < len(ea) and isinstance(ea[mi], (int, float)): est += ea[mi]
-                    else:           # anos previos (MAT prev): budget del data.js
-                        bv = y.get('budget') or []
-                        if mi < len(bv) and isinstance(bv[mi], (int, float)): est += bv[mi]
-            per[pname] = {'real': round(real), 'estimado': round(est),
-                          'pct': round(real / est * 100, 1) if est else None}
-        # serie mensual 2026 (Ene..Dic): real del data.js, estimado del MKT
-        mreal = [0.0] * 12; mest = [0.0] * 12
+        # real mensual 2026 (suma familias del data.js = venta Qlik)
+        mreal = [0.0] * 12
         for fam, yrs in bud.items():
-            y = (yrs or {}).get('2026') or {}
-            rv = (y.get('real') or []); ea = est2026(fam, yrs)
+            rv = ((yrs or {}).get('2026') or {}).get('real') or []
             for mi in range(12):
                 if mi < len(rv) and isinstance(rv[mi], (int, float)): mreal[mi] += rv[mi]
-                if mi < len(ea) and isinstance(ea[mi], (int, float)): mest[mi] += ea[mi]
+        # estimado mensual 2026 = archivo de MKT (por línea); fallback al budget del data.js
+        if mkt is not None and key in mkt:
+            mest = list(mkt[key])
+        else:
+            mest = [0.0] * 12
+            for fam, yrs in bud.items():
+                bv = ((yrs or {}).get('2026') or {}).get('budget') or []
+                for mi in range(12):
+                    if mi < len(bv) and isinstance(bv[mi], (int, float)): mest[mi] += bv[mi]
+        per = {}
+        for pname, idxs in PERIOD_IDX.items():
+            real = 0.0; est = 0.0; est_ok = True
+            for (yr, mi) in idxs:
+                if yr == 2026:
+                    real += mreal[mi]; est += mest[mi] if mi < len(mest) else 0
+                else:
+                    est_ok = False   # sin estimado MKT para años previos
+                    for fam, yrs2 in bud.items():
+                        rv = ((yrs2 or {}).get(str(yr)) or {}).get('real') or []
+                        if mi < len(rv) and isinstance(rv[mi], (int, float)): real += rv[mi]
+            per[pname] = {'real': round(real), 'estimado': round(est) if est_ok else None,
+                          'pct': round(real / est * 100, 1) if (est_ok and est) else None}
         res[key] = {'per': per,
                     'monthly': {'real': [round(x) for x in mreal], 'est': [round(x) for x in mest]},
-                    'mkt_source': bool(ov_line)}
+                    'mkt_source': bool(mkt is not None and key in mkt)}
     return res
 
 # metricas con mercado (para IE/MS relativo) + venta (solo YoY, sin mercado)
