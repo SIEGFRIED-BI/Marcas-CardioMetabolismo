@@ -165,6 +165,11 @@ if ($Competidores) {
 # recompute para que tome todas las marcas. Skipea si falta el xlsx.
 Step 'mercado MAGNUS (IQVIA)' { & $py (Join-Path $PSScriptRoot 'rebuild-otc-magnus-from-iqvia.py') }
 
+# 12.55 CEFALEXINA ARG (comun) vs ARG DUO: IQVIA no las separa (misma molecula/ATC y un
+# solo producto SIE) -> se splittea el mercado por DOSIS a nivel pack (1g/750mg = DUO).
+# Sin esto las dos familias muestran datos identicos y la linea cuenta el mercado 2 veces.
+Step 'CEFALEXINA comun/DUO' { & $py (Join-Path $PSScriptRoot 'split-atb-cefalexina-duo.py') --master $master }
+
 # 12.6 Mercado antimigranoso de TETRALGIN / TETRALGIN NOVO desde el export curado de MKT
 # ('mercado tetralgin*.xlsx' en hub). Redefine SOLO los competidores; las unidades SIE se
 # conservan del cierre oficial (AR_PM). Antes del recompute. Skipea si falta el xlsx.
