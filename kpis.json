@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-27T20:21:30",
+  "generated_at": "2026-07-28T08:30:06",
   "as_of_month": "Jun 2026",
   "periods": [
     "mensual",
@@ -926,18 +926,18 @@
       "kpis": {
         "mensual": {
           "recetas_sie": {
-            "curr": 53410,
-            "prev": 52178,
-            "ie": 103.1
+            "curr": 66773,
+            "prev": 64730,
+            "ie": 104.2
           },
           "ms_recetas": {
-            "curr": 23.78,
-            "prev": 23.07
+            "curr": 24.52,
+            "prev": 23.54
           },
           "mercado_recetas": {
-            "curr": 224642,
-            "prev": 226179,
-            "ie": 99.3
+            "curr": 272367,
+            "prev": 275020,
+            "ie": 99.0
           },
           "units_sie": {
             "curr": 858844,
@@ -961,18 +961,18 @@
         },
         "ytd": {
           "recetas_sie": {
-            "curr": 187154,
-            "prev": 200998,
-            "ie": 100.5
+            "curr": 232095,
+            "prev": 249776,
+            "ie": 100.9
           },
           "ms_recetas": {
-            "curr": 20.51,
-            "prev": 20.4
+            "curr": 21.35,
+            "prev": 21.16
           },
           "mercado_recetas": {
-            "curr": 912524,
-            "prev": 985376,
-            "ie": 92.6
+            "curr": 1087309,
+            "prev": 1180467,
+            "ie": 92.1
           },
           "units_sie": {
             "curr": 3131403,
@@ -996,18 +996,18 @@
         },
         "trimestre": {
           "recetas_sie": {
-            "curr": 126581,
-            "prev": 138642,
-            "ie": 98.1
+            "curr": 157620,
+            "prev": 172274,
+            "ie": 99.0
           },
           "ms_recetas": {
-            "curr": 21.47,
-            "prev": 21.9
+            "curr": 22.27,
+            "prev": 22.49
           },
           "mercado_recetas": {
-            "curr": 589447,
-            "prev": 633142,
-            "ie": 93.1
+            "curr": 707733,
+            "prev": 765914,
+            "ie": 92.4
           },
           "units_sie": {
             "curr": 2195653,
@@ -1031,18 +1031,18 @@
         },
         "semestre": {
           "recetas_sie": {
-            "curr": 223870,
-            "prev": 239796,
+            "curr": 277379,
+            "prev": 298374,
             "ie": 101.2
           },
           "ms_recetas": {
-            "curr": 20.4,
-            "prev": 20.16
+            "curr": 21.24,
+            "prev": 20.98
           },
           "mercado_recetas": {
-            "curr": 1097363,
-            "prev": 1189322,
-            "ie": 92.3
+            "curr": 1306148,
+            "prev": 1422252,
+            "ie": 91.8
           },
           "units_sie": {
             "curr": 3131403,
@@ -1066,18 +1066,18 @@
         },
         "mat": {
           "recetas_sie": {
-            "curr": 548324,
-            "prev": 591046,
-            "ie": 102.8
+            "curr": 680776,
+            "prev": 739723,
+            "ie": 102.1
           },
           "ms_recetas": {
-            "curr": 21.98,
-            "prev": 21.38
+            "curr": 22.7,
+            "prev": 22.23
           },
           "mercado_recetas": {
-            "curr": 2495215,
-            "prev": 2764418,
-            "ie": 90.3
+            "curr": 2998686,
+            "prev": 3328323,
+            "ie": 90.1
           },
           "units_sie": {
             "curr": 6550210,
@@ -1723,6 +1723,69 @@
           "int_curr": 430107,
           "int_prev": 0,
           "int_ie": null
+        }
+      }
+    },
+    {
+      "name": "HEXALER CORT (SIE)",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "family": "HEXALER CORT",
+      "periods": {
+        "mensual": {
+          "rec_curr": 13363,
+          "rec_prev": 12552,
+          "rec_ie": 108.9,
+          "units_curr": 99072,
+          "units_prev": 95624,
+          "units_ie": 101.5,
+          "int_curr": 83898,
+          "int_prev": 69638,
+          "int_ie": 120.5
+        },
+        "ytd": {
+          "rec_curr": 44941,
+          "rec_prev": 48778,
+          "rec_ie": 102.8,
+          "units_curr": 368642,
+          "units_prev": 378938,
+          "units_ie": 96.1,
+          "int_curr": 249697,
+          "int_prev": 285165,
+          "int_ie": 87.6
+        },
+        "trimestre": {
+          "rec_curr": 31039,
+          "rec_prev": 33632,
+          "rec_ie": 103.6,
+          "units_curr": 259443,
+          "units_prev": 250639,
+          "units_ie": 99.2,
+          "int_curr": 203681,
+          "int_prev": 227921,
+          "int_ie": 89.4
+        },
+        "semestre": {
+          "rec_curr": 53509,
+          "rec_prev": 58578,
+          "rec_ie": 101.9,
+          "units_curr": 368642,
+          "units_prev": 378938,
+          "units_ie": 96.1,
+          "int_curr": 284081,
+          "int_prev": 285165,
+          "int_ie": 99.6
+        },
+        "mat": {
+          "rec_curr": 132452,
+          "rec_prev": 148677,
+          "rec_ie": 99.8,
+          "units_curr": 773083,
+          "units_prev": 800878,
+          "units_ie": 95.5,
+          "int_curr": 699346,
+          "int_prev": 285165,
+          "int_ie": 245.2
         }
       }
     },
