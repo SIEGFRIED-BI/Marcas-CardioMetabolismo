@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29T14:53:06",
+  "generated_at": "2026-07-30T10:22:11",
   "as_of_month": "Jun 2026",
   "periods": [
     "mensual",
@@ -896,18 +896,18 @@
       "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
-        854584,
-        589976,
-        633823,
-        545769,
-        422339,
-        372316,
-        304396,
-        232108,
-        399246,
-        530747,
-        806062,
-        858844
+        840445,
+        577381,
+        619961,
+        531307,
+        409629,
+        357960,
+        290413,
+        221209,
+        386927,
+        519363,
+        794548,
+        847255
       ],
       "sparkline_months": [
         "Jul 2025",
@@ -940,18 +940,18 @@
             "ie": 99.0
           },
           "units_sie": {
-            "curr": 858844,
-            "prev": 871334,
+            "curr": 847255,
+            "prev": 860311,
             "ie": 97.4
           },
           "ms_units": {
-            "curr": 44.19,
-            "prev": 45.36
+            "curr": 46.24,
+            "prev": 47.46
           },
           "mercado_units": {
-            "curr": 1943403,
-            "prev": 1920842,
-            "ie": 101.2
+            "curr": 1832267,
+            "prev": 1812888,
+            "ie": 101.1
           },
           "venta_interna": {
             "curr": 1045050,
@@ -975,18 +975,18 @@
             "ie": 92.1
           },
           "units_sie": {
-            "curr": 3131403,
-            "prev": 3212877,
-            "ie": 98.8
+            "curr": 3059715,
+            "prev": 3144218,
+            "ie": 99.2
           },
           "ms_units": {
-            "curr": 37.56,
-            "prev": 38.03
+            "curr": 39.54,
+            "prev": 39.86
           },
           "mercado_units": {
-            "curr": 8337492,
-            "prev": 8448659,
-            "ie": 98.7
+            "curr": 7738004,
+            "prev": 7888745,
+            "ie": 98.1
           },
           "venta_interna": {
             "curr": 3223983,
@@ -1010,18 +1010,18 @@
             "ie": 92.4
           },
           "units_sie": {
-            "curr": 2195653,
-            "prev": 2156503,
-            "ie": 100.4
+            "curr": 2161166,
+            "prev": 2122716,
+            "ie": 100.9
           },
           "ms_units": {
-            "curr": 41.33,
-            "prev": 41.16
+            "curr": 43.46,
+            "prev": 43.09
           },
           "mercado_units": {
-            "curr": 5311952,
-            "prev": 5239076,
-            "ie": 101.4
+            "curr": 4972713,
+            "prev": 4926450,
+            "ie": 100.9
           },
           "venta_interna": {
             "curr": 2442813,
@@ -1045,18 +1045,18 @@
             "ie": 91.8
           },
           "units_sie": {
-            "curr": 3131403,
-            "prev": 3212877,
-            "ie": 98.8
+            "curr": 3059715,
+            "prev": 3144218,
+            "ie": 99.2
           },
           "ms_units": {
-            "curr": 37.56,
-            "prev": 38.03
+            "curr": 39.54,
+            "prev": 39.86
           },
           "mercado_units": {
-            "curr": 8337492,
-            "prev": 8448659,
-            "ie": 98.7
+            "curr": 7738004,
+            "prev": 7888745,
+            "ie": 98.1
           },
           "venta_interna": {
             "curr": 3223983,
@@ -1080,18 +1080,18 @@
             "ie": 90.1
           },
           "units_sie": {
-            "curr": 6550210,
-            "prev": 6583935,
-            "ie": 100.5
+            "curr": 6396398,
+            "prev": 6435399,
+            "ie": 100.9
           },
           "ms_units": {
-            "curr": 37.5,
-            "prev": 37.3
+            "curr": 39.47,
+            "prev": 39.1
           },
           "mercado_units": {
-            "curr": 17468299,
-            "prev": 17653055,
-            "ie": 99.0
+            "curr": 16207412,
+            "prev": 16457308,
+            "ie": 98.5
           },
           "venta_interna": {
             "curr": 5919203,
@@ -1330,18 +1330,18 @@
       "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
-        186523,
-        168402,
-        184400,
-        184629,
-        151760,
-        167587,
-        151967,
-        126150,
-        159068,
-        164741,
-        180085,
-        163953
+        131770,
+        115676,
+        126942,
+        130878,
+        113298,
+        131671,
+        119114,
+        99416,
+        117054,
+        112343,
+        114200,
+        107655
       ],
       "sparkline_months": [
         "Jul 2025",
@@ -1374,18 +1374,18 @@
             "ie": 92.8
           },
           "units_sie": {
-            "curr": 163953,
-            "prev": 164739,
-            "ie": 95.4
+            "curr": 107655,
+            "prev": 108454,
+            "ie": 94.4
           },
           "ms_units": {
-            "curr": 26.23,
-            "prev": 27.5
+            "curr": 19.46,
+            "prev": 20.62
           },
           "mercado_units": {
-            "curr": 625102,
-            "prev": 599088,
-            "ie": 104.3
+            "curr": 553144,
+            "prev": 526053,
+            "ie": 105.1
           },
           "venta_interna": {
             "curr": 101581,
@@ -1409,18 +1409,18 @@
             "ie": 96.4
           },
           "units_sie": {
-            "curr": 945964,
-            "prev": 883142,
-            "ie": 107.3
+            "curr": 669782,
+            "prev": 637530,
+            "ie": 106.2
           },
           "ms_units": {
-            "curr": 25.86,
-            "prev": 24.11
+            "curr": 20.27,
+            "prev": 19.1
           },
           "mercado_units": {
-            "curr": 3658617,
-            "prev": 3663391,
-            "ie": 99.9
+            "curr": 3303907,
+            "prev": 3338404,
+            "ie": 99.0
           },
           "venta_interna": {
             "curr": 669524,
@@ -1444,18 +1444,18 @@
             "ie": 96.2
           },
           "units_sie": {
-            "curr": 508779,
-            "prev": 485286,
-            "ie": 103.0
+            "curr": 334198,
+            "prev": 331109,
+            "ie": 100.1
           },
           "ms_units": {
-            "curr": 27.04,
-            "prev": 26.26
+            "curr": 20.13,
+            "prev": 20.11
           },
           "mercado_units": {
-            "curr": 1881555,
-            "prev": 1847812,
-            "ie": 101.8
+            "curr": 1659911,
+            "prev": 1646722,
+            "ie": 100.8
           },
           "venta_interna": {
             "curr": 320545,
@@ -1479,18 +1479,18 @@
             "ie": 96.3
           },
           "units_sie": {
-            "curr": 945964,
-            "prev": 883142,
-            "ie": 107.3
+            "curr": 669782,
+            "prev": 637530,
+            "ie": 106.2
           },
           "ms_units": {
-            "curr": 25.86,
-            "prev": 24.11
+            "curr": 20.27,
+            "prev": 19.1
           },
           "mercado_units": {
-            "curr": 3658617,
-            "prev": 3663391,
-            "ie": 99.9
+            "curr": 3303907,
+            "prev": 3338404,
+            "ie": 99.0
           },
           "venta_interna": {
             "curr": 669524,
@@ -1514,18 +1514,18 @@
             "ie": 95.8
           },
           "units_sie": {
-            "curr": 1989265,
-            "prev": 1820047,
-            "ie": 107.6
+            "curr": 1420017,
+            "prev": 1316216,
+            "ie": 106.9
           },
           "ms_units": {
-            "curr": 25.72,
-            "prev": 23.9
+            "curr": 20.29,
+            "prev": 18.98
           },
           "mercado_units": {
-            "curr": 7734471,
-            "prev": 7615055,
-            "ie": 101.6
+            "curr": 6997668,
+            "prev": 6935778,
+            "ie": 100.9
           },
           "venta_interna": {
             "curr": 1370581,
@@ -3375,8 +3375,8 @@
           "rec_prev": 2115,
           "rec_ie": 101.2,
           "units_curr": 11589,
-          "units_prev": 11059,
-          "units_ie": 103.6,
+          "units_prev": 11060,
+          "units_ie": 93.5,
           "int_curr": 11741,
           "int_prev": 9800,
           "int_ie": 119.8
@@ -3385,9 +3385,9 @@
           "rec_curr": 11198,
           "rec_prev": 11816,
           "rec_ie": 102.1,
-          "units_curr": 71771,
-          "units_prev": 68822,
-          "units_ie": 96.7,
+          "units_curr": 71675,
+          "units_prev": 68827,
+          "units_ie": 100.0,
           "int_curr": 59629,
           "int_prev": 60080,
           "int_ie": 99.2
@@ -3397,8 +3397,8 @@
           "rec_prev": 6665,
           "rec_ie": 102.0,
           "units_curr": 34521,
-          "units_prev": 33872,
-          "units_ie": 93.4,
+          "units_prev": 33875,
+          "units_ie": 96.7,
           "int_curr": 34880,
           "int_prev": 31995,
           "int_ie": 109.0
@@ -3407,9 +3407,9 @@
           "rec_curr": 13688,
           "rec_prev": 14517,
           "rec_ie": 102.3,
-          "units_curr": 71771,
-          "units_prev": 68822,
-          "units_ie": 96.7,
+          "units_curr": 71675,
+          "units_prev": 68827,
+          "units_ie": 100.0,
           "int_curr": 72662,
           "int_prev": 66954,
           "int_ie": 108.5
@@ -3418,9 +3418,9 @@
           "rec_curr": 28392,
           "rec_prev": 31142,
           "rec_ie": 102.3,
-          "units_curr": 154050,
-          "units_prev": 148876,
-          "units_ie": 97.1,
+          "units_curr": 153982,
+          "units_prev": 148907,
+          "units_ie": 101.9,
           "int_curr": 148987,
           "int_prev": 146307,
           "int_ie": 101.8

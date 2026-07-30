@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-29",
+  "generated_at": "2026-07-30",
   "as_of_month": "Jun 2026",
   "as_of_short": "Jun 2026",
   "period_labels": {
@@ -2122,164 +2122,6 @@
       }
     },
     {
-      "family": "HEXALER BRONQUIAL",
-      "display": "HEXALER BRONQUIAL",
-      "line": "resp",
-      "lineName": "Respiratoria",
-      "sie_brands": [
-        "HEXALER BRONQUIAL (SIE)",
-        "HEXALER NASAL (SIE)",
-        "MOMETAX (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 91547,
-          "market_prev": 90513,
-          "sie_curr": 67887,
-          "sie_prev": 67345,
-          "ms_curr": 74.2,
-          "ms_prev": 74.4,
-          "ie": 100.0,
-          "var_pp": -0.2
-        },
-        "ytd": {
-          "market_curr": 477076,
-          "market_prev": 442532,
-          "sie_curr": 347857,
-          "sie_prev": 314439,
-          "ms_curr": 72.9,
-          "ms_prev": 71.1,
-          "ie": 103.0,
-          "var_pp": 1.8
-        },
-        "trimestre": {
-          "market_curr": 280454,
-          "market_prev": 256901,
-          "sie_curr": 209102,
-          "sie_prev": 188052,
-          "ms_curr": 74.6,
-          "ms_prev": 73.2,
-          "ie": 102.0,
-          "var_pp": 1.4
-        },
-        "mat": {
-          "market_curr": 998931,
-          "market_prev": 937707,
-          "sie_curr": 723230,
-          "sie_prev": 652738,
-          "ms_curr": 72.4,
-          "ms_prev": 69.6,
-          "ie": 104.0,
-          "var_pp": 2.8
-        }
-      }
-    },
-    {
-      "family": "HEXALER NASAL",
-      "display": "HEXALER NASAL",
-      "line": "resp",
-      "lineName": "Respiratoria",
-      "sie_brands": [
-        "HEXALER NASAL (SIE)",
-        "MOMETAX (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 91547,
-          "market_prev": 90513,
-          "sie_curr": 66880,
-          "sie_prev": 66174,
-          "ms_curr": 73.1,
-          "ms_prev": 73.1,
-          "ie": 100.0,
-          "var_pp": 0.0
-        },
-        "ytd": {
-          "market_curr": 477076,
-          "market_prev": 442532,
-          "sie_curr": 342777,
-          "sie_prev": 308718,
-          "ms_curr": 71.8,
-          "ms_prev": 69.8,
-          "ie": 103.0,
-          "var_pp": 2.0
-        },
-        "trimestre": {
-          "market_curr": 280454,
-          "market_prev": 256901,
-          "sie_curr": 206163,
-          "sie_prev": 184748,
-          "ms_curr": 73.5,
-          "ms_prev": 71.9,
-          "ie": 102.0,
-          "var_pp": 1.6
-        },
-        "mat": {
-          "market_curr": 998931,
-          "market_prev": 937707,
-          "sie_curr": 712650,
-          "sie_prev": 640744,
-          "ms_curr": 71.3,
-          "ms_prev": 68.3,
-          "ie": 104.0,
-          "var_pp": 3.0
-        }
-      }
-    },
-    {
-      "family": "MOMETASONE",
-      "display": "MOMETASONE",
-      "line": "derma",
-      "lineName": "Dermatología",
-      "sie_brands": [
-        "HEXALER NASAL (SIE)",
-        "MOMETAX (SIE)",
-        "HEXALER BRONQUIAL (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 91547,
-          "market_prev": 90513,
-          "sie_curr": 67887,
-          "sie_prev": 67345,
-          "ms_curr": 74.2,
-          "ms_prev": 74.4,
-          "ie": 100.0,
-          "var_pp": -0.2
-        },
-        "ytd": {
-          "market_curr": 477076,
-          "market_prev": 442532,
-          "sie_curr": 347857,
-          "sie_prev": 314439,
-          "ms_curr": 72.9,
-          "ms_prev": 71.1,
-          "ie": 103.0,
-          "var_pp": 1.8
-        },
-        "trimestre": {
-          "market_curr": 280454,
-          "market_prev": 256901,
-          "sie_curr": 209102,
-          "sie_prev": 188052,
-          "ms_curr": 74.6,
-          "ms_prev": 73.2,
-          "ie": 102.0,
-          "var_pp": 1.4
-        },
-        "mat": {
-          "market_curr": 998931,
-          "market_prev": 937707,
-          "sie_curr": 723230,
-          "sie_prev": 652738,
-          "ms_curr": 72.4,
-          "ms_prev": 69.6,
-          "ie": 104.0,
-          "var_pp": 2.8
-        }
-      }
-    },
-    {
       "family": "DELTROX",
       "display": "DELTROX",
       "line": "mujer",
@@ -2791,6 +2633,57 @@
           "ms_prev": 59.3,
           "ie": 107.0,
           "var_pp": 3.9
+        }
+      }
+    },
+    {
+      "family": "HEXALER NASAL",
+      "display": "HEXALER NASAL",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "HEXALER NASAL (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 70951,
+          "market_prev": 71899,
+          "sie_curr": 55291,
+          "sie_prev": 55149,
+          "ms_curr": 77.9,
+          "ms_prev": 76.7,
+          "ie": 102.0,
+          "var_pp": 1.2
+        },
+        "ytd": {
+          "market_curr": 349571,
+          "market_prev": 319417,
+          "sie_curr": 271076,
+          "sie_prev": 240047,
+          "ms_curr": 77.5,
+          "ms_prev": 75.2,
+          "ie": 103.0,
+          "var_pp": 2.3
+        },
+        "trimestre": {
+          "market_curr": 218723,
+          "market_prev": 197866,
+          "sie_curr": 171669,
+          "sie_prev": 150955,
+          "ms_curr": 78.5,
+          "ms_prev": 76.3,
+          "ie": 103.0,
+          "var_pp": 2.2
+        },
+        "mat": {
+          "market_curr": 726372,
+          "market_prev": 667651,
+          "sie_curr": 558815,
+          "sie_prev": 492186,
+          "ms_curr": 76.9,
+          "ms_prev": 73.7,
+          "ie": 104.0,
+          "var_pp": 3.2
         }
       }
     },
@@ -3405,6 +3298,57 @@
           "ms_prev": 3.5,
           "ie": 154.0,
           "var_pp": 1.9
+        }
+      }
+    },
+    {
+      "family": "MOMETASONE",
+      "display": "MOMETASONE",
+      "line": "derma",
+      "lineName": "Dermatología",
+      "sie_brands": [
+        "MOMETAX (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 19589,
+          "market_prev": 17478,
+          "sie_curr": 11589,
+          "sie_prev": 11060,
+          "ms_curr": 59.2,
+          "ms_prev": 63.3,
+          "ie": 93.0,
+          "var_pp": -4.1
+        },
+        "ytd": {
+          "market_curr": 122366,
+          "market_prev": 117545,
+          "sie_curr": 71675,
+          "sie_prev": 68827,
+          "ms_curr": 58.6,
+          "ms_prev": 58.6,
+          "ie": 100.0,
+          "var_pp": 0.0
+        },
+        "trimestre": {
+          "market_curr": 58810,
+          "market_prev": 55811,
+          "sie_curr": 34521,
+          "sie_prev": 33875,
+          "ms_curr": 58.7,
+          "ms_prev": 60.7,
+          "ie": 97.0,
+          "var_pp": -2.0
+        },
+        "mat": {
+          "market_curr": 262128,
+          "market_prev": 258430,
+          "sie_curr": 153982,
+          "sie_prev": 148907,
+          "ms_curr": 58.7,
+          "ms_prev": 57.6,
+          "ie": 102.0,
+          "var_pp": 1.1
         }
       }
     },
@@ -4683,6 +4627,57 @@
           "ms_prev": 14.2,
           "ie": 102.0,
           "var_pp": 0.3
+        }
+      }
+    },
+    {
+      "family": "HEXALER BRONQUIAL",
+      "display": "HEXALER BRONQUIAL",
+      "line": "resp",
+      "lineName": "Respiratoria",
+      "sie_brands": [
+        "HEXALER BRONQUIAL (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 1007,
+          "market_prev": 1173,
+          "sie_curr": 1007,
+          "sie_prev": 1173,
+          "ms_curr": 100.0,
+          "ms_prev": 100.0,
+          "ie": 100.0,
+          "var_pp": 0.0
+        },
+        "ytd": {
+          "market_curr": 5093,
+          "market_prev": 5733,
+          "sie_curr": 5093,
+          "sie_prev": 5733,
+          "ms_curr": 100.0,
+          "ms_prev": 100.0,
+          "ie": 100.0,
+          "var_pp": 0.0
+        },
+        "trimestre": {
+          "market_curr": 2946,
+          "market_prev": 3310,
+          "sie_curr": 2946,
+          "sie_prev": 3310,
+          "ms_curr": 100.0,
+          "ms_prev": 100.0,
+          "ie": 100.0,
+          "var_pp": 0.0
+        },
+        "mat": {
+          "market_curr": 10603,
+          "market_prev": 12016,
+          "sie_curr": 10603,
+          "sie_prev": 12016,
+          "ms_curr": 100.0,
+          "ms_prev": 100.0,
+          "ie": 100.0,
+          "var_pp": 0.0
         }
       }
     }

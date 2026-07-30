@@ -126,7 +126,7 @@ SIE_PATTERNS_BY_LINE = {
     'cardio': [r'^DAURAN\b', r'^DILATREND\b', r'^DIOVAN\b', r'^EMPAX\b',
                r'^ENTRESTO\b', r'^EXFORGE\b', r'^METGLUCON\b', r'^PIXABAN\b',
                r'^ROXOLAN\b', r'^SILTRAN\b', r'^SINTROM\b', r'^TELPRES\b',
-               r'^TERLOC\b'],
+               r'^TERLOC\b', r'^SYNCROCOR\b', r'^NEBILET\b'],
     'mujer': [r'^ISIS\b', r'^SIDERBLUT\b', r'^SIDER\b', r'^TRIP\b',
               r'^CALCIO BASE\b', r'^CALCIO CITRATO\b', r'^CLIMATIX\b',
               r'^DELTROX\b', r'^GYNODERM\b', r'^ROXOLAN\b', r'^ALUMPAK\b'],

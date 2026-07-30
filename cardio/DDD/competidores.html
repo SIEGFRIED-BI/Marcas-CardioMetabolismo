@@ -107,7 +107,10 @@ table.hm tbody tr[data-prov]:hover th{background:rgba(176,30,30,.08) !important;
 table.hm tbody tr.row-active th{background:#fef2f2 !important;color:#b01e1e !important;border-left:3px solid #b01e1e !important;font-weight:700;}
 table.hm tbody tr.row-active td{box-shadow:inset 0 0 0 9999px rgba(176,30,30,.04);}
 table.hm td.sub-ie{font-family:'IBM Plex Mono',monospace;font-size:9px;text-align:center;}
-table.hm thead tr:first-child th[colspan="3"],table.hm thead tr:first-child th[colspan="4"]{border-right:2px solid #d4d4d4;}
+table.hm thead tr:first-child th[colspan="3"],table.hm thead tr:first-child th[colspan="4"],table.hm thead tr:first-child th[colspan="5"]{border-right:2px solid #d4d4d4;}
+table.hm.hm-compact thead th{padding:2px 3px;}
+table.hm.hm-compact td{padding:2px 4px;font-size:9px;}
+table.hm.hm-compact td.sub-msprev,table.hm.hm-compact td.sub-uprev{font-size:8px;}
 table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
 </style>
 <style id="nav-compact-overrides">
@@ -221,7 +224,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
   </div>
 </div>
 
-<script src="./competidores-data.js?v=6d9ebe0775"></script>
+<script src="./competidores-data.js?v=111475ebda"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
@@ -609,20 +612,31 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
     if (HEAT_METRIC==='ms')       metricLabel = 'MS%';
     else if (HEAT_METRIC==='dms') metricLabel = 'VAR MS%';
     else                          metricLabel = 'VAR UNIDADES%';
-    const unitsLabel = 'Unidades';
+    // Toggle "Ano anterior": pares actual/anterior juntos y rotulos compactos.
+    // La metrica anterior solo tiene sentido para MS% (el "anterior de una VAR" no existe).
+    const SHOW_PREV_MS = SHOW_PREV && HEAT_METRIC === 'ms';
+    const yy = (ppLab.match(/(\d{4})(?!.*\d{4})/) || [])[1];
+    const yTag = yy ? " '" + yy.slice(-2) : ' ant.';
+    const unitsLabel = SHOW_PREV ? 'U' : 'Unidades';
     const ieLabel = 'IE';
+    const NSUB = 3 + (SHOW_PREV ? 1 : 0) + (SHOW_PREV_MS ? 1 : 0);
+    tbl.classList.toggle('hm-compact', !!SHOW_PREV);
     let h = '<tr><th rowspan="2">Región / Provincia</th>';
     for (const row of grid.rows){
       const cls = row.isSie ? 'sie sie-col' : '';
-      h += `<th class="${cls}" colspan="${SHOW_PREV?4:3}" title="${row.brand}" style="border-bottom:1px solid rgba(255,255,255,.15)">${row.isSie?'★ ':''}${row.brand}</th>`;
+      h += `<th class="${cls}" colspan="${NSUB}" title="${row.brand}" style="border-bottom:1px solid rgba(255,255,255,.15)">${row.isSie?'★ ':''}${row.brand}</th>`;
     }
     h += '</tr><tr>';
     for (const row of grid.rows){
       const cls = row.isSie ? 'sie sie-col sub' : 'sub';
-      h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="${metricLabel}">${metricLabel}</th>`;
-      h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="${unitsLabel}">${unitsLabel}</th>`;
-      if (SHOW_PREV) h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="Unidades del MISMO período del año anterior${ppLab?' ('+ppLab+')':' — sin 12 meses de historia'}">U. ${ppLab||'año ant.'}</th>`;
-      h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="IE vs mercado (base 100)">${ieLabel}</th>`;
+      const SH = 'font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;';
+      const SHP = SH + 'font-style:italic;opacity:.75;';
+      const antTip = ppLab ? ' (' + ppLab + ')' : ' — sin 12 meses de historia';
+      h += `<th class="${cls}" style="${SH}" title="${metricLabel} · ${pLab}">${metricLabel}</th>`;
+      if (SHOW_PREV_MS) h += `<th class="${cls}" style="${SHP}" title="MS% del MISMO período del año anterior${antTip}">MS%${yTag}</th>`;
+      h += `<th class="${cls}" style="${SH}" title="Unidades · ${pLab}">${unitsLabel}</th>`;
+      if (SHOW_PREV) h += `<th class="${cls}" style="${SHP}" title="Unidades del MISMO período del año anterior${antTip}">U${yTag}</th>`;
+      h += `<th class="${cls}" style="${SH}" title="IE vs mercado (base 100)">${ieLabel}</th>`;
     }
     h += '</tr>';
     thead.innerHTML = h;
@@ -646,7 +660,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         : '';
       row += `<th title="${labelTitle||label}"${thStyle}>${label}</th>`;
       for (const r of grid.rows){
-        const cell = cellsByBrand[r.brand]; if (!cell){ row += SHOW_PREV ? '<td>—</td><td>—</td><td>—</td><td>—</td>' : '<td>—</td><td>—</td><td>—</td>'; continue; }
+        const cell = cellsByBrand[r.brand]; if (!cell){ row += '<td>—</td>'.repeat(NSUB); continue; }
         const f = fmtCellMetric(cell, max);
         const tt = [`${r.brand} · ${label}`, `Período: ${period.label}`];
         if (cell.ms_act!=null) tt.push(`MS%: ${cell.ms_act.toFixed(2)}%`);
@@ -654,6 +668,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         if (cell.du!=null) tt.push(`Δ U: ${(cell.du>=0?'+':'')+cell.du.toFixed(1)}%`);
         if (cell.ie!=null) tt.push(`IE: ${Math.round(cell.ie)} (base 100 vs mercado)`);
         tt.push(`Unidades: ${(cell.u_act||0).toLocaleString('es-AR')}`);
+        if (cell.ms_prev!=null) tt.push(`MS% año anterior${ppLab?' ('+ppLab+')':''}: ${cell.ms_prev.toFixed(2)}%`);
         if (cell.u_prev!=null) tt.push(`Unidades año anterior${ppLab?' ('+ppLab+')':''}: ${cell.u_prev.toLocaleString('es-AR')}`);
         if (cell.mkt_act > 0){
           const perPct = cell.mkt_act / 100;
@@ -663,6 +678,8 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         const ttStr = tt.join('\n');
         // Sub-col 1: metric (heat color)
         row += `<td class="${tdCls} sub-metric" style="background:${f.bg};color:${f.fg}" title="${ttStr}">${f.txt}</td>`;
+        // Sub-col 1b: MS% del mismo periodo del ano anterior (solo en modo MS%)
+        if (SHOW_PREV_MS) row += `<td class="${tdCls} sub-msprev" style="color:#6b7280;background:#f3f4f6;font-style:italic;" title="${ttStr}">${cell.ms_prev!=null ? cell.ms_prev.toFixed(1)+'%' : '—'}</td>`;
         // Sub-col 2: unidades
         row += `<td class="${tdCls} sub-units" style="color:#525252;background:#fafafa;font-weight:500;" title="${ttStr}">${fmtUnits(cell.u_act)}</td>`;
         // Unidades del mismo periodo del ano anterior (toggle "Ano anterior")
@@ -1160,18 +1177,22 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
     // Delta numerico con signo (ej. "+2.5", "-1.2")
     m = s.match(/^([+\-]\d+(?:[.,]\d+)?)$/);
     if (m) return {value: parseFloat(m[1].replace(',', '.')), fmt:'+0.0;-0.0'};
+    // Numero con separador de MILES "1.234" / "1,234" / "1.234.567".
+    // OJO: va ANTES del decimal pelado. Si no, "215.594" (toLocaleString es-AR)
+    // matchea como decimal y se exporta 215,594 -> mil veces menos. Grupos de
+    // EXACTAMENTE 3 digitos: ninguna celda de estas tablas tiene 3 decimales
+    // (los formateadores usan toFixed(0|1) o fmtUnits con k/M).
+    m = s.match(/^(\d{1,3}(?:[.,]\d{3})+)$/);
+    if (m){
+      const cleaned = m[1].replace(/[.,]/g, '');
+      return {value: parseInt(cleaned, 10), fmt:'#,##0'};
+    }
     // Entero o decimal pelado (ej. "103", "1234", "0.5")
     m = s.match(/^(\d+(?:[.,]\d+)?)$/);
     if (m){
       const v = parseFloat(m[1].replace(',', '.'));
       const fmt = (m[1].indexOf('.') >= 0 || m[1].indexOf(',') >= 0) ? '#,##0.0' : '#,##0';
       return {value: v, fmt};
-    }
-    // Numero con miles "1.234" o "1,234"
-    m = s.match(/^(\d{1,3}(?:[.,]\d{3})+)$/);
-    if (m){
-      const cleaned = m[1].replace(/[.,]/g, '');
-      return {value: parseInt(cleaned, 10), fmt:'#,##0'};
     }
     return {value: s, fmt:null};
   }

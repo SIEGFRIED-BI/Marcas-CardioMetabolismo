@@ -41,33 +41,66 @@ def detect_cierre_month(monthly):
 
 
 def aggregate_quarterly(monthly):
-    out = defaultdict(int)
-    for mk, v in monthly.items():
+    """Suma por trimestre, pero SOLO si los 3 meses del trimestre existen en
+    monthly. Un trimestre con 1-2 meses no es un trimestre: es una ventana
+    parcial disfrazada de completa (mismo defecto que ytd/mat, ver mas abajo).
+    Se descarta en vez de sumarse; el eje temporal (quien arma las keys) achica
+    solo, no hace falta filtrarlo aparte."""
+    by_q = defaultdict(set)
+    for mk in monthly:
         qk = quarter_key(mk)
         if qk:
-            try: out[qk] += int(round(float(v or 0)))
-            except (TypeError, ValueError): pass
-    return dict(out)
+            by_q[qk].add(mk)
+    out = {}
+    for qk, present in by_q.items():
+        q_num, y = qk.split()
+        q_num, y = int(q_num[1:]), int(y)
+        expected = {f'{NUM_TO_MES[m]} {y}' for m in range((q_num - 1) * 3 + 1, q_num * 3 + 1)}
+        if present >= expected:
+            total = 0
+            for mk in expected:
+                try: total += int(round(float(monthly.get(mk) or 0)))
+                except (TypeError, ValueError): pass
+            out[qk] = total
+    return out
 
 
 def aggregate_ytd(monthly, cierre_month):
-    """YTD per year ending in cierre_month."""
+    """YTD per year ending in cierre_month. SOLO si los meses 1..cierre_month
+    de ese año existen TODOS en monthly -- si no, el YTD es una suma parcial
+    (ej. 3 de 6 meses) que se leeria como un YTD real y mentiria el % de
+    variacion interanual. Se descarta la key entera en vez de publicar el
+    numero truncado (bug real: derma/mujer/SNC arrancan meses despues del
+    1/enero de su primer año -> 'Jun 2021' sumaba 3/6 meses y se leia +332%)."""
     if not monthly: return {}
     cierre_lbl = NUM_TO_MES.get(cierre_month, 'Dec')
-    by_year = defaultdict(int)
+    by_year = defaultdict(dict)
     for mk, v in monthly.items():
         parts = mk.split()
         if len(parts) != 2: continue
         m_num = MES_INV.get(parts[0])
-        if not m_num: continue
-        if m_num <= cierre_month:
-            try: by_year[parts[1]] += int(round(float(v or 0)))
-            except (TypeError, ValueError): pass
-    return {f'{cierre_lbl} {y}': v for y, v in by_year.items()}
+        if not m_num or m_num > cierre_month: continue
+        by_year[parts[1]][m_num] = v
+    out = {}
+    for y, vals in by_year.items():
+        if set(vals.keys()) >= set(range(1, cierre_month + 1)):
+            total = 0
+            for v in vals.values():
+                try: total += int(round(float(v or 0)))
+                except (TypeError, ValueError): pass
+            out[f'{cierre_lbl} {y}'] = total
+    return out
 
 
 def aggregate_mat(monthly, cierre_month):
-    """MAT per year = rolling 12 months ending in cierre_month."""
+    """MAT per year = rolling 12 months ending in cierre_month. SOLO si los 12
+    meses de esa ventana existen TODOS en monthly -- si no, es un MAT con
+    menos de 12 meses reales (bug real: el primer año de historia de cada
+    linea/producto solo trae los meses desde que arranca el tracking; sumarlos
+    y rotularlos 'MAT' los hace lucir como un trailing-12-meses genuino).
+    Cubre tambien productos/mercados que arrancan a mitad de la serie (ej. un
+    lanzamiento nuevo o un mercado reconstruido aparte): ahi el chequeo de
+    cobertura los excluye sin necesitar un piso aparte por linea."""
     if not monthly: return {}
     cierre_lbl = NUM_TO_MES.get(cierre_month, 'Dec')
     years_with = set()
@@ -78,16 +111,19 @@ def aggregate_mat(monthly, cierre_month):
             except ValueError: pass
     out = {}
     for y in sorted(years_with):
-        total = 0
+        window = {}
         for back in range(11, -1, -1):
             total_idx = (y * 12 + (cierre_month - 1)) - back
             yy, mm = divmod(total_idx, 12)
             mk = f'{NUM_TO_MES[mm + 1]} {yy}'
-            v = monthly.get(mk)
-            if v is not None:
+            if mk in monthly:
+                window[mk] = monthly[mk]
+        if len(window) == 12:
+            total = 0
+            for v in window.values():
                 try: total += int(round(float(v or 0)))
                 except (TypeError, ValueError): pass
-        out[f'{cierre_lbl} {y}'] = total
+            out[f'{cierre_lbl} {y}'] = total
     return out
 
 

@@ -22,6 +22,15 @@
         "new_key": "ATC:R03DC53",
         "corrected_atc": "R03DC53"
       }
+    ],
+    "cardio": [
+      {
+        "comment": "OJO - esta regla NO es un mislabel del panel (a diferencia de la de respiratorio arriba): C07B1 'COMB.BETABL.HIPOT.Y/O DIU' es la clase ATC correcta y consistente tanto para carvedilol+HCTZ (DILATREND D) como para nebivolol+HCTZ (SYNCROCOR D / NEBILET D) - IQVIA no se equivoca. El split es una decision de PRODUCTO: regla #2 de CLAUDE.md dice que el mercado se define por la MOLECULA EXACTA (mono o combo), nunca por la clase ATC entera (que agrupa cualquier beta-bloqueante+diuretico). Sin esta regla, SYNCROCOR D/NEBILET D (Siegfried, mol=NEBIVOLOL+HYDROCHLOROTHIAZIDE) caerian en el mismo 'ATC:C07B1' que DILATREND D (Siegfried, mol=CARVEDILOL+HYDROCHLOROTHIAZIDE) y cada marca leeria su MS% contra el total de las DOS familias de combos sumadas (incluyendo al otro combo SIE como si fuera 'mercado', no competidor). Auditoria 2026-07-30.",
+        "if_molecule": "NEBIVOLOL",
+        "in_atc": "C07B1",
+        "new_key": "ATC:C07B1-NEBIVOLOL",
+        "corrected_atc": "C07B1"
+      }
     ]
   }
 }

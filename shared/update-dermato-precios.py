@@ -10,7 +10,14 @@ dedicado.
 
 Tambien actualiza meta.price_prev_label y price_curr_label.
 
-Uso: py shared/update-dermato-precios.py [--pricefile <xlsx>] [--dry-run]
+Uso: py shared/update-dermato-precios.py --pricefile <xlsx> [--dry-run]
+
+Nota (2026-07-30): hasta la migracion F4 el dato vivia inline en
+dermato_dashboard.html ('const D = {...}'); ahora vive en dermatologia/data.js
+('window.OTC_DASHBOARD = {...}'), igual que sync-dermato-pm.py /
+merge-recetas-dermato.py. El DEFAULT_FILE viejo (un dump de Downloads de
+mayo-2026, ya inexistente) se saco: --pricefile es obligatorio para no
+correr en silencio contra un dump viejo/equivocado.
 """
 from __future__ import annotations
 import argparse, json, re, sys
@@ -18,8 +25,7 @@ from pathlib import Path
 import openpyxl
 
 REPO = Path(__file__).resolve().parent.parent
-HTML = REPO / 'dermatologia' / 'dermato_dashboard.html'
-DEFAULT_FILE = Path(r'C:\Users\camarinaro\Downloads\Sin título - Tabla - 4 de mayo de 2026.xlsx')
+DATA = REPO / 'dermatologia' / 'data.js'
 
 
 def norm(s):
@@ -98,7 +104,7 @@ def parse_xlsx(path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--pricefile', default=str(DEFAULT_FILE))
+    ap.add_argument('--pricefile', required=True, help='Dump plano del Manual Farmaceutico (Producto/Presentacion/2 col PVP al ...)')
     ap.add_argument('--dry-run', action='store_true')
     args = ap.parse_args()
 
@@ -111,10 +117,11 @@ def main():
     print(f'  label_prev: {label_prev}')
     print(f'  label_curr: {label_curr}')
 
-    text = HTML.read_text(encoding='utf-8', errors='replace')
-    m = re.search(r'const D = (\{)', text)
-    abs_start = m.start() + len('const D = ')
-    abs_start = text.index('{', abs_start)
+    text = DATA.read_text(encoding='utf-8', errors='replace')
+    m = re.search(r'window\.OTC_DASHBOARD\s*=\s*', text)
+    if not m:
+        print(f'ERROR: window.OTC_DASHBOARD no encontrado en {DATA}', file=sys.stderr); return 3
+    abs_start = text.index('{', m.end())
     D, end = json.JSONDecoder().raw_decode(text[abs_start:])
     abs_end = abs_start + end
 
@@ -145,8 +152,8 @@ def main():
         print('DRY RUN: no se escribio.')
         return 0
     new_text = text[:abs_start] + json.dumps(D, ensure_ascii=False) + text[abs_end:]
-    HTML.write_text(new_text, encoding='utf-8', newline='')
-    print(f'-> {HTML} reescrito ({HTML.stat().st_size:,} bytes)')
+    DATA.write_text(new_text, encoding='utf-8', newline='')
+    print(f'-> {DATA} reescrito ({DATA.stat().st_size:,} bytes)')
     return 0
 
 

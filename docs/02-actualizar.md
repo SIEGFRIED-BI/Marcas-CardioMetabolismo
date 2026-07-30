@@ -225,9 +225,16 @@ Correr siempre `--dry-run` primero. `merge-stock.py` (incremental, solo chart de
 
 **Fuente:** dump del Manual Farmacéutico (`Producto, Presentacion, Droga, PVP …`).
 ```
-py shared/merge-precios.py <dump.xlsx>          # cardio/ATB/OTC/respi (precios[FAM].molecule[pres])
-py shared/update-dermato-precios.py <dump.xlsx> # dermato (precios[FAM][pres], shape flat)
+py shared/merge-precios.py <dump.xlsx>                     # cardio/ATB/OTC/respi (precios[FAM].molecule[pres])
+py shared/update-dermato-precios.py --pricefile <dump.xlsx> # dermato (precios[FAM][pres], shape flat)
 ```
+> `update-dermato-precios.py` matchea por (producto, presentación) normalizados
+> contra `dermatologia/data.js`. Si el % de match es bajo, no correr igual: el
+> resto queda con precio viejo bajo la etiqueta `price_curr_label` nueva (fecha
+> "al día" mintiendo sobre filas que no se actualizaron). Revisar antes las
+> presentaciones sin match — normalmente es que la presentación curada en
+> `precios` no coincide con el pack real del dump nuevo (dosis o tamaño
+> distinto), no que el producto haya desaparecido.
 
 ---
 

@@ -101,8 +101,6 @@ Correcciones puntuales de datos o bugs.
 | `fix-otc-stock-empty.py` | Quita entries de stock placeholder (0/0) en OTC. |
 | `fix-rec-comp-colors.py` | Colores visibles para competidores en el chart de Recetas. |
 | `fix-ddd-quarterly-hardcoded.py` | Quita índices hardcodeados (12 meses/4 quarters) en DDD. |
-| `fix-dermato-mar2026.py` | Extiende `mol_perf` derma a Mar 2026 + remueve productos. |
-| `fix-dermato-mometax.py` | Restaura recetas de MOMETAX (estaban en 0 desde Oct 2025). |
 | `fix-medicos-jan-feb-mar-2026.py` | Corrige `medicos` (count único, no suma) Ene-Mar 2026. |
 | `fix-mujer-d3-comp.py` | Pobla `rec_comp.D3` de mujer (estaba vacío). |
 | `fix-mujer-solo-ms.py` | Saca la familia SOLO del MS% Recetas (OTC, sin pivot CloseUp). |
