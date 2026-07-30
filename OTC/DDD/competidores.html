@@ -107,7 +107,7 @@ table.hm tbody tr[data-prov]:hover th{background:rgba(176,30,30,.08) !important;
 table.hm tbody tr.row-active th{background:#fef2f2 !important;color:#b01e1e !important;border-left:3px solid #b01e1e !important;font-weight:700;}
 table.hm tbody tr.row-active td{box-shadow:inset 0 0 0 9999px rgba(176,30,30,.04);}
 table.hm td.sub-ie{font-family:'IBM Plex Mono',monospace;font-size:9px;text-align:center;}
-table.hm thead tr:first-child th[colspan="3"]{border-right:2px solid #d4d4d4;}
+table.hm thead tr:first-child th[colspan="3"],table.hm thead tr:first-child th[colspan="4"]{border-right:2px solid #d4d4d4;}
 table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
 </style>
 <style id="nav-compact-overrides">
@@ -189,6 +189,9 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         <button data-m="dms">VAR MS%</button>
         <button data-m="du">VAR UNIDADES%</button>
       </div>
+      <div class="seg" id="ctl-prevyear">
+        <button data-py="1" title="Agrega, por marca, las unidades del MISMO periodo del año anterior">Año anterior</button>
+      </div>
       <span class="meta" id="period-label"></span>
       <span class="meta" id="metric-legend" style="margin-left:10px;color:#6b7280;"></span>
       <button id="btn-export" style="padding:7px 14px;background:#16a34a;color:#fff;border:0;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.04em;margin-left:8px;">📥 Exportar Excel</button>
@@ -262,6 +265,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
 
   let HEAT_PERIOD = 'q';
   let HEAT_METRIC = 'ms';
+  let SHOW_PREV = false;   // 4ta subcolumna: unidades del mismo periodo del año anterior
   let HEAT_PRESET = 'top10';
   let HEAT_SEARCH = '';
   let HEAT_MARKET = null;
@@ -322,7 +326,28 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
   }
 
   // === Period helpers ===
+  // La comparacion es SIEMPRE contra el MISMO periodo del ano anterior (12 meses
+  // atras) en los 5 modos. Antes Mensual/Trimestral/Semestral comparaban contra el
+  // periodo inmediatamente anterior, asi que "VAR MS%" / "VAR UNIDADES%" / IE
+  // mezclaban base interanual (YTD/MAT) con base secuencial (m/q/s) bajo la misma
+  // etiqueta. Para YTD y MAT la ventana es identica a la anterior (no cambia ningun
+  // numero) y se les conserva su etiqueta ('YTD 2025' / 'MAT May-2025').
   function periodIdxs(){
+    const p = periodIdxsBase();
+    if (!p || !p.curr || !p.curr.length) return p;
+    const minI = Math.min.apply(null, p.curr);
+    if (minI - 12 >= 0){
+      p.prev = p.curr.map(i => i - 12);
+      if (HEAT_PERIOD === 'm' || HEAT_PERIOD === 'q' || HEAT_PERIOD === 's'){
+        const a = p.prev[0], b = p.prev[p.prev.length - 1];
+        p.prevLabel = MONTHS[a] + (b > a ? '..' + MONTHS[b] : '');
+      }
+    } else {
+      p.prev = null; p.prevLabel = null;
+    }
+    return p;
+  }
+  function periodIdxsBase(){
     const N = MONTHS.length; if (!N) return null;
     const last = N - 1;
     const lastM = MONTHS[last];
@@ -588,13 +613,14 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
     let h = '<tr><th rowspan="2">Región / Provincia</th>';
     for (const row of grid.rows){
       const cls = row.isSie ? 'sie sie-col' : '';
-      h += `<th class="${cls}" colspan="3" title="${row.brand}" style="border-bottom:1px solid rgba(255,255,255,.15)">${row.isSie?'★ ':''}${row.brand}</th>`;
+      h += `<th class="${cls}" colspan="${SHOW_PREV?4:3}" title="${row.brand}" style="border-bottom:1px solid rgba(255,255,255,.15)">${row.isSie?'★ ':''}${row.brand}</th>`;
     }
     h += '</tr><tr>';
     for (const row of grid.rows){
       const cls = row.isSie ? 'sie sie-col sub' : 'sub';
       h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="${metricLabel}">${metricLabel}</th>`;
       h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="${unitsLabel}">${unitsLabel}</th>`;
+      if (SHOW_PREV) h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="Unidades del MISMO período del año anterior${ppLab?' ('+ppLab+')':' — sin 12 meses de historia'}">U. ${ppLab||'año ant.'}</th>`;
       h += `<th class="${cls}" style="font-size:8px;font-weight:600;opacity:.9;letter-spacing:.02em;white-space:nowrap;" title="IE vs mercado (base 100)">${ieLabel}</th>`;
     }
     h += '</tr>';
@@ -619,7 +645,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         : '';
       row += `<th title="${labelTitle||label}"${thStyle}>${label}</th>`;
       for (const r of grid.rows){
-        const cell = cellsByBrand[r.brand]; if (!cell){ row += '<td>—</td><td>—</td><td>—</td>'; continue; }
+        const cell = cellsByBrand[r.brand]; if (!cell){ row += SHOW_PREV ? '<td>—</td><td>—</td><td>—</td><td>—</td>' : '<td>—</td><td>—</td><td>—</td>'; continue; }
         const f = fmtCellMetric(cell, max);
         const tt = [`${r.brand} · ${label}`, `Período: ${period.label}`];
         if (cell.ms_act!=null) tt.push(`MS%: ${cell.ms_act.toFixed(2)}%`);
@@ -627,6 +653,7 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         if (cell.du!=null) tt.push(`Δ U: ${(cell.du>=0?'+':'')+cell.du.toFixed(1)}%`);
         if (cell.ie!=null) tt.push(`IE: ${Math.round(cell.ie)} (base 100 vs mercado)`);
         tt.push(`Unidades: ${(cell.u_act||0).toLocaleString('es-AR')}`);
+        if (cell.u_prev!=null) tt.push(`Unidades año anterior${ppLab?' ('+ppLab+')':''}: ${cell.u_prev.toLocaleString('es-AR')}`);
         if (cell.mkt_act > 0){
           const perPct = cell.mkt_act / 100;
           tt.push(`1% MS% = ${Math.round(perPct).toLocaleString('es-AR')} u.`);
@@ -637,6 +664,8 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
         row += `<td class="${tdCls} sub-metric" style="background:${f.bg};color:${f.fg}" title="${ttStr}">${f.txt}</td>`;
         // Sub-col 2: unidades
         row += `<td class="${tdCls} sub-units" style="color:#525252;background:#fafafa;font-weight:500;" title="${ttStr}">${fmtUnits(cell.u_act)}</td>`;
+        // Unidades del mismo periodo del ano anterior (toggle "Ano anterior")
+        if (SHOW_PREV) row += `<td class="${tdCls} sub-uprev" style="color:#6b7280;background:#f3f4f6;font-weight:500;font-style:italic;" title="${ttStr}">${fmtUnits(cell.u_prev)}</td>`;
         // Sub-col 3: IE
         const ieCol = colorIE(cell.ie);
         row += `<td class="${tdCls} sub-ie" style="background:${ieCol.bg};color:${ieCol.fg};font-weight:600;" title="${ttStr}">${fmtIE(cell.ie)}</td>`;
@@ -1068,6 +1097,11 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
       HEAT_METRIC = btn.dataset.m;
       document.querySelectorAll('#ctl-metric button').forEach(b=>b.classList.toggle('on', b===btn));
       render();
+    } else if (t.closest && t.closest('#ctl-prevyear')){
+      const btn = t.closest('button'); if (!btn) return;
+      SHOW_PREV = !SHOW_PREV;
+      btn.classList.toggle('on', SHOW_PREV);
+      render();
     } else if (t.closest && t.closest('#ctl-preset')){
       const btn = t.closest('button'); if (!btn || !btn.dataset.preset) return;
       HEAT_PRESET = btn.dataset.preset;
@@ -1251,5 +1285,6 @@ table.hm td.sub-ie:not(:last-child){border-right:2px solid #d4d4d4 !important;}
 </script>
 <script src="../../shared/export-pdf.js?v=bed86c2268"></script>
 <script src="../../shared/resize-cols.js?v=34a75aacf6"></script>
+<script src="../../shared/sortable-heatmap.js?v=cad926924f"></script>
 </body>
 </html>

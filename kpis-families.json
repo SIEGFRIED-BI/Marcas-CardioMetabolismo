@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-18",
+  "generated_at": "2026-07-29",
   "as_of_month": "Jun 2026",
   "as_of_short": "Jun 2026",
   "period_labels": {
@@ -831,6 +831,162 @@
       }
     },
     {
+      "family": "SYNCROCOR",
+      "display": "SYNCROCOR",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "SYNCROCOR (SIE)",
+        "NEBILET (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 252603,
+          "market_prev": 233668,
+          "sie_curr": 27436,
+          "sie_prev": 33894,
+          "ms_curr": 10.9,
+          "ms_prev": 14.5,
+          "ie": 75.0,
+          "var_pp": -3.6
+        },
+        "ytd": {
+          "market_curr": 1495648,
+          "market_prev": 1420211,
+          "sie_curr": 185714,
+          "sie_prev": 203209,
+          "ms_curr": 12.4,
+          "ms_prev": 14.3,
+          "ie": 87.0,
+          "var_pp": -1.9
+        },
+        "trimestre": {
+          "market_curr": 762963,
+          "market_prev": 721257,
+          "sie_curr": 92068,
+          "sie_prev": 100901,
+          "ms_curr": 12.1,
+          "ms_prev": 14.0,
+          "ie": 86.0,
+          "var_pp": -1.9
+        },
+        "mat": {
+          "market_curr": 3002786,
+          "market_prev": 2934898,
+          "sie_curr": 385875,
+          "sie_prev": 443595,
+          "ms_curr": 12.9,
+          "ms_prev": 15.1,
+          "ie": 85.0,
+          "var_pp": -2.2
+        }
+      }
+    },
+    {
+      "family": "TETRALGIN",
+      "display": "TETRALGIN",
+      "line": "otx",
+      "lineName": "OTX",
+      "sie_brands": [
+        "TETRALGIN (SIE)",
+        "TETRALGIN NOVO (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 255478,
+          "market_prev": 217446,
+          "sie_curr": 32017,
+          "sie_prev": 31221,
+          "ms_curr": 12.5,
+          "ms_prev": 14.4,
+          "ie": 87.0,
+          "var_pp": -1.9
+        },
+        "ytd": {
+          "market_curr": 1456488,
+          "market_prev": 1303881,
+          "sie_curr": 186093,
+          "sie_prev": 189302,
+          "ms_curr": 12.8,
+          "ms_prev": 14.5,
+          "ie": 88.0,
+          "var_pp": -1.7
+        },
+        "trimestre": {
+          "market_curr": 770162,
+          "market_prev": 646227,
+          "sie_curr": 93352,
+          "sie_prev": 94822,
+          "ms_curr": 12.1,
+          "ms_prev": 14.7,
+          "ie": 83.0,
+          "var_pp": -2.6
+        },
+        "mat": {
+          "market_curr": 2843098,
+          "market_prev": 2625905,
+          "sie_curr": 378833,
+          "sie_prev": 376565,
+          "ms_curr": 13.3,
+          "ms_prev": 14.3,
+          "ie": 93.0,
+          "var_pp": -1.0
+        }
+      }
+    },
+    {
+      "family": "TETRALGIN NOVO",
+      "display": "TETRALGIN NOVO",
+      "line": "otx",
+      "lineName": "OTX",
+      "sie_brands": [
+        "TETRALGIN (SIE)",
+        "TETRALGIN NOVO (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 255478,
+          "market_prev": 217446,
+          "sie_curr": 32017,
+          "sie_prev": 31221,
+          "ms_curr": 12.5,
+          "ms_prev": 14.4,
+          "ie": 87.0,
+          "var_pp": -1.9
+        },
+        "ytd": {
+          "market_curr": 1456488,
+          "market_prev": 1303881,
+          "sie_curr": 186093,
+          "sie_prev": 189302,
+          "ms_curr": 12.8,
+          "ms_prev": 14.5,
+          "ie": 88.0,
+          "var_pp": -1.7
+        },
+        "trimestre": {
+          "market_curr": 770162,
+          "market_prev": 646227,
+          "sie_curr": 93352,
+          "sie_prev": 94822,
+          "ms_curr": 12.1,
+          "ms_prev": 14.7,
+          "ie": 83.0,
+          "var_pp": -2.6
+        },
+        "mat": {
+          "market_curr": 2843098,
+          "market_prev": 2625905,
+          "sie_curr": 378833,
+          "sie_prev": 376565,
+          "ms_curr": 13.3,
+          "ms_prev": 14.3,
+          "ie": 93.0,
+          "var_pp": -1.0
+        }
+      }
+    },
+    {
       "family": "CLOTRIMAZOLE",
       "display": "CLOTRIMAZOLE",
       "line": "derma",
@@ -986,110 +1142,6 @@
       }
     },
     {
-      "family": "TETRALGIN",
-      "display": "TETRALGIN",
-      "line": "otx",
-      "lineName": "OTX",
-      "sie_brands": [
-        "TETRALGIN (SIE)",
-        "TETRALGIN NOVO (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 185457,
-          "market_prev": 187343,
-          "sie_curr": 32017,
-          "sie_prev": 31221,
-          "ms_curr": 17.3,
-          "ms_prev": 16.7,
-          "ie": 104.0,
-          "var_pp": 0.6
-        },
-        "ytd": {
-          "market_curr": 1116814,
-          "market_prev": 1102050,
-          "sie_curr": 186093,
-          "sie_prev": 189302,
-          "ms_curr": 16.7,
-          "ms_prev": 17.2,
-          "ie": 97.0,
-          "var_pp": -0.5
-        },
-        "trimestre": {
-          "market_curr": 577219,
-          "market_prev": 549421,
-          "sie_curr": 93352,
-          "sie_prev": 94822,
-          "ms_curr": 16.2,
-          "ms_prev": 17.3,
-          "ie": 94.0,
-          "var_pp": -1.1
-        },
-        "mat": {
-          "market_curr": 2184800,
-          "market_prev": 2220887,
-          "sie_curr": 378833,
-          "sie_prev": 376565,
-          "ms_curr": 17.3,
-          "ms_prev": 17.0,
-          "ie": 102.0,
-          "var_pp": 0.3
-        }
-      }
-    },
-    {
-      "family": "TETRALGIN NOVO",
-      "display": "TETRALGIN NOVO",
-      "line": "otx",
-      "lineName": "OTX",
-      "sie_brands": [
-        "TETRALGIN NOVO (SIE)",
-        "TETRALGIN (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 185457,
-          "market_prev": 187343,
-          "sie_curr": 32017,
-          "sie_prev": 31221,
-          "ms_curr": 17.3,
-          "ms_prev": 16.7,
-          "ie": 104.0,
-          "var_pp": 0.6
-        },
-        "ytd": {
-          "market_curr": 1116814,
-          "market_prev": 1102050,
-          "sie_curr": 186093,
-          "sie_prev": 189302,
-          "ms_curr": 16.7,
-          "ms_prev": 17.2,
-          "ie": 97.0,
-          "var_pp": -0.5
-        },
-        "trimestre": {
-          "market_curr": 577219,
-          "market_prev": 549421,
-          "sie_curr": 93352,
-          "sie_prev": 94822,
-          "ms_curr": 16.2,
-          "ms_prev": 17.3,
-          "ie": 94.0,
-          "var_pp": -1.1
-        },
-        "mat": {
-          "market_curr": 2184800,
-          "market_prev": 2220887,
-          "sie_curr": 378833,
-          "sie_prev": 376565,
-          "ms_curr": 17.3,
-          "ms_prev": 17.0,
-          "ie": 102.0,
-          "var_pp": 0.3
-        }
-      }
-    },
-    {
       "family": "SIN ESTROGENO",
       "display": "SIN ESTROGENO",
       "line": "mujer",
@@ -1188,108 +1240,6 @@
           "ms_prev": 11.5,
           "ie": 86.0,
           "var_pp": -1.5
-        }
-      }
-    },
-    {
-      "family": "CEFALEXINA ARG",
-      "display": "CEFALEXINA ARG",
-      "line": "antibio",
-      "lineName": "Antibióticos",
-      "sie_brands": [
-        "CEFALEXINA ARGENTI (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 127217,
-          "market_prev": 129881,
-          "sie_curr": 74905,
-          "sie_prev": 75799,
-          "ms_curr": 58.9,
-          "ms_prev": 58.4,
-          "ie": 101.0,
-          "var_pp": 0.5
-        },
-        "ytd": {
-          "market_curr": 828191,
-          "market_prev": 866789,
-          "sie_curr": 484124,
-          "sie_prev": 485666,
-          "ms_curr": 58.5,
-          "ms_prev": 56.0,
-          "ie": 104.0,
-          "var_pp": 2.5
-        },
-        "trimestre": {
-          "market_curr": 401202,
-          "market_prev": 416539,
-          "sie_curr": 235000,
-          "sie_prev": 238090,
-          "ms_curr": 58.6,
-          "ms_prev": 57.2,
-          "ie": 102.0,
-          "var_pp": 1.4
-        },
-        "mat": {
-          "market_curr": 1654836,
-          "market_prev": 1720093,
-          "sie_curr": 961350,
-          "sie_prev": 947100,
-          "ms_curr": 58.1,
-          "ms_prev": 55.1,
-          "ie": 106.0,
-          "var_pp": 3.0
-        }
-      }
-    },
-    {
-      "family": "CEFALEXINA ARG DUO",
-      "display": "CEFALEXINA ARG DUO",
-      "line": "antibio",
-      "lineName": "Antibióticos",
-      "sie_brands": [
-        "CEFALEXINA ARGENTI (SIE)"
-      ],
-      "periods": {
-        "mes": {
-          "market_curr": 127217,
-          "market_prev": 129881,
-          "sie_curr": 74905,
-          "sie_prev": 75799,
-          "ms_curr": 58.9,
-          "ms_prev": 58.4,
-          "ie": 101.0,
-          "var_pp": 0.5
-        },
-        "ytd": {
-          "market_curr": 828191,
-          "market_prev": 866789,
-          "sie_curr": 484124,
-          "sie_prev": 485666,
-          "ms_curr": 58.5,
-          "ms_prev": 56.0,
-          "ie": 104.0,
-          "var_pp": 2.5
-        },
-        "trimestre": {
-          "market_curr": 401202,
-          "market_prev": 416539,
-          "sie_curr": 235000,
-          "sie_prev": 238090,
-          "ms_curr": 58.6,
-          "ms_prev": 57.2,
-          "ie": 102.0,
-          "var_pp": 1.4
-        },
-        "mat": {
-          "market_curr": 1654836,
-          "market_prev": 1720093,
-          "sie_curr": 961350,
-          "sie_prev": 947100,
-          "ms_curr": 58.1,
-          "ms_prev": 55.1,
-          "ie": 106.0,
-          "var_pp": 3.0
         }
       }
     },
@@ -2483,6 +2433,57 @@
       }
     },
     {
+      "family": "CEFALEXINA ARG DUO",
+      "display": "CEFALEXINA ARG DUO",
+      "line": "antibio",
+      "lineName": "Antibióticos",
+      "sie_brands": [
+        "CEFALEXINA ARGENTI (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 70068,
+          "market_prev": 72961,
+          "sie_curr": 38225,
+          "sie_prev": 39622,
+          "ms_curr": 54.6,
+          "ms_prev": 54.3,
+          "ie": 100.0,
+          "var_pp": 0.3
+        },
+        "ytd": {
+          "market_curr": 458267,
+          "market_prev": 478305,
+          "sie_curr": 250623,
+          "sie_prev": 249935,
+          "ms_curr": 54.7,
+          "ms_prev": 52.3,
+          "ie": 105.0,
+          "var_pp": 2.4
+        },
+        "trimestre": {
+          "market_curr": 220751,
+          "market_prev": 234010,
+          "sie_curr": 120776,
+          "sie_prev": 124594,
+          "ms_curr": 54.7,
+          "ms_prev": 53.2,
+          "ie": 103.0,
+          "var_pp": 1.5
+        },
+        "mat": {
+          "market_curr": 926089,
+          "market_prev": 939672,
+          "sie_curr": 500902,
+          "sie_prev": 484164,
+          "ms_curr": 54.1,
+          "ms_prev": 51.5,
+          "ie": 105.0,
+          "var_pp": 2.6
+        }
+      }
+    },
+    {
       "family": "DECADRON",
       "display": "DECADRON",
       "line": "resp",
@@ -2739,6 +2740,57 @@
           "ms_prev": 29.1,
           "ie": 99.0,
           "var_pp": -0.4
+        }
+      }
+    },
+    {
+      "family": "CEFALEXINA ARG",
+      "display": "CEFALEXINA ARG",
+      "line": "antibio",
+      "lineName": "Antibióticos",
+      "sie_brands": [
+        "CEFALEXINA ARGENTI (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 57149,
+          "market_prev": 56958,
+          "sie_curr": 36680,
+          "sie_prev": 36195,
+          "ms_curr": 64.2,
+          "ms_prev": 63.5,
+          "ie": 101.0,
+          "var_pp": 0.7
+        },
+        "ytd": {
+          "market_curr": 369981,
+          "market_prev": 388667,
+          "sie_curr": 233505,
+          "sie_prev": 235808,
+          "ms_curr": 63.1,
+          "ms_prev": 60.7,
+          "ie": 104.0,
+          "var_pp": 2.4
+        },
+        "trimestre": {
+          "market_curr": 180471,
+          "market_prev": 182636,
+          "sie_curr": 114202,
+          "sie_prev": 113544,
+          "ms_curr": 63.3,
+          "ms_prev": 62.2,
+          "ie": 102.0,
+          "var_pp": 1.1
+        },
+        "mat": {
+          "market_curr": 728956,
+          "market_prev": 780725,
+          "sie_curr": 460536,
+          "sie_prev": 463101,
+          "ms_curr": 63.2,
+          "ms_prev": 59.3,
+          "ie": 107.0,
+          "var_pp": 3.9
         }
       }
     },
@@ -3156,7 +3208,8 @@
       "line": "derma",
       "lineName": "Dermatología",
       "sie_brands": [
-        "ACNECLIN (SIE)"
+        "ACNECLIN (SIE)",
+        "ACNECLIN AP (SIE)"
       ],
       "periods": {
         "mes": {
@@ -3403,6 +3456,58 @@
           "ms_prev": 10.3,
           "ie": 114.0,
           "var_pp": 1.4
+        }
+      }
+    },
+    {
+      "family": "SYNCROCOR D",
+      "display": "SYNCROCOR D",
+      "line": "cardio",
+      "lineName": "Cardiometabolismo",
+      "sie_brands": [
+        "SYNCROCOR D (SIE)",
+        "NEBILET D (SIE)"
+      ],
+      "periods": {
+        "mes": {
+          "market_curr": 16290,
+          "market_prev": 15357,
+          "sie_curr": 4840,
+          "sie_prev": 5753,
+          "ms_curr": 29.7,
+          "ms_prev": 37.5,
+          "ie": 79.0,
+          "var_pp": -7.8
+        },
+        "ytd": {
+          "market_curr": 95079,
+          "market_prev": 92055,
+          "sie_curr": 31689,
+          "sie_prev": 34694,
+          "ms_curr": 33.3,
+          "ms_prev": 37.7,
+          "ie": 88.0,
+          "var_pp": -4.4
+        },
+        "trimestre": {
+          "market_curr": 48271,
+          "market_prev": 45971,
+          "sie_curr": 15414,
+          "sie_prev": 16795,
+          "ms_curr": 31.9,
+          "ms_prev": 36.5,
+          "ie": 87.0,
+          "var_pp": -4.6
+        },
+        "mat": {
+          "market_curr": 190320,
+          "market_prev": 184704,
+          "sie_curr": 64651,
+          "sie_prev": 70835,
+          "ms_curr": 34.0,
+          "ms_prev": 38.4,
+          "ie": 89.0,
+          "var_pp": -4.4
         }
       }
     },

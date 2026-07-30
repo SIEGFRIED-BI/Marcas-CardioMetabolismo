@@ -14,7 +14,7 @@
   Orden (con las cadenas de reversion bakeadas y los flags de idempotencia):
     1. build-all (5 data.js)
     2. sync SNC -> 3. re-aplicar PGB multidosis -> 4. re-aplicar BREXPIPRAZOLE
-    5. sync derma -> 6. sync mujer
+    5. sync derma -> 5b. re-aplicar split ACNECLIN/ACNECLIN AP -> 6. sync mujer
     7. preservar meses pre-ventana que los syncs borran (regla #7)
     8. venta --cutoff -> 9. re-split MAGNUS venta -> 10. re-aplicar mujer TRIP
     11. split MAGNUS iqvia/recetas
@@ -101,6 +101,13 @@ Step 'sync SNC'            { & $py (Join-Path $PSScriptRoot 'sync-snc-pm.py') --
 Step 'SNC PGB multidosis'  { & $py (Join-Path $PSScriptRoot 'rebuild-pgb-multidosis-snc.py') --master $master }
 Step 'SNC BREXPIPRAZOLE'   { & $py (Join-Path $PSScriptRoot 'rebuild-brexpiprazole-ateneo-snc.py') --source $ateneo }
 Step 'sync derma'          { & $py (Join-Path $PSScriptRoot 'sync-dermato-pm.py') --master $master }
+# derma ACNECLIN/ACNECLIN AP: el AR_PM ya los reporta como 2 Product distintos
+# desde jul-2021, pero un merge historico (previo a este script) los dejo
+# sumados en una sola entrada -> ACNECLIN se leia con 9x su volumen real y
+# ACNECLIN AP no tenia serie. Reparte manteniendo el total de familia EXACTO
+# (cero drift). Se re-aplica siempre por si el sync los volviera a mezclar
+# (mismo patron que los rebuilds de SNC arriba); si ya estan separados, no-opea.
+Step 'derma ACNECLIN split' { & $py (Join-Path $PSScriptRoot 'fix-dermato-acneclin-split.py') --master $master }
 Step 'sync mujer'          { & $py (Join-Path $PSScriptRoot 'sync-mujer-pm.py') --master $master }
 
 # 7. Preservar meses pre-ventana que los syncs borran (regla #7)
@@ -138,6 +145,15 @@ Step 'OTC MAGNUS estimado'   { & $py (Join-Path $PSScriptRoot 'fix-otc-magnus-es
 # Stock + Cobertura desde 'Laboratorio - Familia - Producto*' del hub (18 meses).
 # Solo familias/presentaciones del tablero. Skipea si falta el xlsx.
 Step 'stock + cobertura'     { & $py (Join-Path $PSScriptRoot 'build-stock-from-laboratorio.py') }
+# cardio SYNCROCOR / SYNCROCOR D (nebivolol): re-aplica los splits que los pasos de
+# arriba revierten. VA DESPUES de venta y de stock a proposito:
+#   - IQVIA: el mercado del mono se define por molecula EXACTA (build-data matchea por
+#     Contains y 'HYDROCHLOROTHIAZIDE_NEBIVOLOL' contiene 'NEBIVOLOL' -> mezclaria).
+#   - venta + stock: las 5 presentaciones comparten Familia SAP 'SYNCROCOR' -> se
+#     reparten por Cod. Presentacion (el merge por Familia le da todo al mono).
+#   - recetas: el mercado de CloseUp es 'NEBIVOLOL (NEBILET)' y mezcla las 2 drogas.
+# Idempotente; skipea cada bloque cuya fuente no este.
+Step 'cardio SYNCROCOR split' { & $py (Join-Path $PSScriptRoot 'onboard-cardio-syncrocor.py') --master $master --file $venta --cutoff $ventaCutoff }
 # Convenios (obras sociales) dermato desde CloseUp "Detalle consumos y aportes por convenio".
 # Fuente MANUAL: depositar los 2 exports como 'Convenios dermato <AÑO>.xlsx' (current=closeYear,
 # prev=closeYear-1) en el hub o _inbox/<closeMonth>. El script auto-resuelve y SKIPEA (exit 0) si
@@ -150,6 +166,19 @@ Step 'convenios dermato'     { & $py (Join-Path $PSScriptRoot 'merge-convenios-d
 # layout) -> regenerar cambiaria la APARIENCIA de las paginas de competidores sin
 # validar. Hasta definir cual template es el canonico, queda fuera del cierre por
 # defecto (la data IQVIA/venta/KPIs SI se actualiza). Correr aparte: -Competidores.
+#
+# OJO - lo que se PIERDE si regeneras con -Competidores (vive solo en las 7
+# competidores.html committeadas, NO en el template del generador):
+#   a) toggle "Ano anterior" (4ta subcolumna con las unidades del mismo periodo
+#      del ano anterior) en la tabla Por Provincia;
+#   b) comparacion SIEMPRE interanual: periodIdxs() envuelve a periodIdxsBase()
+#      y fuerza prev = curr - 12 meses en los 5 modos (sin eso, Mensual/
+#      Trimestral/Semestral vuelven a comparar contra el periodo INMEDIATAMENTE
+#      anterior y VAR MS% / VAR UNIDADES% / IE cambian de base sin avisar);
+#   c) los includes de export-pdf.js y resize-cols.js (ya faltaban antes).
+# El include de shared/sortable-heatmap.js (orden por columna) SI esta en el
+# template, asi que ese sobrevive. Si regeneras, re-aplica (a) y (b) a mano o
+# porta el template primero.
 if ($Competidores) {
   Step 'competidores data' { & $py (Join-Path $PSScriptRoot 'build-competidores-shape-a.py') --month $cycleFolder }
   foreach ($s in 'build-competidores-pages.py','rebuild-ddd-inline-from-competidores.py','update-ddd-mujer-from-competidores.py','update-ddd-otcdata-from-competidores.py') {

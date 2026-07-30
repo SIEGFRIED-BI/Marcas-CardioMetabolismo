@@ -95,7 +95,8 @@ Correcciones puntuales de datos o bugs.
 | `fix-mol-perf-mat-monthly.py` | Arregla `mat` simplificado a solo entries anuales (rompía chart SNC). |
 | `fix-kpi-order.py` | Ordena los KPIs (IE, MS%, Unidades, Crecimiento, Estimado, MS% Recetas) igual en LÍNEA y MARCA. |
 | `fix-kpi-source-position.py` | Badge de fuente inline (no absolute) para no romper labels largos. |
-| `fix-acneclin-split.py` | Separa ACNECLIN y ACNECLIN AP en `mol_perf.MINOCYCLINE` (derma). |
+| `fix-dermato-acneclin-split.py` | Separa ACNECLIN y ACNECLIN AP en `mol_perf.MINOCYCLINE` (derma); wireado en `update-all.ps1` tras `sync-dermato-pm.py` (se revierte igual que los `LOCKED_REBUILDS` de mujer). |
+| `sortable-heatmap.js` | Orden por columna (click en el header) de las tablas `table.hm` de las 7 páginas de competidores/DDD. Trabaja solo sobre el DOM renderizado → sirve para las 4 variantes del script inline sin tocar `renderTableA`. Fija `TOTAL PAÍS` arriba y manda los `—` al final. Incluido en el template del generador vía `__HUB__`. |
 | `fix-atb-stock-2026.py` | Re-carga stock Ene-Abr 2026 de ATB (estaba 14-17× abajo). |
 | `fix-otc-stock-empty.py` | Quita entries de stock placeholder (0/0) en OTC. |
 | `fix-rec-comp-colors.py` | Colores visibles para competidores en el chart de Recetas. |

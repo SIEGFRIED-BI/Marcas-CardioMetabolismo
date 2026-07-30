@@ -45,7 +45,8 @@ SHARED_ASSETS = [
     'multi-period-table.js', 'multi-period-table.css',
     'budget-overrides.js', 'ux-shared.js', 'data-status.js',
     'export-pdf.js', 'export-common.js', 'export-dashboard.js', 'export-ddd.js',
-    'resize-cols.js', 'design-tokens.css', 'microinteractions.css', 'responsive.css',
+    'resize-cols.js', 'sortable-heatmap.js',
+    'design-tokens.css', 'microinteractions.css', 'responsive.css',
 ]
 
 

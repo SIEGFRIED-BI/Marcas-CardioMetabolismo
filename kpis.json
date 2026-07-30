@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T08:30:06",
+  "generated_at": "2026-07-29T14:53:06",
   "as_of_month": "Jun 2026",
   "periods": [
     "mensual",
@@ -28,18 +28,18 @@
       "venta_through": "Jun 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
-        372413,
-        335250,
-        333902,
-        354024,
-        309136,
-        354632,
-        336591,
-        286066,
-        339506,
-        326313,
-        329118,
-        327075
+        415613,
+        373668,
+        371401,
+        393316,
+        344707,
+        393775,
+        374851,
+        319426,
+        377807,
+        363927,
+        366710,
+        359351
       ],
       "sparkline_months": [
         "Jul 2025",
@@ -58,177 +58,177 @@
       "kpis": {
         "mensual": {
           "recetas_sie": {
-            "curr": 46311,
-            "prev": 46274,
-            "ie": 89.7
+            "curr": 51422,
+            "prev": 51809,
+            "ie": 89.1
           },
           "ms_recetas": {
-            "curr": 7.58,
-            "prev": 8.46
+            "curr": 7.84,
+            "prev": 8.81
           },
           "mercado_recetas": {
-            "curr": 610581,
-            "prev": 546975,
-            "ie": 111.6
+            "curr": 655636,
+            "prev": 588292,
+            "ie": 111.4
           },
           "units_sie": {
-            "curr": 327075,
-            "prev": 331152,
-            "ie": 88.1
+            "curr": 359351,
+            "prev": 370799,
+            "ie": 86.6
           },
           "ms_units": {
-            "curr": 6.38,
-            "prev": 7.24
+            "curr": 6.66,
+            "prev": 7.69
           },
           "mercado_units": {
-            "curr": 5126758,
-            "prev": 4571908,
-            "ie": 112.1
+            "curr": 5395651,
+            "prev": 4820933,
+            "ie": 111.9
           },
           "venta_interna": {
-            "curr": 304419,
+            "curr": 312382,
             "prev": 298149,
-            "ie": 102.1
+            "ie": 104.8
           }
         },
         "ytd": {
           "recetas_sie": {
-            "curr": 221958,
-            "prev": 234731,
-            "ie": 88.0
+            "curr": 246908,
+            "prev": 263544,
+            "ie": 87.4
           },
           "ms_recetas": {
-            "curr": 7.58,
-            "prev": 8.61
+            "curr": 7.85,
+            "prev": 8.99
           },
           "mercado_recetas": {
-            "curr": 2928641,
-            "prev": 2725186,
-            "ie": 107.5
+            "curr": 3145337,
+            "prev": 2933094,
+            "ie": 107.2
           },
           "units_sie": {
-            "curr": 1944669,
-            "prev": 1989839,
-            "ie": 91.9
+            "curr": 2162072,
+            "prev": 2227742,
+            "ie": 91.3
           },
           "ms_units": {
-            "curr": 6.6,
-            "prev": 7.19
+            "curr": 6.96,
+            "prev": 7.63
           },
           "mercado_units": {
-            "curr": 29453794,
-            "prev": 27692471,
-            "ie": 106.4
+            "curr": 31044521,
+            "prev": 29204737,
+            "ie": 106.3
           },
           "venta_interna": {
-            "curr": 1964630,
+            "curr": 1972593,
             "prev": 1951835,
-            "ie": 100.7
+            "ie": 101.1
           }
         },
         "trimestre": {
           "recetas_sie": {
-            "curr": 136161,
-            "prev": 139031,
-            "ie": 89.2
+            "curr": 151431,
+            "prev": 155909,
+            "ie": 88.6
           },
           "ms_recetas": {
-            "curr": 7.58,
-            "prev": 8.5
+            "curr": 7.85,
+            "prev": 8.86
           },
           "mercado_recetas": {
-            "curr": 1795988,
-            "prev": 1635690,
-            "ie": 109.8
+            "curr": 1928635,
+            "prev": 1759891,
+            "ie": 109.6
           },
           "units_sie": {
-            "curr": 982506,
-            "prev": 1019124,
-            "ie": 90.4
+            "curr": 1089988,
+            "prev": 1136820,
+            "ie": 90.0
           },
           "ms_units": {
-            "curr": 6.51,
-            "prev": 7.2
+            "curr": 6.86,
+            "prev": 7.62
           },
           "mercado_units": {
-            "curr": 15081332,
-            "prev": 14149328,
-            "ie": 106.6
+            "curr": 15892566,
+            "prev": 14916556,
+            "ie": 106.5
           },
           "venta_interna": {
-            "curr": 945157,
+            "curr": 953120,
             "prev": 990262,
-            "ie": 95.4
+            "ie": 96.2
           }
         },
         "semestre": {
           "recetas_sie": {
-            "curr": 266356,
-            "prev": 285366,
-            "ie": 87.6
+            "curr": 296385,
+            "prev": 320760,
+            "ie": 86.9
           },
           "ms_recetas": {
-            "curr": 7.6,
-            "prev": 8.68
+            "curr": 7.88,
+            "prev": 9.07
           },
           "mercado_recetas": {
-            "curr": 3503006,
-            "prev": 3286100,
-            "ie": 106.6
+            "curr": 3761882,
+            "prev": 3537821,
+            "ie": 106.3
           },
           "units_sie": {
-            "curr": 1944669,
-            "prev": 1989839,
-            "ie": 91.9
+            "curr": 2162072,
+            "prev": 2227742,
+            "ie": 91.3
           },
           "ms_units": {
-            "curr": 6.6,
-            "prev": 7.19
+            "curr": 6.96,
+            "prev": 7.63
           },
           "mercado_units": {
-            "curr": 29453794,
-            "prev": 27692471,
-            "ie": 106.4
+            "curr": 31044521,
+            "prev": 29204737,
+            "ie": 106.3
           },
           "venta_interna": {
-            "curr": 1964630,
+            "curr": 1972593,
             "prev": 1951835,
-            "ie": 100.7
+            "ie": 101.1
           }
         },
         "mat": {
           "recetas_sie": {
-            "curr": 536477,
-            "prev": 595473,
-            "ie": 87.6
+            "curr": 597732,
+            "prev": 672446,
+            "ie": 86.7
           },
           "ms_recetas": {
-            "curr": 7.89,
-            "prev": 9.0
+            "curr": 8.18,
+            "prev": 9.43
           },
           "mercado_recetas": {
-            "curr": 6803597,
-            "prev": 6617537,
-            "ie": 102.8
+            "curr": 7306278,
+            "prev": 7127845,
+            "ie": 102.5
           },
           "units_sie": {
-            "curr": 4004026,
-            "prev": 4176516,
-            "ie": 93.5
+            "curr": 4454552,
+            "prev": 4690946,
+            "ie": 92.6
           },
           "ms_units": {
-            "curr": 6.79,
-            "prev": 7.26
+            "curr": 7.16,
+            "prev": 7.73
           },
           "mercado_units": {
-            "curr": 59009550,
-            "prev": 57534559,
+            "curr": 62202656,
+            "prev": 60654161,
             "ie": 102.6
           },
           "venta_interna": {
-            "curr": 3842135,
+            "curr": 3850098,
             "prev": 1951835,
-            "ie": 196.8
+            "ie": 197.3
           }
         }
       }
@@ -2735,6 +2735,69 @@
       }
     },
     {
+      "name": "NEBILET (SIE)",
+      "line": "cardio",
+      "lineName": "CardioMetabólica",
+      "family": "SYNCROCOR",
+      "periods": {
+        "mensual": {
+          "rec_curr": 2906,
+          "rec_prev": 3196,
+          "rec_ie": 83.6,
+          "units_curr": 18330,
+          "units_prev": 17898,
+          "units_ie": 94.7,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "ytd": {
+          "rec_curr": 12543,
+          "rec_prev": 14636,
+          "rec_ie": 82.3,
+          "units_curr": 108652,
+          "units_prev": 111788,
+          "units_ie": 92.3,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "trimestre": {
+          "rec_curr": 7760,
+          "rec_prev": 8641,
+          "rec_ie": 84.1,
+          "units_curr": 54447,
+          "units_prev": 54909,
+          "units_ie": 93.7,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "semestre": {
+          "rec_curr": 15060,
+          "rec_prev": 17994,
+          "rec_ie": 81.5,
+          "units_curr": 108652,
+          "units_prev": 111788,
+          "units_ie": 92.3,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "mat": {
+          "rec_curr": 30448,
+          "rec_prev": 38882,
+          "rec_ie": 79.7,
+          "units_curr": 223154,
+          "units_prev": 241565,
+          "units_ie": 90.3,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        }
+      }
+    },
+    {
       "name": "ROXOLAN (SIE)",
       "line": "cardio",
       "lineName": "CardioMetabólica",
@@ -3235,6 +3298,69 @@
           "int_curr": 111052,
           "int_prev": 43148,
           "int_ie": 257.4
+        }
+      }
+    },
+    {
+      "name": "SYNCROCOR (SIE)",
+      "line": "cardio",
+      "lineName": "CardioMetabólica",
+      "family": "SYNCROCOR",
+      "periods": {
+        "mensual": {
+          "rec_curr": 1444,
+          "rec_prev": 1588,
+          "rec_ie": 83.6,
+          "units_curr": 9106,
+          "units_prev": 15996,
+          "units_ie": 52.7,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "ytd": {
+          "rec_curr": 8897,
+          "rec_prev": 10380,
+          "rec_ie": 82.3,
+          "units_curr": 77062,
+          "units_prev": 91421,
+          "units_ie": 80.0,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "trimestre": {
+          "rec_curr": 5362,
+          "rec_prev": 5971,
+          "rec_ie": 84.1,
+          "units_curr": 37621,
+          "units_prev": 45992,
+          "units_ie": 77.3,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "semestre": {
+          "rec_curr": 10682,
+          "rec_prev": 12762,
+          "rec_ie": 81.5,
+          "units_curr": 77062,
+          "units_prev": 91421,
+          "units_ie": 80.0,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "mat": {
+          "rec_curr": 22202,
+          "rec_prev": 28353,
+          "rec_ie": 79.7,
+          "units_curr": 162721,
+          "units_prev": 202030,
+          "units_ie": 78.7,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
         }
       }
     },
@@ -3743,65 +3869,65 @@
       }
     },
     {
-      "name": "ACNECLIN (SIE)",
+      "name": "ACNECLIN AP (SIE)",
       "line": "derma",
       "lineName": "Dermatología",
       "family": "MINOCYCLINE",
       "periods": {
         "mensual": {
-          "rec_curr": 126,
-          "rec_prev": 186,
-          "rec_ie": 76.5,
-          "units_curr": 12356,
-          "units_prev": 13126,
-          "units_ie": 94.2,
-          "int_curr": 1137,
-          "int_prev": 1531,
-          "int_ie": 74.3
+          "rec_curr": 2157,
+          "rec_prev": 2616,
+          "rec_ie": 93.1,
+          "units_curr": 11010,
+          "units_prev": 11737,
+          "units_ie": 93.8,
+          "int_curr": 10659,
+          "int_prev": 12267,
+          "int_ie": 86.9
         },
         "ytd": {
-          "rec_curr": 707,
-          "rec_prev": 834,
-          "rec_ie": 88.9,
-          "units_curr": 62709,
-          "units_prev": 67800,
-          "units_ie": 95.0,
-          "int_curr": 5370,
-          "int_prev": 5663,
-          "int_ie": 94.8
+          "rec_curr": 10508,
+          "rec_prev": 11469,
+          "rec_ie": 96.1,
+          "units_curr": 55366,
+          "units_prev": 60454,
+          "units_ie": 94.1,
+          "int_curr": 43454,
+          "int_prev": 49381,
+          "int_ie": 88.0
         },
         "trimestre": {
-          "rec_curr": 397,
-          "rec_prev": 509,
-          "rec_ie": 83.4,
-          "units_curr": 34994,
-          "units_prev": 38502,
-          "units_ie": 94.3,
-          "int_curr": 3199,
-          "int_prev": 3764,
-          "int_ie": 85.0
+          "rec_curr": 6458,
+          "rec_prev": 7248,
+          "rec_ie": 95.2,
+          "units_curr": 31096,
+          "units_prev": 34439,
+          "units_ie": 93.7,
+          "int_curr": 30573,
+          "int_prev": 33261,
+          "int_ie": 91.9
         },
         "semestre": {
-          "rec_curr": 870,
-          "rec_prev": 1030,
-          "rec_ie": 88.8,
-          "units_curr": 62709,
-          "units_prev": 67800,
-          "units_ie": 95.0,
-          "int_curr": 6177,
-          "int_prev": 6567,
-          "int_ie": 94.1
+          "rec_curr": 12686,
+          "rec_prev": 13814,
+          "rec_ie": 96.6,
+          "units_curr": 55366,
+          "units_prev": 60454,
+          "units_ie": 94.1,
+          "int_curr": 51649,
+          "int_prev": 55832,
+          "int_ie": 92.5
         },
         "mat": {
-          "rec_curr": 2046,
-          "rec_prev": 2289,
-          "rec_ie": 91.5,
-          "units_curr": 140931,
-          "units_prev": 145447,
-          "units_ie": 97.8,
-          "int_curr": 14013,
-          "int_prev": 13981,
-          "int_ie": 100.2
+          "rec_curr": 28661,
+          "rec_prev": 30659,
+          "rec_ie": 95.7,
+          "units_curr": 124654,
+          "units_prev": 129994,
+          "units_ie": 96.8,
+          "int_curr": 118846,
+          "int_prev": 123261,
+          "int_ie": 96.4
         }
       }
     },
@@ -4499,6 +4625,69 @@
       }
     },
     {
+      "name": "NEBILET D (SIE)",
+      "line": "cardio",
+      "lineName": "CardioMetabólica",
+      "family": "SYNCROCOR D",
+      "periods": {
+        "mensual": {
+          "rec_curr": 526,
+          "rec_prev": 519,
+          "rec_ie": 88.5,
+          "units_curr": 3345,
+          "units_prev": 3145,
+          "units_ie": 100.3,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "ytd": {
+          "rec_curr": 2122,
+          "rec_prev": 2295,
+          "rec_ie": 87.3,
+          "units_curr": 19155,
+          "units_prev": 18825,
+          "units_ie": 98.5,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "trimestre": {
+          "rec_curr": 1368,
+          "rec_prev": 1444,
+          "rec_ie": 88.1,
+          "units_curr": 9820,
+          "units_prev": 9518,
+          "units_ie": 98.3,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "semestre": {
+          "rec_curr": 2591,
+          "rec_prev": 2804,
+          "rec_ie": 87.2,
+          "units_curr": 19155,
+          "units_prev": 18825,
+          "units_ie": 98.5,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "mat": {
+          "rec_curr": 5199,
+          "rec_prev": 5884,
+          "rec_ie": 85.6,
+          "units_curr": 39063,
+          "units_prev": 38060,
+          "units_ie": 99.6,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        }
+      }
+    },
+    {
       "name": "ARTRO RED (SIE)",
       "line": "otx",
       "lineName": "OTC",
@@ -4810,6 +4999,69 @@
           "int_curr": 22766,
           "int_prev": 20483,
           "int_ie": 111.1
+        }
+      }
+    },
+    {
+      "name": "SYNCROCOR D (SIE)",
+      "line": "cardio",
+      "lineName": "CardioMetabólica",
+      "family": "SYNCROCOR D",
+      "periods": {
+        "mensual": {
+          "rec_curr": 235,
+          "rec_prev": 232,
+          "rec_ie": 88.5,
+          "units_curr": 1495,
+          "units_prev": 2608,
+          "units_ie": 54.0,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "ytd": {
+          "rec_curr": 1388,
+          "rec_prev": 1502,
+          "rec_ie": 87.2,
+          "units_curr": 12534,
+          "units_prev": 15869,
+          "units_ie": 76.5,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "trimestre": {
+          "rec_curr": 780,
+          "rec_prev": 822,
+          "rec_ie": 88.2,
+          "units_curr": 5594,
+          "units_prev": 7277,
+          "units_ie": 73.2,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "semestre": {
+          "rec_curr": 1696,
+          "rec_prev": 1834,
+          "rec_ie": 87.3,
+          "units_curr": 12534,
+          "units_prev": 15869,
+          "units_ie": 76.5,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
+        },
+        "mat": {
+          "rec_curr": 3406,
+          "rec_prev": 3854,
+          "rec_ie": 85.6,
+          "units_curr": 25588,
+          "units_prev": 32775,
+          "units_ie": 75.8,
+          "int_curr": 0,
+          "int_prev": 0,
+          "int_ie": null
         }
       }
     },
@@ -5251,6 +5503,69 @@
           "int_curr": 15484,
           "int_prev": 14389,
           "int_ie": 107.6
+        }
+      }
+    },
+    {
+      "name": "ACNECLIN (SIE)",
+      "line": "derma",
+      "lineName": "Dermatología",
+      "family": "MINOCYCLINE",
+      "periods": {
+        "mensual": {
+          "rec_curr": 126,
+          "rec_prev": 186,
+          "rec_ie": 76.5,
+          "units_curr": 1346,
+          "units_prev": 1389,
+          "units_ie": 96.9,
+          "int_curr": 1137,
+          "int_prev": 1531,
+          "int_ie": 74.3
+        },
+        "ytd": {
+          "rec_curr": 707,
+          "rec_prev": 834,
+          "rec_ie": 88.9,
+          "units_curr": 7343,
+          "units_prev": 7346,
+          "units_ie": 102.7,
+          "int_curr": 5370,
+          "int_prev": 5663,
+          "int_ie": 94.8
+        },
+        "trimestre": {
+          "rec_curr": 397,
+          "rec_prev": 509,
+          "rec_ie": 83.4,
+          "units_curr": 3898,
+          "units_prev": 4063,
+          "units_ie": 99.6,
+          "int_curr": 3199,
+          "int_prev": 3764,
+          "int_ie": 85.0
+        },
+        "semestre": {
+          "rec_curr": 870,
+          "rec_prev": 1030,
+          "rec_ie": 88.8,
+          "units_curr": 7343,
+          "units_prev": 7346,
+          "units_ie": 102.7,
+          "int_curr": 6177,
+          "int_prev": 6567,
+          "int_ie": 94.1
+        },
+        "mat": {
+          "rec_curr": 2046,
+          "rec_prev": 2289,
+          "rec_ie": 91.5,
+          "units_curr": 16277,
+          "units_prev": 15453,
+          "units_ie": 106.3,
+          "int_curr": 14013,
+          "int_prev": 13981,
+          "int_ie": 100.2
         }
       }
     },

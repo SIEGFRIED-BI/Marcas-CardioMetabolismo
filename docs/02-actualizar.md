@@ -113,6 +113,14 @@ py shared/sync-dermato-pm.py        # segmentado por molécula
 > vs solo VIASEK MENOCARE CAPS oral). En respiratorio, **ACEMUK** usa
 > `rebuild-acemuk-atc-r05c0.py` (todos los R05C0). Si agregás un mercado fijo
 > nuevo: creá `rebuild-<linea>-<mercado>-market.py` y agregalo a `LOCKED_REBUILDS`.
+>
+> **Split defensivo (mismo patrón, otra línea):** `update-all.ps1` corre
+> `fix-dermato-acneclin-split.py` justo después de `sync-dermato-pm.py`. El AR_PM
+> ya reporta ACNECLIN y ACNECLIN AP como productos distintos, pero un merge
+> histórico los dejó sumados en `mol_perf.MINOCYCLINE` (ACNECLIN se leía con 9×
+> su volumen real). Reparte manteniendo el total de familia exacto (cero drift);
+> si ya están separados, no-opea. Si dermato vuelve a mostrar `ACNECLIN AP` en
+> 0 en el Mercado IQVIA, correlo suelto: `py shared/fix-dermato-acneclin-split.py`.
 
 **Confirmar:** abrí el tablero → Mercado IQVIA → el último mes debe ser el nuevo;
 o `py shared/recompute-mol-perf-aggregates.py --dry-run` muestra el cierre detectado.

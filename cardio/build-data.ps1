@@ -51,6 +51,8 @@ $dashboardFamilyOrder = @(
   'SILTRAN',
   'SILTRAN MET',
   'SINTROM',
+  'SYNCROCOR',
+  'SYNCROCOR D',
   'TELPRES',
   'TERLOC'
 )
@@ -75,6 +77,8 @@ $dashboardColors = [ordered]@{
   'SILTRAN' = '#0891b2'
   'SILTRAN MET' = '#0f766e'
   'SINTROM' = '#92400e'
+  'SYNCROCOR' = '#be123c'
+  'SYNCROCOR D' = '#9f1239'
   'TELPRES' = '#7c2d12'
   'TERLOC' = '#4f46e5'
 }
@@ -99,13 +103,21 @@ $dashboardMarketConfig = [ordered]@{
   'SILTRAN' = @{ label = 'Sitagliptina'; group = 'SILTRAN'; filters = @(@{ molecules = @('SITAGLIPTIN'); atcStarts = @('A10H'); productsLike = @('SILTRAN') }); sieProducts = @('SILTRAN (SIE)') }
   'SILTRAN MET' = @{ label = 'Sitagliptina + Metformina'; group = 'SILTRAN MET'; filters = @(@{ molecules = @('METFORMIN_SITAGLIPTIN'); atcStarts = @('A10M'); productsLike = @('SILTRAN MET') }); sieProducts = @('SILTRAN MET (SIE)') }
   'SINTROM' = @{ label = 'Acenocumarol'; group = 'SINTROM'; filters = @(@{ molecules = @('ACENOCOUMAROL'); atcStarts = @('B01A'); productsLike = @('SINTROM') }); sieProducts = @('SINTROM (SIE)') }
+  # SYNCROCOR / SYNCROCOR D: el matcheo de molecula es por Contains, y
+  # 'HYDROCHLOROTHIAZIDE_NEBIVOLOL'.Contains('NEBIVOLOL') -> el mercado del mono se
+  # tragaria el combo (regla #2 de CLAUDE.md). El mercado REAL (molecula exacta), la
+  # venta y el stock (las 5 presentaciones comparten Familia SAP 'SYNCROCOR') y las
+  # recetas (mercado 'NEBIVOLOL (NEBILET)') los re-aplica SIEMPRE
+  # shared/onboard-cardio-syncrocor.py, que corre despues del build en update-all.ps1.
+  'SYNCROCOR' = @{ label = 'Nebivolol'; group = 'SYNCROCOR'; filters = @(@{ molecules = @('NEBIVOLOL'); atcStarts = @('C07A'); productsLike = @('SYNCROCOR') }); sieProducts = @('SYNCROCOR (SIE)') }
+  'SYNCROCOR D' = @{ label = 'Nebivolol + Hidroclorotiazida'; group = 'SYNCROCOR D'; filters = @(@{ molecules = @('HYDROCHLOROTHIAZIDE_NEBIVOLOL'); atcStarts = @('C07B'); productsLike = @('SYNCROCOR D') }); sieProducts = @('SYNCROCOR D (SIE)') }
   'TELPRES' = @{ label = 'Telmisartan'; group = 'TELPRES'; filters = @(@{ molecules = @('TELMISARTAN'); atcStarts = @('C09C'); productsLike = @('TELPRES') }); sieProducts = @('TELPRES (SIE)') }
   'TERLOC' = @{ label = 'Amlodipina'; group = 'TERLOC'; filters = @(@{ molecules = @('AMLODIPINE'); atcStarts = @('C08C'); productsLike = @('TERLOC') }); sieProducts = @('TERLOC (SIE)') }
 }
 
 $familyOrder = @(
   'Totales',
-  'DAURAN','DILATREND','DILATREND AP','DILATREND D','DIOVAN','DIOVAN D','EMPAX','EMPAX MET','ENTRESTO','EXFORGE','EXFORGE D','METGLUCON AP','METGLUCON DUO','PIXABAN','ROXOLAN','ROXOLAN PLUS','SILTRAN','SILTRAN MET','SINTROM','TELPRES','TERLOC'
+  'DAURAN','DILATREND','DILATREND AP','DILATREND D','DIOVAN','DIOVAN D','EMPAX','EMPAX MET','ENTRESTO','EXFORGE','EXFORGE D','METGLUCON AP','METGLUCON DUO','PIXABAN','ROXOLAN','ROXOLAN PLUS','SILTRAN','SILTRAN MET','SINTROM','SYNCROCOR','SYNCROCOR D','TELPRES','TERLOC'
 )
 
 $dddMarketConfig = [ordered]@{
@@ -465,6 +477,11 @@ function Resolve-InternalSalesFamily {
       'SILTRAN' { return 'SILTRAN' }
       'SILTRAN MET' { return 'SILTRAN MET' }
       'SINTROM' { return 'SINTROM' }
+      # OJO: en SAP las 5 presentaciones (incluida la del combo) comparten
+      # Familia = 'SYNCROCOR' -> esto le da TODO al mono. El reparto real por
+      # presentacion lo re-aplica shared/onboard-cardio-syncrocor.py.
+      'SYNCROCOR' { return 'SYNCROCOR' }
+      'SYNCROCOR D' { return 'SYNCROCOR D' }
       'TELPRES' { return 'TELPRES' }
       'TERLOC' { return 'TERLOC' }
     }

@@ -1052,6 +1052,7 @@ __DATA_LOADER__
   document.getElementById('cutoff').textContent = MONTHS.length ? `Hasta ${MONTHS[MONTHS.length-1]}` : '';
 })();
 </script>
+<script src="__HUB__shared/sortable-heatmap.js"></script>
 </body>
 </html>
 """
