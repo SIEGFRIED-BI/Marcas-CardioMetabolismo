@@ -53,7 +53,10 @@ El pre-commit hook ejecuta:
 Si algo falla, NO usar `--no-verify`. Investigar y arreglar.
 (El hook vive en `.git/hooks/pre-commit`; copia versionada: `shared/git-pre-commit.sh`.)
 Chequeos manuales extra: `shared/check-mercados-fuente.py` (familias que mezclan
-mercados) y `shared/bump-cache-busters.py --check`.
+mercados DENTRO de una linea), `shared/check-mercados-cross-linea.py` (una marca
+SIE de OTRA linea colada en el mol_perf de esta — bug MOMETASONE 2026-07-30, el
+anterior no lo ve porque compara contra el competidores-data.js de la propia
+linea) y `shared/bump-cache-busters.py --check`.
 
 ## Cierre mensual — 1 comando
 

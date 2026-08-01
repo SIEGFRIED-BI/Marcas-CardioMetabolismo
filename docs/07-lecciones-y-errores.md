@@ -38,6 +38,27 @@ moléculas/mercados, el dashboard también.
 **Guardrail:** `py shared/check-mercados-fuente.py` (detector de familias que
 mezclan ≥2 mercados-fuente con SIE). Correr tras cualquier sync/rebuild de IQVIA.
 
+**Addendum 2026-07-30 — el mismo bug regresó y el guardrail no lo vio.**
+`mol_perf.MOMETASONE` (dermato) volvió a fusionar 3 mercados (D07A0 tópicos,
+R01A1 nasales, R03D1 inhalantes) — MOMETAX leía 72,4% de MS% contra la
+molécula entera en vez de su 58,7% real, y HEXALER NASAL/HEXALER BRONQUIAL
+(marcas de **respiratorio**) estaban duplicadas ahí adentro. Pasó **17.856
+checks de `audit-full.py`** sin que nada lo marcara.
+Por qué `check-mercados-fuente.py` no lo vio: mapea marca→mercado usando el
+`competidores-data.js` **de la propia línea**. HEXALER NASAL/BRONQUIAL no
+están en el de dermato (son de respiratorio) → el lookup da `None` → la marca
+se saltea en silencio → nunca cuenta como "≥2 mercados". Es un blindspot
+estructural, no un chequeo mal escrito: nunca puede ver una marca que
+pertenece a OTRA línea.
+**Fix:** `shared/split-mometasone-atc.py` (split por ATC real del master, con
+invariantes verificados antes de escribir — ver el script).
+**Guardrail nuevo (complementario, no reemplaza al anterior):**
+`py shared/check-mercados-cross-linea.py` — compara contra el `sieProds` de
+**las 7 líneas**, no contra un solo `competidores-data.js`. Verificado que
+atrapa el bug real: corrido contra el data.js pre-fix (git show del commit
+anterior) flaggeó exactamente HEXALER NASAL/BRONQUIAL en MOMETASONE y MOMETAX
+en HEXALER NASAL/BRONQUIAL, en ambas direcciones.
+
 ---
 
 ## ❌ Bug 3 — Venta Interna: %Cumpl absurdo (705%) por col0 vs col1

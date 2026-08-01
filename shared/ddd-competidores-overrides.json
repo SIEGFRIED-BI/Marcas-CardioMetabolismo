@@ -21,6 +21,36 @@
         "in_atc": "R01B0",
         "new_key": "ATC:R03DC53",
         "corrected_atc": "R03DC53"
+      },
+      {
+        "comment": "Auditoria cross-linea 2026-07-30: R01B0 (descongestivos antihistaminico+pseudoefedrina) es correcto para HEXALER PLUS, pero adentro quedaban TAMBIEN chlorphenamine+pseudoefedrina, loratadine+pseudoefedrina y fexofenadine+pseudoefedrina (ninguno SIE) -- HEXALER PLUS (desloratadine+pseudoefedrina, unico competidor real: FRENALER D) leia su MS% contra las 4 combinaciones sumadas (1,9%) en vez del 15,9% real dentro de SU combo. Confirmado contra respiratorio/data.js: mol_perf.HEXALER PLUS YA existe aislado con 1 competidor real -- este override solo alinea la pagina regional al mismo criterio que ya usa el dashboard principal (AR_PM nacional), no inventa una clasificacion nueva. No es mislabel de IQVIA: la clase R01B0 es correcta y ancha (cubre cualquier antihistaminico+pseudoefedrina); el split es la convencion de este proyecto (molecula exacta, regla #2 CLAUDE.md).",
+        "if_molecule": "DESLORATADINE",
+        "in_atc": "R01B0",
+        "new_key": "ATC:R01B0-DESLORATADINE",
+        "corrected_atc": "R01B0"
+      },
+      {
+        "comment": "Auditoria cross-linea 2026-07-30: H02B0 (corticoide+antihistaminico) junta 5 combos (betamethasone+desloratadine/loratadine/fexofenadine/levocetirizine, chlorphenamine+dexamethasone). HEXALER CORT (betamethasone+desloratadine, 6 competidores reales: FRENALER CORT/DESLORAMAR CORT/HISTADICASONE/DESALER CORT/...) leia 15,5% contra los 5 combos sumados en vez del 22,9% real dentro de SU combo. mol_perf.HEXALER CORT YA existe aislado en el dashboard principal con esos 6 competidores -- alinea la pagina regional a eso.",
+        "if_molecule": "DESLORATADINE",
+        "in_atc": "H02B0",
+        "new_key": "ATC:H02B0-DESLORATADINE",
+        "corrected_atc": "H02B0"
+      },
+      {
+        "comment": "Auditoria cross-linea 2026-07-30: R05B0 (mucolitico+antibiotico) junta ambroxol+amoxicilina, ambroxol+amoxicilina+ac.clavulanico, ampicilina+guaifenesina+metamizol, ambroxol+claritromicina, etc. ACEMUK BIOTIC DUO (acetylcisteina+amoxicilina, 3 competidores reales: AMOXIDAL DUO MUC/AMIXEN AC/CISTEFORT DUO) leia 11,6% contra todo R05B0 en vez del 65,9% real dentro de SU combo. mol_perf.ACEMUK BIOTIC DUO YA existe aislado en el dashboard principal con esos 3 competidores.",
+        "if_molecule": "ACETYLCYSTEINE",
+        "in_atc": "R05B0",
+        "new_key": "ATC:R05B0-ACETYLCYSTEINE",
+        "corrected_atc": "R05B0"
+      }
+    ],
+    "dermato": [
+      {
+        "comment": "Auditoria cross-linea 2026-07-30: D07B3 (corticoide+antimicotico topico) junta betamethasone+gentamicin+miconazole (28,3M u., el mas grande), betamethasone+clotrimazole+gentamicin, betamethasone+gentamicin+nystatin+tolnaftate, diflorasone+econazole+gentamicin, y gentamicin+hydrocortisone+ketoconazole (MICROSONA C C). Este ultimo leia 1,5% contra los 34,3M combinados en vez del 67,8% real dentro de su combo (5 competidores reales: TRIDERMAL/GENTACLER/TRIEFECT/TRICUR/...). mol_perf.GENTAMICIN_HYDROCORTISONE_KETOCONAZOLE YA existe aislado en el dashboard principal (data.js) con esos 5 competidores -- este override solo alinea la pagina regional (competidores-data.js/DDD) al mismo criterio, no inventa nada nuevo.",
+        "if_molecule": "HYDROCORTISONE",
+        "in_atc": "D07B3",
+        "new_key": "ATC:D07B3-HYDROCORTISONE",
+        "corrected_atc": "D07B3"
       }
     ],
     "cardio": [

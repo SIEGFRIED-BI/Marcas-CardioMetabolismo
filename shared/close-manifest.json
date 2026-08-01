@@ -4,7 +4,7 @@
 
   "global": {
     "closeMonth": "2026-06",
-    "ventaCutoff": "2026-06",
+    "ventaCutoff": "2026-07",
     "_ventaCutoff_docs": "Ultimo mes COMPLETO de venta interna. Puede ir ADELANTE de closeMonth porque IQVIA reporta con atraso (~2 meses) y la venta SAP/Qlik esta al dia. La tabla Venta vs Estimado y el KPI de venta usan este corte; el resto (IQVIA/IE de mercado) usa closeMonth. Si se omite, cae a closeMonth.",
     "closeYear": 2026,
     "cycleFolder": "2026-04",
