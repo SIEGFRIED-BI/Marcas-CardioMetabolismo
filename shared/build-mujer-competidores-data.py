@@ -28,8 +28,30 @@ from collections import defaultdict
 from pathlib import Path
 import openpyxl
 
-XLSX = Path(r'C:\Users\camarinaro\Downloads\Producto-Molécula-ATC-provincia - 11 de mayo de 2026.xlsx')
-OUT = Path(r'C:\Users\camarinaro\Marcas-CardioMetabolismo\mujer\DDD\competidores-data.js')
+REPO = Path(__file__).resolve().parent.parent
+INPUTS = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs')
+OUT = REPO / 'mujer' / 'DDD' / 'competidores-data.js'
+
+
+def resolve_regional_xlsx(month, hub_sub='linea-mujer'):
+    """Mismo resolver que build-competidores-shape-a.py: glob del
+    'Producto-Mol*provincia*.xlsx' mas reciente del mes en el hub.
+
+    Antes esto era una ruta HARDCODEADA a
+        C:\\Users\\camarinaro\\Downloads\\Producto-Molécula-ATC-provincia - 11 de mayo de 2026.xlsx
+    que ya no existe, asi que el script ABORTABA siempre y el DDD de mujer no era
+    regenerable por la via documentada (lo bloqueaba para el cierre mensual).
+    """
+    base = INPUTS / hub_sub / month
+    cands = []
+    for sub in ('fuentes-originales', 'ddd', ''):
+        d = base / sub if sub else base
+        if d.is_dir():
+            cands += [p for p in d.glob('Producto-Mol*provincia*.xlsx') if not p.name.startswith('~$')]
+    return max(cands, key=lambda p: p.stat().st_mtime) if cands else None
+
+
+XLSX = None   # se resuelve en main() con --month, o se pasa explicito con --xlsx
 
 MONTH_ORDER = {'Ene':1,'Feb':2,'Mar':3,'Abr':4,'May':5,'Jun':6,
                'Jul':7,'Ago':8,'Sep':9,'Oct':10,'Nov':11,'Dic':12}
@@ -132,11 +154,19 @@ def main():
     global XLSX
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument('--xlsx', default=str(XLSX), help='Producto-Mol-ATC-provincia xlsx (default: hardcoded)')
+    ap.add_argument('--xlsx', default=None,
+                    help='Producto-Mol-ATC-provincia xlsx. Si se omite se resuelve por glob '
+                         'del hub con --month (linea-mujer/<month>/fuentes-originales)')
+    ap.add_argument('--month', default='2026-04', help='carpeta de ciclo del hub')
     a = ap.parse_args()
-    XLSX = Path(a.xlsx)
+    XLSX = Path(a.xlsx) if a.xlsx else resolve_regional_xlsx(a.month)
+    if XLSX is None:
+        print(f'ERROR: no encontre Producto-Mol*provincia*.xlsx en '
+              f'{INPUTS / "linea-mujer" / a.month}', file=sys.stderr)
+        return 2
     if not XLSX.is_file():
         print(f'ERROR: {XLSX} no existe', file=sys.stderr); return 2
+    print(f'  fuente: {XLSX.name}')
 
     wb = openpyxl.load_workbook(XLSX, read_only=True, data_only=True)
     ws = wb.active

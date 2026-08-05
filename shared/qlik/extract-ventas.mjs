@@ -39,11 +39,35 @@ async function main() {
   const session = qix.openAppSession({ appId: APP_ID });
   const app = await session.getDoc();
 
-  // selección: organización doméstica (Rofina). El filtro por año NO se hace acá (el
-  // selectValues sobre el campo "Año" no matchea por la ñ); la ventana temporal la aplica
-  // qlik-ventas-to-planilla.py (los labels de AñoMes son ASCII). Extraemos todo Rofina.
+  // selección: organización doméstica (Rofina). El filtro por año NO se hace acá; la ventana
+  // temporal la aplica qlik-ventas-to-planilla.py (los labels de AñoMes son ASCII).
+  //
+  // OJO: se paso de selectValues() a toggleSelect() y se AGREGO una asercion numerica.
+  // En la app de DDD del mismo tenant se comprobo que selectValues quedo INERTE: devuelve
+  // true, las selecciones activas quedan en [] y el total sigue siendo el universo completo.
+  // Si eso le pasa tambien a esta app, este script extraeria TODAS las organizaciones
+  // creyendo que filtro Rofina, y la venta interna publicada saldria inflada sin que nada
+  // avisara. Una seleccion que reporta exito no prueba nada: hay que verificarla contra un
+  // numero, y por eso se aborta si el total no bajo.
+  async function totalEscalar() {
+    const o = await app.createSessionObject({ qInfo: { qType: "tot" }, qHyperCubeDef: {
+      qDimensions: [], qMeasures: [{ qDef: { qDef: "sum(venta_un)" } }],
+      qInitialDataFetch: [{ qTop: 0, qLeft: 0, qHeight: 1, qWidth: 1 }] } });
+    return (await o.getLayout()).qHyperCube.qDataPages[0].qMatrix[0][0].qNum;
+  }
+  await app.clearAll();
+  const totalSinFiltro = await totalEscalar();
   const of = await app.getField("Descripcion_Organizacion_Venta");
-  await of.selectValues({ qFieldValues: [{ qText: ORG_FILTER }], qToggleMode: false, qSoftLock: false });
+  await of.toggleSelect(String(ORG_FILTER), false, 0);
+  const totalFiltrado = await totalEscalar();
+  process.stderr.write(`organizacion "${ORG_FILTER}": total ` +
+    `${Math.round(totalSinFiltro).toLocaleString("es-AR")} -> ` +
+    `${Math.round(totalFiltrado).toLocaleString("es-AR")} u\n`);
+  if (!(totalFiltrado > 0 && totalFiltrado < totalSinFiltro)) {
+    throw new Error(`LA SELECCION DE ORGANIZACION NO HIZO EFECTO: quedo en ` +
+      `${Math.round(totalFiltrado)} u contra ${Math.round(totalSinFiltro)} sin filtrar. ` +
+      `No se extrae nada: se estarian trayendo todas las organizaciones.`);
+  }
 
   const def = { qInfo: { qType: "sessiontable" }, qHyperCubeDef: {
     qDimensions: [["gran_familia"], ["familia"], ["producto"], ["CodigoProducto"], ["AñoMes"]]

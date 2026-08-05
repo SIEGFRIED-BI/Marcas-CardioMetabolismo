@@ -48,10 +48,35 @@ async function main() {
   const app = await session.getDoc();
   await app.clearAll();
 
-  // Seleccionar los mercados de la linea (filtra el modelo -> el cubo baja de ~8M a ~774k).
+  // ── Seleccionar los mercados de la linea (filtra el modelo -> el cubo baja de ~9,5M) ──
+  //
+  // OJO: selectValues() ES INERTE EN ESTA APP desde que se republico (2026-08-05 16:46 UTC).
+  // Devuelve true, las selecciones activas quedan en [] y el total sigue siendo el panel
+  // completo (695.227.298 u). Medido con DescripcionMercado, con AñoMes y con Periodo, o sea
+  // no es el acento. Lo que SI funciona es toggleSelect(): seleccionando AñoMes='Jun-2026'
+  // baja el total a 31.926.027 u exactos.
+  // Y no alcanza con cambiar de metodo: una seleccion que reporta exito HAY QUE VERIFICARLA
+  // CONTRA UN NUMERO. Este script corrio meses filtrando de verdad y despues dejo de
+  // filtrar sin que nada avisara -- se habria traido las 9.508.682 filas del panel entero
+  // creyendo que traia 774k. De ahi la asercion de abajo.
+  async function totalEscalar() {
+    const o = await app.createSessionObject({ qInfo: { qType: "tot" }, qHyperCubeDef: {
+      qDimensions: [], qMeasures: [{ qDef: { qDef: "sum(MensualUnidades)" } }],
+      qInitialDataFetch: [{ qTop: 0, qLeft: 0, qHeight: 1, qWidth: 1 }] } });
+    return (await o.getLayout()).qHyperCube.qDataPages[0].qMatrix[0][0].qNum;
+  }
+  const totalSinFiltro = await totalEscalar();
   const fld = await app.getField("DescripcionMercado");
-  await fld.selectValues(markets.map(m => ({ qText: String(m) })), false, false);
-  process.stderr.write(`mercados seleccionados: ${markets.length}\n`);
+  for (const m of markets) await fld.toggleSelect(String(m), true, 0);
+  const totalFiltrado = await totalEscalar();
+  process.stderr.write(`mercados seleccionados: ${markets.length} | ` +
+    `total ${Math.round(totalSinFiltro).toLocaleString("es-AR")} -> ` +
+    `${Math.round(totalFiltrado).toLocaleString("es-AR")} u\n`);
+  if (!(totalFiltrado < totalSinFiltro)) {
+    throw new Error(`LA SELECCION NO HIZO EFECTO: el total quedo en ` +
+      `${Math.round(totalFiltrado)} u contra ${Math.round(totalSinFiltro)} sin filtrar. ` +
+      `No se extrae nada: se estaria trayendo el panel completo creyendo que se filtro.`);
+  }
 
   const def = { qInfo: { qType: "sessiontable" }, qHyperCubeDef: {
     qDimensions: [
