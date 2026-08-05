@@ -3,51 +3,94 @@
 """
 shared/itemize-molperf-otros.py
 
-Arregla el RANKING de las tablas de Mercado IQVIA: desglosa del bucket
-'Otros (resto del mercado)' las marcas que SUPERAN a la marca SIE, para que el
-puesto que muestra el tablero sea el puesto real de IQVIA.
+Desglosa el bucket 'Otros (resto del mercado)' de mol_perf para que la APERTURA
+de la tabla multi-periodo (Mercado IQVIA) muestre el ranking COMPLETO del mercado:
+las marcas que estan arriba de la propia y tambien las que estan abajo.
 
 EL BUG
 ------
 Los build-data.ps1 de cardio/ATB/OTC/respiratorio cortan en 8 productos por
 mercado (`if ($selectedProductNames.Count -ge 8) { break }`) y meten todo el
-resto en un unico 'Otros (resto del mercado)'. Cuando dentro de ese bucket hay
-marcas MAS GRANDES que la marca propia, el tablero la muestra en un puesto que
-no existe. Caso reportado: ROXOLAN se veia #7 y en IQVIA es #10, porque ROSUFEN,
-ROSUSTATIN y ROSUFEC (los tres > ROXOLAN) estaban dentro de 'Otros'.
+resto en un unico producto sintetico 'Otros (resto del mercado)' (is_resto).
+El render NO tiene tope -- shared/multi-period-table.js buildCompRows() lista
+todos los products con rank #1..#N -- asi que el ranking incompleto es 100% del
+dato, no de la UI.
+
+Sintomas historicos:
+  - ROXOLAN se veia #7 y en el Explorador de IQVIA es #10, porque ROSUFEN,
+    ROSUSTATIN y ROSUFEC (los tres > ROXOLAN) estaban dentro de 'Otros'.
+  - Aun despues de arreglar el puesto, no se veia quien estaba POR DEBAJO.
 Los agregados (total de mercado y MS% propio) SIEMPRE estuvieron bien: lo unico
 falso era el ranking y la lista de competidores.
 
-POR QUE NO SE USA enrich-molperf-from-competidores.py
-----------------------------------------------------
-Ese script trae las marcas de competidores-data.js, que es el panel REGIONAL
-(DDD, Qlik) -- otro universo que el AR_PM nacional del que sale mol_perf. Mezclar
-las dos fuentes rompe la invariante sum(products) == family total. Aca se lee el
-MISMO master AR_PM.
+MODOS
+-----
+  --mode full      (default) itemiza TODO el universo del mercado -> ranking
+                   completo, arriba y abajo. Es lo que se ve hoy en el tablero.
+  --mode outrank   comportamiento conservador original: solo las marcas que
+                   SUPERAN a la marca SIE (arregla el numero de puesto y nada mas).
+                   Se conserva para poder reproducir el estado previo.
 
-POR QUE NO SE RE-CORRE build-data.ps1 CON EL CAP MAS ALTO
----------------------------------------------------------
-Regenerar esas 4 lineas desde cero revierte la venta interna del mes y todos los
-splits (MAGNUS/36, ROXOLAN/PLUS, SYNCROCOR/D, TRIP). Este script es quirurgico:
-solo toca mol_perf[mercado].products.
+COMO SE INFIERE EL UNIVERSO DEL MERCADO
+---------------------------------------
+Se toman los productos ya listados, se los busca por nombre en el master AR_PM, se
+junta el set de sus moleculas y se consideran "ocultos" los productos del master
+con esa misma molecula que no estan listados. Se usa el MISMO master del que salio
+mol_perf, no competidores-data.js (ese es el panel REGIONAL de Qlik/DDD: otro
+universo, mezclarlos rompe la invariante de la suma).
 
-COMO PRESERVA LA CONSISTENCIA (esto es lo importante)
-----------------------------------------------------
-NO se elimina el bucket: se lo RECALCULA. 'Otros' sigue siendo el residuo
+LA REGLA ES ASIMETRICA -- ESTO ES LO IMPORTANTE
+-----------------------------------------------
+La inferencia por molecula puede no coincidir con el mercado, y los dos sentidos
+del error NO son equivalentes:
+
+  SUB-CONTAR (candidatos < bucket) es SEGURO.
+      El mercado tiene productos que la molecula sola no explica. Se agregan las
+      marcas que si se conocen y el bucket se queda con el remanente sin explicar.
+      No se inventa nada y la suma sigue cerrando.
+      Caso real: respiratorio DECADRON, May 2024, bucket 6.749 vs candidatos
+      5.323 -> faltan 1.426 u. Se itemiza igual; 'Otros' conserva esas 1.426.
+
+  SOBRE-CONTAR (candidatos > bucket) es INACEPTABLE.
+      Significa que la molecula abarca MAS que el mercado (mercados splitteados
+      por dosis o definidos por ATC) y se estarian listando marcas de OTRO
+      mercado. Se RECHAZA el mercado entero.
+      Casos reales: ATB CEFALEXINA ARG (candidatos +1.953% sobre el bucket) y
+      CEFALEXINA ARG DUO (+5.038%). Quedan intactos y se reportan.
+
+La separacion medida es de tres ordenes de magnitud (peor error relativo por mes:
+26 mercados <= 3,75%, DECADRON 21%, los dos CEFALEXINA 3.795% y 8.226%), asi que
+el umbral de SOBRE_TOL no es un numero al voleo: cae en un hueco enorme.
+
+COMO PRESERVA LA CONSISTENCIA
+-----------------------------
+NO se elimina el bucket: se lo RECALCULA como el residuo
     Otros = total_del_mercado - suma(productos listados)
-solo que ahora hay mas productos listados, asi que el residuo es mas chico. Por
-construccion sum(products) == family total EXACTO, mes a mes, sin tocar ni un
-valor del total del mercado. (Si se itemizara reemplazando el bucket por la suma
-cruda de las marcas, el total se movaria unas decenas de unidades por el
-redondeo por-producto que hace el build -- eso NO se hace.)
+Hay mas productos listados, asi que el residuo es mas chico. Por construccion
+sum(products) == mol_perf[fam].{monthly,quarterly,ytd,mat} EXACTO, sin tocar ni un
+valor del total del mercado. (Itemizar reemplazando el bucket por la suma cruda de
+las marcas moveria el total unas decenas de unidades, porque el build redondea por
+producto y el bucket absorbe ese redondeo. Eso NO se hace.)
 
-Se ABORTA por mercado si el residuo recalculado quedaria NEGATIVO en algun mes:
-significa que el universo inferido no es el del mercado (p.ej. mercados
-splitteados por dosis como CEFALEXINA ARG / ARG DUO, donde la molecula sola
-sobre-cuenta). Esos mercados quedan intactos y se reportan.
+El residuo puede quedar levemente NEGATIVO sin que nada este mal: el build redondea
+producto por producto, asi que la suma de valores redondeados puede pasarse del total
+por unas pocas unidades. NO se descartan marcas reales para forzar residuo >= 0 (eso
+costaba 6 a 8 marcas por mercado para tapar unidades de redondeo): se deja el residuo
+EXACTO y se rechaza el mercado solo si se hunde mas de RESID_TOL del total del
+periodo. Medido: 26 mercados legitimos entre 0 y -85 u (<= 0,043% del mercado) contra
+-33.728 u (59%) en CEFALEXINA ARG.
+
+Los candidatos que son marcas SIEGFRIED se tratan aparte (ver el bloque es_sie): no
+se pueden listar como competencia porque el nombre y el flag is_sie alimentan el
+total SIE de compania.
+
+El master cubre Jul 2021..Jun 2026 y los tableros solo necesitan ventanas desde
+Feb 2024, asi que todas las ventanas MAT/YTD de los productos nuevos estan
+completamente cubiertas (no hay MAT parcial).
 
 Uso:
-    py shared/itemize-molperf-otros.py [--master <xlsx>] [--dry-run]
+    py shared/itemize-molperf-otros.py [--mode full|outrank] [--master <xlsx>]
+                                       [--dry-run] [--report <json>]
 """
 from __future__ import annotations
 import argparse, json, re, sys
@@ -62,6 +105,30 @@ RESTO = 'Otros (resto del mercado)'
 LINES = ['cardio/data.js', 'ATB/data.js', 'OTC/data.js', 'respiratorio/data.js']
 MES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 MI = {m: i + 1 for i, m in enumerate(MES)}
+
+# Tolerancia de SOBRE-conteo: cuanto puede exceder el MAT de los candidatos al MAT
+# del bucket antes de considerar que el universo por molecula no es el del mercado.
+# 2% deja pasar el redondeo por-producto del build (medido: peor caso 0,45%) y
+# rechaza los splits por dosis (medido: +1.953% y +5.038%).
+SOBRE_TOL = 0.02
+# Ademas se exige que los meses en que los candidatos exceden al bucket por mas de
+# 5% no sean mas de este porcentaje del total de meses (defensa por si el MAT
+# compensa un sobre-conteo mensual con un sub-conteo en otro mes).
+SOBRE_MESES_MAX = 0.25
+# Cota del residuo negativo, como fraccion del total del periodo. El redondeo
+# por-producto del build da hasta 0,043% (medido); un universo mal inferido da 36-59%.
+# 0,5% deja un margen de 10x sobre el peor caso legitimo y 70x bajo el roto.
+RESID_TOL = 0.005
+# Maximo que la absorcion del deficit de redondeo puede quitarle a UNA marca en UN
+# mes, como fraccion de lo que esa marca vendio ese mes. Con 1%, una marca de miles
+# de unidades absorbe cualquier deficit sin moverse de forma perceptible, y una de
+# 16 unidades no se toca nunca (int(16*0.01) == 0).
+ABSORB_MAX_FRAC = 0.01
+# El cupo se calcula con int(), asi que una marca con menos de 100 unidades en el mes
+# da cupo 0 y queda fuera de la absorcion por truncamiento. Para no perder por eso las
+# ultimas unidades del deficit, a partir de este piso se le permite ceder 1 unidad.
+# Con el piso en 100, ceder 1 unidad sigue siendo <= 1% del mes: la cota no se afloja.
+ABSORB_MIN_DISP = 100
 
 
 def msort(mk):
@@ -155,7 +222,10 @@ def agg_from_monthly(monthly, keys_ref, kind, cierre):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--master', default=str(DEFAULT_MASTER))
+    ap.add_argument('--mode', choices=['full', 'outrank'], default='full',
+                    help='full = itemiza todo el mercado (default); outrank = solo los que superan al SIE')
     ap.add_argument('--dry-run', action='store_true')
+    ap.add_argument('--report', default=None, help='escribe un resumen JSON en esta ruta')
     a = ap.parse_args()
 
     mp_path = Path(a.master)
@@ -163,6 +233,7 @@ def main():
         print('ERROR: master no existe: {}'.format(mp_path), file=sys.stderr)
         return 2
     print('Master: {}'.format(mp_path))
+    print('Modo:   {}'.format(a.mode))
     MPROD, MMONTHS = read_master(mp_path)
     print('  {} productos en el master, {} meses ({}..{})'.format(
         len(MPROD), len(MMONTHS), MMONTHS[0], MMONTHS[-1]))
@@ -172,11 +243,12 @@ def main():
         by_base[strip_suffix(n)].append(n)
 
     print()
-    print('{:<12} {:<24} {:>9} {:>9} {:>6} {:>13} {}'.format(
-        'linea', 'mercado', 'rank_ant', 'rank_new', 'items', 'Otros nuevo', 'estado'))
-    print('-' * 108)
+    print('{:<12} {:<22} {:>8} {:>8} {:>7} {:>6} {:>12} {}'.format(
+        'linea', 'mercado', 'rank_ant', 'rank_new', '+items', 'resid%', 'Otros nuevo', 'estado'))
+    print('-' * 122)
 
     planned = []
+    report = {'mode': a.mode, 'master': str(mp_path), 'markets': []}
     tocados = saltados = 0
     for rel in LINES:
         p = REPO / rel
@@ -186,6 +258,16 @@ def main():
         D, end = json.JSONDecoder().raw_decode(text[s:])
         e = s + end
         cambios_linea = 0
+        linea = rel.split('/')[0]
+        # Nombres de producto ya presentes en CUALQUIER mercado de esta linea. Sirve
+        # para el caso de los candidatos SIEGFRIED: check-total-consistency.py dedupea
+        # los productos SIE por NOMBRE, asi que si el nombre ya figura en otro mercado
+        # de la linea agregarlo aca no mueve el total SIE de compania. Si NO figura en
+        # ninguno, agregarlo SI lo moveria -> se excluye y se reporta.
+        ya_en_linea = set()
+        for _f in (D.get('mol_perf') or {}).values():
+            for _p in (_f.get('products') or []):
+                ya_en_linea.add(str(_p.get('prod')))
 
         for fam, f in (D.get('mol_perf') or {}).items():
             prods = f.get('products') or []
@@ -219,78 +301,221 @@ def main():
             if not ocultos:
                 continue
 
-            # MAT de cada oculto, para saber quien supera a la marca SIE
-            idx = MMONTHS.index(last) if last in MMONTHS else len(MMONTHS) - 1
-            w = MMONTHS[max(0, idx - 11):idx + 1]
-            mat_of = {n: sum(MPROD[n]['monthly'].get(mk, 0) for mk in w) for n in ocultos}
-            superan = sorted([n for n in ocultos if mat_of[n] > sie_mat],
-                             key=lambda n: -mat_of[n])
-
             orden_ant = sorted(prods, key=lambda x: -((x.get('mat') or {}).get(last, 0) or 0))
             rank_ant = [i for i, x in enumerate(orden_ant, 1) if x is principal][0]
 
-            if not superan:
-                continue    # el rank ya era correcto
+            def fila(rank_new, n_add, n_desc, resto_new, estado):
+                print('{:<12} {:<22} {:>8} {:>8} {:>7} {:>6} {:>12} {}'.format(
+                    linea[:12], fam[:22], '#' + str(rank_ant), rank_new, n_add, n_desc,
+                    '{:,}'.format(resto_new) if isinstance(resto_new, int) else resto_new, estado))
 
-            # --- construir los productos nuevos, restringidos a los meses del mercado ---
+            # ── GATE DE SOBRE-CONTEO ──────────────────────────────────────────
+            # Si el universo por molecula excede al bucket, la molecula abarca mas
+            # que el mercado -> se estarian listando marcas de OTRO mercado.
+            idx = MMONTHS.index(last) if last in MMONTHS else len(MMONTHS) - 1
+            w12 = MMONTHS[max(0, idx - 11):idx + 1]
+            cand_mat = sum(sum(MPROD[n]['monthly'].get(mk, 0) for mk in w12) for n in ocultos)
+            resto_mat = int((resto.get('mat') or {}).get(last) or 0)
+            rm = resto.get('monthly_vals') or {}
+            meses_cmp = [mk for mk in rm if mk in MMONTHS and int(rm[mk] or 0) > 0]
+            excede = 0
+            for mk in meses_cmp:
+                sc = sum(MPROD[n]['monthly'].get(mk, 0) for n in ocultos)
+                if sc > int(rm[mk] or 0) * 1.05:
+                    excede += 1
+            sobre_mat = resto_mat > 0 and cand_mat > resto_mat * (1 + SOBRE_TOL)
+            sobre_meses = bool(meses_cmp) and (excede / len(meses_cmp)) > SOBRE_MESES_MAX
+            if sobre_mat or sobre_meses:
+                saltados += 1
+                exc_pct = ((cand_mat / resto_mat - 1) * 100) if resto_mat else float('inf')
+                fila('-', len(ocultos), '-', '-',
+                     'RECHAZADO: sobre-cuenta {:+.0f}% del bucket ({} de {} meses exceden) '
+                     '-> la molecula {} abarca mas que este mercado'.format(
+                         exc_pct, excede, len(meses_cmp), '/'.join(sorted(mols))[:40]))
+                report['markets'].append({
+                    'line': linea, 'market': fam, 'action': 'rechazado-sobreconteo',
+                    'candidates': len(ocultos), 'resto_mat': resto_mat, 'cand_mat': cand_mat,
+                    'exceso_pct': round(exc_pct, 2) if resto_mat else None,
+                    'meses_exceden': excede, 'meses_comparados': len(meses_cmp),
+                    'molecules': sorted(mols)})
+                continue
+
+            # ── candidatos SIEGFRIED: marcas PROPIAS escondidas en el bucket ───
+            # Se detectan por el sufijo de laboratorio del master ('(SIE)') o por
+            # manufacturer. NO se pueden agregar como si fueran competencia: el flag
+            # is_sie y el nombre alimentan el total SIE de compania.
+            def es_sie(n):
+                return '(SIE)' in n.upper() or 'SIEGFRIED' in (MPROD[n]['manuf'] or '').upper()
+
+            # Se excluyen TODOS, tanto los que ya figuran en otro mercado de la linea como
+            # los que no. Motivo medido: check-total-consistency.py (y build-total.py)
+            # arman el universo SIE de compania con sie.setdefault(p['prod'], ...), o sea
+            # dedupean POR NOMBRE y se quedan con la PRIMERA copia que encuentran. Si se
+            # agrega 'DILATREND AP (SIE)' como competidor del mercado DILATREND, esa copia
+            # puede TAPAR a la publicada del mercado DILATREND AP segun el orden de
+            # iteracion -- y si la absorcion de redondeo le toco alguna unidad, el MAT SIE
+            # de compania se mueve. Medido: 20.496.830 vs 20.496.827, 3 unidades, con
+            # tolerancia 2 -> el gate falla. Es una dependencia del orden de iteracion, o
+            # sea fragil por diseño, y no vale la pena para mostrar en el ranking una marca
+            # propia que ya tiene su propia fila de mercado.
+            sie_excluidos = [n for n in ocultos if es_sie(n)]
+            sie_incluidos = []
+            ocultos = [n for n in ocultos if n not in sie_excluidos]
+            if sie_excluidos:
+                report.setdefault('sie_ocultos_excluidos', []).extend(
+                    {'line': linea, 'market': fam, 'prod': n,
+                     'ya_listada_en_la_linea': n in ya_en_linea,
+                     'motivo': 'marca Siegfried dentro del bucket Otros; agregarla como '
+                               'competidor puede mover el total SIE de compania por el dedup '
+                               'por nombre'} for n in sie_excluidos)
+            if not ocultos:
+                continue
+
+            # ── seleccion de candidatos segun el modo ─────────────────────────
+            mat_of = {n: sum(MPROD[n]['monthly'].get(mk, 0) for mk in w12) for n in ocultos}
+            if a.mode == 'outrank':
+                elegidos = [n for n in ocultos if mat_of[n] > sie_mat]
+                if not elegidos:
+                    continue    # el rank ya era correcto
+            else:
+                elegidos = list(ocultos)
+            elegidos.sort(key=lambda n: -mat_of[n])
+
             meses_mkt = sorted(fam_monthly, key=msort)
             q_ref = list((f.get('quarterly') or {}).keys())
             y_ref = list((f.get('ytd') or {}).keys())
             m_ref = list((f.get('mat') or {}).keys())
-            nuevos = []
-            for n in superan:
+
+            def mk_prod(n):
                 monthly = {mk: int(MPROD[n]['monthly'].get(mk, 0) or 0) for mk in meses_mkt}
                 if not any(monthly.values()):
-                    continue
-                nuevos.append({
+                    return None
+                return {
                     'prod': n,
                     'manuf': MPROD[n]['manuf'],
-                    'is_sie': False,
+                    'is_sie': n in sie_incluidos,
                     'monthly_vals': monthly,
                     'quarterly_vals': agg_from_monthly(monthly, q_ref, 'quarterly', cierre),
                     'ytd': agg_from_monthly(monthly, y_ref, 'ytd', cierre),
                     'mat': agg_from_monthly(monthly, m_ref, 'mat', cierre),
                     'ms_monthly': {}, 'ms_quarterly': {}, 'ms_ytd': {}, 'ms_mat': {},
-                })
+                }
+
+            nuevos = [x for x in (mk_prod(n) for n in elegidos) if x]
             if not nuevos:
                 continue
 
-            # --- recalcular el residuo: total - suma(listados + nuevos) ---
-            def suma(campo, keys):
-                acc = defaultdict(int)
-                for x in listados + nuevos:
-                    d = x.get(campo) or {}
-                    for k in keys:
-                        acc[k] += int(d.get(k, 0) or 0)
+            # ── TODO SE DERIVA DEL RESIDUO MENSUAL ────────────────────────────
+            # Se verifico empiricamente que en las 4 lineas la consistencia interna es
+            # perfecta: cada producto tiene quarterly == suma de sus propios meses
+            # (4.005 comparaciones, 0 diferencias) y cada familia tambien
+            # (702 comparaciones, 0 diferencias). Asi que el residuo se calcula UNA vez
+            # a nivel mensual y sus agregados se derivan de el con agg_from_monthly,
+            # igual que cualquier otro producto. Eso hace que
+            #   suma(products.quarterly) == familia.quarterly
+            # cierre por construccion en vez de por resta de agregados: los dos lados
+            # terminan siendo sumas de los MISMOS valores mensuales.
+            def suma_monthly(cands):
+                acc = {mk: 0 for mk in meses_mkt}
+                for x in listados + cands:
+                    mv = x.get('monthly_vals') or {}
+                    for mk in meses_mkt:
+                        acc[mk] += int(mv.get(mk, 0) or 0)
                 return acc
 
-            s_m = suma('monthly_vals', meses_mkt)
-            s_q = suma('quarterly_vals', q_ref)
-            s_y = suma('ytd', y_ref)
-            s_t = suma('mat', m_ref)
-            neg = [mk for mk in meses_mkt if fam_monthly[mk] - s_m[mk] < 0]
-            if neg:
+            r_m = {mk: fam_monthly[mk] - suma_monthly(nuevos)[mk] for mk in meses_mkt}
+
+            # ── COTA DE CORDURA DEL RESIDUO ───────────────────────────────────
+            # El residuo mensual puede quedar levemente NEGATIVO sin que nada este mal:
+            # el build redondea producto por producto, asi que la suma de valores
+            # redondeados puede pasarse del total por unas pocas unidades. Medido en las
+            # 4 lineas: el peor residuo mensual de los mercados legitimos va de 0 a
+            # -85 u, o sea <= 0,043% del mes. Los mercados con el universo mal inferido
+            # estan 3 ordenes de magnitud mas abajo (CEFALEXINA ARG: -33.728 u = 59%).
+            # NO se descartan marcas reales para forzar el residuo >= 0 (eso costaba 6 a
+            # 8 marcas por mercado para tapar unidades de redondeo): se rechaza el
+            # mercado solo si el residuo se hunde mas alla de RESID_TOL del mes.
+            peor_rel, peor_k = 0.0, ''
+            for mk, v in r_m.items():
+                if v < 0 and fam_monthly[mk] > 0:
+                    rel_err = abs(v) / fam_monthly[mk]
+                    if rel_err > peor_rel:
+                        peor_rel, peor_k = rel_err, 'monthly[{}]={}'.format(mk, v)
+            if peor_rel > RESID_TOL:
                 saltados += 1
-                print('{:<12} {:<24} {:>9} {:>9} {:>6} {:>13} {}'.format(
-                    rel.split('/')[0][:12], fam[:24], '#' + str(rank_ant), '-', len(nuevos), '-',
-                    'SALTADO: residuo negativo en {} mes(es) -> el universo inferido no es el del mercado'.format(len(neg))))
+                fila('-', len(nuevos), '-', '-',
+                     'RECHAZADO: residuo {:.2f}% del total en {} -> excede la cota de redondeo '
+                     '({:.1f}%), el universo inferido no es el del mercado'.format(
+                         peor_rel * 100, peor_k, RESID_TOL * 100))
+                report['markets'].append({
+                    'line': linea, 'market': fam, 'action': 'rechazado-residuo',
+                    'candidates': len(elegidos), 'peor_residuo_rel_pct': round(peor_rel * 100, 3),
+                    'peor_residuo_key': peor_k})
                 continue
 
-            nuevo_resto_m = {mk: fam_monthly[mk] - s_m[mk] for mk in meses_mkt}
-            nuevo_resto_q = {k: int((f.get('quarterly') or {}).get(k, 0) or 0) - s_q[k] for k in q_ref}
-            nuevo_resto_y = {k: int((f.get('ytd') or {}).get(k, 0) or 0) - s_y[k] for k in y_ref}
-            nuevo_resto_t = {k: int((f.get('mat') or {}).get(k, 0) or 0) - s_t[k] for k in m_ref}
-            if any(v < 0 for v in list(nuevo_resto_q.values()) + list(nuevo_resto_y.values()) + list(nuevo_resto_t.values())):
-                saltados += 1
-                print('{:<12} {:<24} {:>9} {:>9} {:>6} {:>13} {}'.format(
-                    rel.split('/')[0][:12], fam[:24], '#' + str(rank_ant), '-', len(nuevos), '-',
-                    'SALTADO: residuo negativo en un agregado'))
-                continue
+            # ── ABSORCION DEL DEFICIT DE REDONDEO ─────────────────────────────
+            # Donde el residuo mensual quedo negativo, se le descuentan esas unidades
+            # al candidato NUEVO mas grande de ese mes. Reglas:
+            #   - Los productos LISTADOS no se tocan NUNCA: sus valores ya estan
+            #     publicados y deben seguir coincidiendo con IQVIA.
+            #   - Se elige el mas grande del mes para que la distorsion relativa sea la
+            #     minima posible (decenas de unidades sobre miles).
+            #   - Si ni todos los candidatos juntos alcanzan a cubrir el deficit, se
+            #     rechaza el mercado: eso ya no seria redondeo.
+            # Esto deja el residuo >= 0 en todos los meses SIN inventar unidades: las
+            # que se descuentan son exactamente las que el redondeo del build habia
+            # duplicado, y la suma total no se mueve ni una unidad.
+            # La cota es POR MES y RELATIVA AL VALOR DE ESE MES: a ninguna marca se le
+            # quita mas de ABSORB_MAX_FRAC de lo que vendio ese mes. Consecuencias:
+            #   - las marcas grandes del mes absorben el deficit entero sin moverse
+            #     de manera perceptible (unas decenas sobre miles);
+            #   - las marcas microscopicas NUNCA se tocan (el 1% de 16 unidades es 0),
+            #     asi que no se las puede desfigurar;
+            #   - si en un mes el deficit no se puede cubrir con ese criterio, el
+            #     remanente queda en 'Otros' -- el residuo sigue siendo EXACTO, solo
+            #     puede quedar levemente negativo en ese mes puntual.
+            # (Un intento anterior comparaba las unidades quitadas en 29 meses contra el
+            # MAT de los ultimos 12: mezclaba ventanas y daba falsos 56%.)
+            reasignadas, meses_ajustados, meses_negativos = 0, 0, []
+            peor_dist, peor_dist_det = 0.0, ''
+            for mk in meses_mkt:
+                falta = -r_m[mk]
+                if falta <= 0:
+                    continue
+                for x in sorted(nuevos, key=lambda y: -(int((y['monthly_vals']).get(mk, 0) or 0))):
+                    if falta <= 0:
+                        break
+                    disp = int(x['monthly_vals'].get(mk, 0) or 0)
+                    cupo = int(disp * ABSORB_MAX_FRAC)
+                    if cupo == 0 and disp >= ABSORB_MIN_DISP:
+                        cupo = 1
+                    quita = min(cupo, falta)
+                    if quita <= 0:
+                        continue
+                    x['monthly_vals'][mk] = disp - quita
+                    falta -= quita
+                    reasignadas += quita
+                    if disp > 0 and quita / disp > peor_dist:
+                        peor_dist = quita / disp
+                        peor_dist_det = '{} {} -{} u de {:,}'.format(x['prod'], mk, quita, disp)
+                if falta > 0:
+                    meses_negativos.append('{}({})'.format(mk, -falta))
+                else:
+                    meses_ajustados += 1
 
-            resto['monthly_vals'] = nuevo_resto_m
-            resto['quarterly_vals'] = nuevo_resto_q
-            resto['ytd'] = nuevo_resto_y
-            resto['mat'] = nuevo_resto_t
+            # Recalcular el residuo y los agregados de cada nuevo DESPUES del ajuste,
+            # para que cada producto siga cumpliendo agregado == suma de sus meses.
+            r_m = {mk: fam_monthly[mk] - suma_monthly(nuevos)[mk] for mk in meses_mkt}
+            for x in nuevos:
+                x['quarterly_vals'] = agg_from_monthly(x['monthly_vals'], q_ref, 'quarterly', cierre)
+                x['ytd'] = agg_from_monthly(x['monthly_vals'], y_ref, 'ytd', cierre)
+                x['mat'] = agg_from_monthly(x['monthly_vals'], m_ref, 'mat', cierre)
+
+            resto['monthly_vals'] = r_m
+            resto['quarterly_vals'] = agg_from_monthly(r_m, q_ref, 'quarterly', cierre)
+            resto['ytd'] = agg_from_monthly(r_m, y_ref, 'ytd', cierre)
+            resto['mat'] = agg_from_monthly(r_m, m_ref, 'mat', cierre)
+            r_t = resto['mat']
 
             finales = listados + nuevos + [resto]
             # ms_* de TODOS contra el total de familia (que no cambio)
@@ -311,24 +536,50 @@ def main():
             rank_new = [i for i, x in enumerate(orden_new, 1) if x is principal][0]
             tocados += 1
             cambios_linea += 1
-            print('{:<12} {:<24} {:>9} {:>9} {:>6} {:>13,} {}'.format(
-                rel.split('/')[0][:12], fam[:24], '#' + str(rank_ant), '#' + str(rank_new),
-                len(nuevos), nuevo_resto_t.get(last, 0),
-                'OK  ' + ', '.join(x['prod'] for x in nuevos[:3]) + ('...' if len(nuevos) > 3 else '')))
+            det = 'OK  ranking de {} marcas'.format(len(finales) - 1)
+            if sie_excluidos:
+                det += ' | {} SIE fuera: {}'.format(len(sie_excluidos), ', '.join(sie_excluidos))
+            if sie_incluidos:
+                det += ' | SIE propia visible: {}'.format(', '.join(sie_incluidos))
+            if reasignadas:
+                det += ' | {} u de redondeo reasignadas ({} mes), peor {:.2f}% en {}'.format(
+                    reasignadas, meses_ajustados, peor_dist * 100, peor_dist_det)
+            if meses_negativos:
+                det += ' | Otros levemente negativo en {}: {}'.format(
+                    len(meses_negativos), ', '.join(meses_negativos[:4]))
+            fila('#' + str(rank_new), len(nuevos), '{:.3f}%'.format(peor_rel * 100),
+                 r_t.get(last, 0), det)
+            report['markets'].append({
+                'line': linea, 'market': fam, 'action': 'itemizado',
+                'rank_ant': rank_ant, 'rank_new': rank_new,
+                'added': len(nuevos), 'n_products_final': len(finales),
+                'peor_residuo_rel_pct': round(peor_rel * 100, 4),
+                'peor_residuo_key': peor_k,
+                'unidades_reasignadas': reasignadas, 'meses_ajustados': meses_ajustados,
+                'peor_distorsion_pct': round(peor_dist * 100, 4), 'peor_distorsion': peor_dist_det,
+                'meses_otros_negativo': meses_negativos,
+                'sie_incluidos': sie_incluidos, 'sie_excluidos': sie_excluidos,
+                'resto_mat_new': r_t.get(last, 0), 'resto_mat_old': resto_mat,
+                'sie_brand': principal.get('prod')})
 
         if cambios_linea:
             planned.append((p, text, s, e, D))
 
     print()
-    print('mercados corregidos: {} | saltados por no reconciliar: {}'.format(tocados, saltados))
+    print('mercados itemizados: {} | rechazados/saltados: {}'.format(tocados, saltados))
+    if a.report:
+        Path(a.report).write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding='utf-8')
+        print('reporte -> {}'.format(a.report))
     if a.dry_run:
         print('\nDRY RUN: no se escribio nada.')
         return 0
     print()
     for p, text, s, e, D in planned:
+        antes = p.stat().st_size
         p.write_text(text[:s] + json.dumps(D, ensure_ascii=False) + text[e:],
                      encoding='utf-8', newline='')
-        print('-> {} ({:,} bytes)'.format(p.relative_to(REPO), p.stat().st_size))
+        print('-> {} ({:,} -> {:,} bytes, {:+.1f}%)'.format(
+            p.relative_to(REPO), antes, p.stat().st_size, (p.stat().st_size / antes - 1) * 100))
     return 0
 
 

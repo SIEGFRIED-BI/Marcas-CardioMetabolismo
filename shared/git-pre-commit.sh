@@ -188,4 +188,21 @@ if git diff --cached --name-only | grep -qE 'data\.js$'; then
         exit 1
     fi
 fi
+
+# Check 13: suma(mol_perf[fam].products) == mol_perf[fam] total, exacto.
+# Es la invariante de la que recompute-mol-perf-aggregates.py deriva el total del
+# mercado: si no cierra, el proximo recompute mueve el total publicado y arrastra el
+# tablero Total y los KPIs. Ningun otro gate la verificaba por familia.
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    echo "Running molperf-suma-productos check..."
+    py shared/check-molperf-suma-productos.py
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "MOLPERF-SUMA FAILED -- commit bloqueado"
+        echo "La suma de mol_perf[fam].products no da el total de la familia."
+        echo "Si se agregaron competidores, el residuo 'Otros (resto del mercado)' tiene"
+        echo "que recalcularse: py shared/itemize-molperf-otros.py"
+        exit 1
+    fi
+fi
 exit 0

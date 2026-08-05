@@ -49,6 +49,13 @@ El pre-commit hook ejecuta:
    contra pérdida de meses históricos en mol_perf
 3. `shared/audit-full.py` — consistencia kpis.json ↔ data.js ↔ mol_perf
 4. `shared/check-venta-vs-estimado.py` — bloquea %Cumpl >500% (lumping col0/col1)
+5. `shared/check-molperf-suma-productos.py` — `suma(mol_perf[fam].products)` ==
+   total de la familia, EXACTO. Es la invariante de la que
+   `recompute-mol-perf-aggregates.py` deriva el total del mercado: si no cierra, el
+   próximo recompute mueve el total publicado y arrastra el tablero Total y los KPIs
+   (error silencioso y diferido). La fila `Otros (resto del mercado)` es parte de la
+   suma y puede quedar levemente negativa por el redondeo por-producto del build;
+   se tolera hasta 0,5% del período.
 
 Si algo falla, NO usar `--no-verify`. Investigar y arreglar.
 (El hook vive en `.git/hooks/pre-commit`; copia versionada: `shared/git-pre-commit.sh`.)
@@ -57,6 +64,22 @@ mercados DENTRO de una linea), `shared/check-mercados-cross-linea.py` (una marca
 SIE de OTRA linea colada en el mol_perf de esta — bug MOMETASONE 2026-07-30, el
 anterior no lo ve porque compara contra el competidores-data.js de la propia
 linea) y `shared/bump-cache-busters.py --check`.
+
+**Ranking completo en la apertura del mercado.** Los `build-data.ps1` de
+cardio/ATB/OTC/respiratorio cortan en 8 productos por mercado y meten el resto en
+`Otros (resto del mercado)`, así que la apertura de la tabla multi-período mostraba un
+ranking truncado (el render no tiene tope: es el dato). Lo destapa
+`shared/itemize-molperf-otros.py` (`--mode full`, default), que itemiza el universo del
+mercado desde el master AR_PM. **La regla es asimétrica** y conviene no tocarla:
+*sub-contar* (los candidatos no llegan a explicar el bucket, ej. respiratorio DECADRON)
+es seguro y se itemiza igual dejando el remanente en `Otros`; *sobre-contar* (los
+candidatos exceden el bucket) significa que la molécula abarca más que el mercado y se
+**rechaza** — es el caso de los mercados splitteados por dosis, ATB CEFALEXINA ARG
+(+1953%) y ARG DUO (+5038%), cuyas dos familias particionan la molécula CEFALEXIN.
+Los candidatos que son marcas SIEGFRIED se excluyen siempre: `check-total-consistency.py`
+y `build-total.py` arman el universo SIE de compañía con `sie.setdefault(p['prod'], ...)`,
+o sea dedupean por NOMBRE y se quedan con la primera copia, así que una copia agregada
+puede tapar a la publicada según el orden de iteración y mover el MAT SIE de compañía.
 
 ## Cierre mensual — 1 comando
 

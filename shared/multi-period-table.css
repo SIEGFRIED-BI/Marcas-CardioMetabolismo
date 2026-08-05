@@ -3,13 +3,36 @@
  * Mismo lenguaje visual que kpis.html → vista 'Por Marca'.
  * Responsive: sin scrollbar horizontal en ningún breakpoint.
  */
+/* --mp-hd-h: alto de la fila de grupo (MAT/YTD/TRIM/MES). Es el offset con el que se
+ * pega la segunda fila de cabecera (Units/MS%/IE/Var pp) debajo de la primera. Se
+ * redefine en los breakpoints donde cambia el alto (cuando .mp-lbl se oculta). */
+:root { --mp-hd-h: 36px; }
 .mp-wrap {
   overflow-x: hidden;
+  /* Con la apertura de un mercado grande la tabla pasa de 1 fila a 30-46, y sin un
+   * tope la cabecera se va de pantalla: se pierde saber si una columna es MAT, YTD,
+   * TRIM o MES. Con max-height el .mp-wrap es su propio scrollport y el thead puede
+   * quedar sticky adentro. Debajo de 82vh de contenido no cambia nada visualmente. */
+  overflow-y: auto;
+  max-height: 82vh;
+  overscroll-behavior: contain;
   width: 100%;
   max-width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;
+}
+/* Cabecera fija dentro del scrollport. Las dos filas se pegan: la de grupo arriba y
+ * la de metricas justo debajo. z-index para quedar sobre las celdas del tbody. */
+.mp-table thead tr.mp-group-row th {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+.mp-table thead tr.mp-sub-row th {
+  position: sticky;
+  top: var(--mp-hd-h);
+  z-index: 3;
 }
 .mp-table {
   width: 100%;
@@ -230,6 +253,8 @@
   .mp-table thead tr.mp-group-row th .mp-lbl { font-size: 7px; }
 }
 @media (max-width: 1024px) {
+  /* aca .mp-lbl se oculta -> la fila de grupo se achica y el offset del sticky cambia */
+  :root { --mp-hd-h: 21px; }
   .mp-table { font-size: 9.5px; }
   .mp-table thead tr.mp-group-row th { font-size: 9px; padding: 4px 3px; }
   .mp-table thead tr.mp-sub-row th.mp-sh { font-size: 8.5px; padding: 3px 2px; }
@@ -237,6 +262,7 @@
   .mp-table thead tr.mp-group-row th .mp-lbl { display: none; }
 }
 @media (max-width: 768px) {
+  :root { --mp-hd-h: 20px; }
   .mp-table { font-size: 9px; }
   .mp-table th, .mp-table td { padding: 3px 1px; }
   .mp-table thead tr.mp-group-row th { font-size: 8.5px; }
