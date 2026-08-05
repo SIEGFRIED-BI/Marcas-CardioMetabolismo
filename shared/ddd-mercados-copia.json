@@ -1,0 +1,66 @@
+{
+ "_doc": "Mercados del panel DDD regional que son COPIA de un slice de otro mercado del mismo archivo. build-competidores-shape-a.py saltea sus filas: re-indexa los mercados por molecula/ATC y la columna Mercado no forma parte de la clave, asi que si el archivo trae el contenedor Y el contenido las unidades se suman DOS VECES. Generado por shared/qlik/detectar-mercados-copia-xlsx.py, que compara celda por celda (region, producto, mes) y solo marca copias EXACTAS. mujer NO se lista a proposito: build-mujer-competidores-data.py indexa por mercado, cada mercado es su propio bucket y no hay doble conteo.",
+ "_medido": "ATB azitromicina May-2026: 259.658 u publicadas vs 213.664 u reales en Qlik (+21,5%).",
+ "lineas": {
+  "ATB": {
+   "saltear": [
+    "Macromax pediátr. (azitro)",
+    "Cefalexina Argentia Dúo"
+   ],
+   "contenido_en": {
+    "Macromax pediátr. (azitro)": "Macromax",
+    "Cefalexina Argentia Dúo": "Cefalexina Argentia Familia"
+   },
+   "unidades_de_doble_conteo": 2460235,
+   "inflacion_pct": 17.6
+  },
+  "respiratorio": {
+   "saltear": [
+    "Hexaler bronquial duo",
+    "Hexaler bronquial",
+    "Acemuk Pediatrico",
+    "Alergical",
+    "Alidial",
+    "Aireal Plus"
+   ],
+   "contenido_en": {
+    "Hexaler bronquial duo": "Asma (Hexaler bronquial)",
+    "Hexaler bronquial": "Asma (Hexaler bronquial)",
+    "Acemuk Pediatrico": "Acemuk",
+    "Alergical": "Hexaler",
+    "Alidial": "Hexaler",
+    "Aireal Plus": "Hexaler Plus"
+   },
+   "unidades_de_doble_conteo": 40091834,
+   "inflacion_pct": 17.79
+  },
+  "dermato": {
+   "saltear": [
+    "Micomazol Crema"
+   ],
+   "contenido_en": {
+    "Micomazol Crema": "Micomazol Total"
+   },
+   "unidades_de_doble_conteo": 4585980,
+   "inflacion_pct": 8.57
+  },
+  "SNC": {
+   "saltear": [
+    "Valquir",
+    "Visdon",
+    "Quetiapinas",
+    "Brexil",
+    "Lurap"
+   ],
+   "contenido_en": {
+    "Valquir": "Antidepresivos",
+    "Visdon": "Antidepresivos",
+    "Quetiapinas": "Antipsicóticos",
+    "Brexil": "Antipsicóticos",
+    "Lurap": "Antipsicóticos"
+   },
+   "unidades_de_doble_conteo": 7792094,
+   "inflacion_pct": 16.13
+  }
+ }
+}

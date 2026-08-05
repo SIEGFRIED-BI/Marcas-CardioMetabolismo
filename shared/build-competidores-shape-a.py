@@ -39,6 +39,28 @@ LINE_CFG = [
     # segmentos custom). Ver memoria iqvia-base-unica-arquitectura.
 ]
 
+# ── MERCADOS-COPIA: el fix del doble conteo del DDD ──────────────────────────────
+# Los mercados de la columna Mercado son una jerarquia deliberada (Macromax ⊃ Macromax
+# pediátr.; Antipsicóticos ⊃ Quetiapinas; Micomazol Total ⊃ Micomazol Crema). Este builder
+# re-indexa los mercados por molecula/ATC, asi que la columna Mercado NO forma parte de la
+# clave de units[brand][region][mes]: si el archivo trae el contenedor Y el contenido, esas
+# unidades se suman DOS VECES. Medido en ATB, May-2026: el mercado de azitromicina publicaba
+# 259.658 u contra 213.664 u reales en Qlik (+21,5%), y todo MS% contra ese denominador
+# quedaba subestimado ~18%. Las series afectadas mostraban ratios enteros exactos (-50,0%,
+# -66,7% tras el fix), que es la firma de duplicacion estructural.
+# La lista sale de shared/qlik/detectar-mercados-copia-xlsx.py, que compara celda por celda
+# (region, producto, mes) y solo marca copias EXACTAS. Descartar una copia no cambia ningun
+# valor: el contenedor ya tiene esas unidades.
+COPIA_CFG = REPO / 'shared' / 'ddd-mercados-copia.json'
+
+
+def mercados_copia(line):
+    if not COPIA_CFG.is_file():
+        return set()
+    cfg = json.loads(COPIA_CFG.read_text(encoding='utf-8'))
+    return set(((cfg.get('lineas') or {}).get(line) or {}).get('saltear') or [])
+
+
 def resolve_regional_xlsx(hub_sub, month):
     """Glob del Producto-Molecula-ATC-provincia*.xlsx mas reciente del mes."""
     base = INPUTS / hub_sub / month
@@ -204,6 +226,9 @@ def build_one(line: str, xlsx: Path, out: Path) -> str:
     c_mes    = cols.get('AñoMes', 4)
     c_prod   = cols.get('Producto', 7)
     c_unid   = cols.get('Unidades', 8)
+    c_mkt    = cols.get('Mercado', 1)
+    saltear  = mercados_copia(line)
+    n_copia  = 0
 
     months_set, regions_set = set(), set()
     units = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))   # brand->region->mes->u
@@ -220,6 +245,12 @@ def build_one(line: str, xlsx: Path, out: Path) -> str:
         prod   = row[c_prod]   if c_prod   < len(row) else None
         unid   = row[c_unid]   if c_unid   < len(row) else None
         if not region or not mes or not prod: continue
+        # mercado-copia: sus filas ya estan en el mercado contenedor -> se saltean para no
+        # contarlas dos veces (ver mercados_copia arriba)
+        if saltear and c_mkt < len(row) and row[c_mkt] is not None:
+            if str(row[c_mkt]).strip() in saltear:
+                n_copia += 1
+                continue
         region = str(region).strip()
         if region in ('Totales', '-'): continue
         mes = str(mes).strip()
@@ -314,7 +345,9 @@ def build_one(line: str, xlsx: Path, out: Path) -> str:
         f'window.SFG_COMP_DATA = {json.dumps(out_obj, ensure_ascii=False)};\n',
         encoding='utf-8', newline=''
     )
+    copia_txt = f'copia_salteada={n_copia:,} ' if n_copia else ''
     return (f'  [{line}] OK rows={n_rows:,} kept={n_kept:,} '
+            f'{copia_txt}'
             f'months={len(months)} ({months[0] if months else "-"}..{months[-1] if months else "-"}) '
             f'regions={len(regions)} mercados(SIE)={len(out_obj["markets"])} '
             f'-> {out.name} ({out.stat().st_size:,} bytes)')

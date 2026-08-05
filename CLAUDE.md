@@ -65,6 +65,26 @@ SIE de OTRA linea colada en el mol_perf de esta — bug MOMETASONE 2026-07-30, e
 anterior no lo ve porque compara contra el competidores-data.js de la propia
 linea) y `shared/bump-cache-busters.py --check`.
 
+**Mercados-copia del DDD regional (doble conteo).** Los mercados de la columna `Mercado`
+del panel DDD son una **jerarquía deliberada**: un contenedor y sus sub-segmentos
+(`Macromax` ⊃ `Macromax pediátr.`; `Antipsicóticos` ⊃ `Quetiapinas`; `Micomazol Total` ⊃
+`Micomazol Crema`). El dato está bien — el problema es que `build-competidores-shape-a.py`
+re-indexa por molécula/ATC (`units[brand][region][mes] += u`) y la columna `Mercado` **no**
+forma parte de la clave, así que si el archivo trae el contenedor Y el contenido esas
+unidades se suman **dos veces**. Medido en ATB, May-2026: el mercado de azitromicina
+publicaba 259.658 u contra 213.664 u reales en Qlik (+21,5%).
+La lista vive en **`shared/ddd-mercados-copia.json`** y el builder saltea esas filas. Se
+regenera con `shared/qlik/detectar-mercados-copia-xlsx.py`, que compara **celda por celda**
+`(región, producto, mes)` sobre el propio xlsx y solo marca copias EXACTAS. Conviene
+re-correrlo cuando aparezcan mercados nuevos en el panel.
+**mujer NO se lista a propósito**: `build-mujer-competidores-data.py` indexa por mercado
+(`data[market][brand][region][mes]`), o sea cada mercado del Ateneo es su propio bucket con
+su total correcto y ahí no hay doble conteo — descartar le borraría 22 mercados (los
+segmentos de marketing que esa página muestra).
+NO usar la API de Qlik para detectar esto: devuelve agregados a medio calcular y el mismo
+test dio resultados distintos entre corridas, con la dirección contenedor/contenido
+invertida (marcaba `Hexaler ⊆ Alergical` con Hexaler en 18,0M y Alergical en 9,5M).
+
 **Vista alternativa del mercado por clase terapéutica (`mercadosATC`).** En Mercado IQVIA
 hay un selector *Universo: Molécula / Clase terapéutica*. La segunda mide cada marca
 contra su clase ATC III del Ateneo (ROXOLAN: 2,0% en ROSUVASTATIN vs 1,05% en
