@@ -405,10 +405,8 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
       </div>
       <div>
         <div><div class="chart-h280"><canvas id="perfChart"></canvas></div></div>
-        <div class="card-sm" style="margin-top:16px;">
-          <p style="font-size:9px;font-weight:700;color:#4b5563;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">Tabla comparativa · <span id="perf-table-period"></span></p>
-          <div style="overflow-y:auto;max-height:320px;overflow-x:hidden;" id="perf-table"></div>
-        </div>
+        <!-- perf-table-oculta: la tabla simple de 1 periodo se saco de la vista; queda la COMPARATIVA MULTI-PERIODO. Los ids siguen aca (ocultos) porque renderPerf les escribe en varios puntos y sin ellos tira null y rompe el grafico. -->
+        <div style="display:none"><span id="perf-table-period"></span><div id="perf-table"></div></div>
       </div>
     </div>
       <div class="card mp-summary-card" style="margin-top:14px;">
