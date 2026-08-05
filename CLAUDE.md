@@ -65,6 +65,26 @@ SIE de OTRA linea colada en el mol_perf de esta — bug MOMETASONE 2026-07-30, e
 anterior no lo ve porque compara contra el competidores-data.js de la propia
 linea) y `shared/bump-cache-busters.py --check`.
 
+**Vista alternativa del mercado por clase terapéutica (`mercadosATC`).** En Mercado IQVIA
+hay un selector *Universo: Molécula / Clase terapéutica*. La segunda mide cada marca
+contra su clase ATC III del Ateneo (ROXOLAN: 2,0% en ROSUVASTATIN vs 1,05% en
+`C10A - PRD REGULADORES LIPIDOS`, y de #10 pasa a #24 de 135). La genera
+`shared/build-mercados-atc.py` — clasificación del Ateneo, unidades del master AR_PM,
+porque el Ateneo viene en MAT móvil y la tabla necesita mensual. Valida el cruce AR_PM vs
+Ateneo por clase (265/265 cierran) y aborta si alguna se pasa de `--tol`.
+Vive en una clave **aparte** de `mol_perf` a propósito: `build-total.py:260` y
+`check-total-consistency.py:54` recorren `mol_perf` para armar el mercado de compañía, y
+el universo ATC ancho bajaría el MS% publicado. **Ese paso tiene que correr después de
+`build-all`**: el literal `$dashboardData` de cada `build-data.ps1` (27 claves) reescribe
+`data.js` entero y borra cualquier clave que no conozca. Ya está encadenado en
+`update-all.ps1`, igual que `itemize-molperf-otros.py`.
+Ojo con `respPerf` (cardio/ATB/respiratorio): es un intento previo de lo mismo
+(`{molecule,atc} × {all,etico,popular}`) pero está **truncado a 8 productos sin fila de
+residuo** (cardio ROXOLAN `atc.all` suma 9.530.488 contra su `family.mat` 20.671.610),
+los 6 nodos `etico`/`popular` están vacíos y va un mes atrasado. Solo respiratorio lo
+consume, en el gráfico (`respiratorio/index.html:643`), así que ahí conviven dos vistas
+ATC con números distintos.
+
 **Ranking completo en la apertura del mercado.** Los `build-data.ps1` de
 cardio/ATB/OTC/respiratorio cortan en 8 productos por mercado y meten el resto en
 `Otros (resto del mercado)`, así que la apertura de la tabla multi-período mostraba un

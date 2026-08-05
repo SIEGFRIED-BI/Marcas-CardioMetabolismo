@@ -63,13 +63,19 @@ def parse_data(text, var_pattern):
 
 
 def get_months_set(D):
-    mol = D.get('mol_perf', {})
     all_months = set()
-    for v in mol.values():
+    for v in (D.get('mol_perf') or {}).values():
         if not isinstance(v, dict): continue
         for p in v.get('products', []):
             mv = p.get('monthly_vals', {})
             all_months.update(mv.keys())
+    # mercadosATC: vista alternativa del mercado por clase terapeutica ATC. Se une (no
+    # reemplaza) porque tambien es historia mensual publicada y sin esto quedaba sin red:
+    # si un cierre la dejara con menos meses -- o vacia -- este gate daba OK igual.
+    for c in ((D.get('mercadosATC') or {}).get('clases') or {}).values():
+        if not isinstance(c, dict): continue
+        for p in c.get('products', []):
+            all_months.update((p.get('monthly_vals') or {}).keys())
     return all_months
 
 

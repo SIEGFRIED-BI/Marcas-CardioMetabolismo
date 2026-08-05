@@ -208,7 +208,24 @@ Step 'mercado TETRALGIN (IQVIA)' { & $py (Join-Path $PSScriptRoot 'rebuild-otc-t
 # Excluir productos vetados (BONVIVA, CALCITOL D3, etc.) de todas las data.js ANTES de agregados/KPIs.
 Step 'excluir productos' { & $py (Join-Path $PSScriptRoot 'apply-product-exclusions.py') }
 
+# Ranking COMPLETO en la apertura del mercado: los build-data.ps1 cortan en 8 productos
+# por mercado y meten el resto en 'Otros (resto del mercado)', asi que sin este paso la
+# apertura de la tabla multi-periodo vuelve a mostrar un ranking truncado y un puesto que
+# no existe (ROXOLAN se veia #7 en vez de #10). Recalcula el residuo, no lo borra, asi que
+# sum(products) sigue dando el total de la familia (lo verifica el Check 13 del hook).
+# TIENE que correr DESPUES de build-all: ese literal reescribe data.js entero.
+Step 'ranking completo mercados' { & $py (Join-Path $PSScriptRoot 'itemize-molperf-otros.py') --master $master }
+
 Step 'recompute aggregates' { & $py (Join-Path $PSScriptRoot 'recompute-mol-perf-aggregates.py') --cierre $closeMonth }
+
+# Vista alternativa del mercado por clase terapeutica ATC (clave mercadosATC): permite
+# medir cada marca contra su universo amplio ademas de contra su molecula exacta
+# (ROXOLAN: 2,0% en ROSUVASTATIN vs 1,05% en C10A - PRD REGULADORES LIPIDOS). La
+# clasificacion sale del Ateneo y las unidades del master. Igual que el paso anterior,
+# TIENE que correr despues de build-all porque el literal $dashboardData de build-data.ps1
+# no conoce esta clave y la borraria. Valida el cruce AR_PM vs Ateneo por clase y aborta
+# si alguna no cierra.
+Step 'mercados ATC (vista amplia)' { & $py (Join-Path $PSScriptRoot 'build-mercados-atc.py') --ateneo $ateneo --master $master }
 # brandKpis de MAGNUS 36 (no lo crea build-data; lo arma desde mol_perf MAGNUS 36 +
 # budget + rec_ms, y lo suma a sieProds). Tras el recompute (necesita ytd/mat). Idempotente.
 Step 'MAGNUS 36 brandKpis' { & $py (Join-Path $PSScriptRoot 'ensure-magnus36-brandkpis.py') }
