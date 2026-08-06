@@ -14,6 +14,13 @@
 4. **`?v=<hash>` del cache-buster siempre fresco** — automático (build-all +
    pre-commit). Nunca editar data.js sin que el `?v` cambie, o el deployado
    sirve la versión vieja cacheada.
+   El Check 0 del hook **bumpeaba pero no re-stageaba** las 7 `*/DDD/competidores.html`
+   (+ `dermatologia/competidores.html`): tenía una lista hardcodeada con solo los
+   `index.html` de línea. Se commiteaba el `competidores-data.js` nuevo con el HTML
+   apuntando al hash viejo → dato publicado nuevo, **mes viejo en pantalla**, y ningún
+   gate lo veía porque no mueve ninguna suma. Arreglado 2026-08-05: ya no hay lista,
+   re-stagea todo html cuyo único cambio sea el `?v=`. Si tocás el hook, **copialo a
+   `.git/hooks/pre-commit`** — son dos archivos distintos y se desincronizan.
 5. **Los splits de Venta Interna (MAGNUS/36, ROXOLAN/PLUS) NO son parte del merge.**
    Re-correr `merge-ventas-internas.py` completo los REVIERTE. Re-aplicarlos
    después, o correr la corrección de la línea puntual.
@@ -145,6 +152,27 @@ venta/regionales en `fuentes-originales` de cada línea. `-SkipBuildAll` saltea 
 rebuild de las 5 (útil si solo cambió SNC/derma/recetas).
 
 **No tocar:** `window.OTC_DATA` (lo usan las páginas de competidores Shape B).
+
+### DDD por API: anexar un mes suelto
+
+`shared/qlik/extract-ddd-mes.mjs` (troceado por región, ~20 min) → `append-ddd-mes.py`
+(estrictamente aditivo, aborta si el mes ya está) → rebuild de las 7 líneas.
+
+**Qlik puede REDEFINIR un mercado de un mes al otro, y ningún gate de sumas lo ve.**
+Al traer Jun-2026, `Trip +45` (mujer) pasó de 129 a 314 productos y +37% de unidades: no
+era crecimiento, era otro universo. G1/G2/G3 pasaron las tres porque ninguna rompe una
+suma — lo cazó el chequeo de **FORMA** (marcas de mujer 324 → 483, las 159 nuevas
+solo-junio). Por eso el diff mensual **tiene que contar valores distintos por dimensión**,
+no solo comparar totales.
+Herramienta: `shared/qlik/restringir-mes-a-historico.py --mercado "<X>"` limita el mes
+nuevo a los productos que ya estaban en la historia de ese mercado (se aplicó a
+`Trip +45`: −9.203 filas / −398.887 u / −182 productos, y el archivo sin restringir queda
+al lado como `_sin-restringir - *.bak`).
+**Ojo con la lectura inversa:** entre los productos excluidos estaba `TRIP +45 TABL
+RECUBIE x 30`, o sea la propia marca SIE, históricamente ausente de su propio mercado.
+Puede ser que Qlik haya corregido un agujero viejo en vez de ensanchar el mercado.
+Resolverlo a favor de Qlik obliga a **re-expresar los 24 meses** — decisión del usuario,
+no del pipeline.
 
 ## Líneas y archivos
 

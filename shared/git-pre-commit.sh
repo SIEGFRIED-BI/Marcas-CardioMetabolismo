@@ -5,12 +5,29 @@
 # Check 0: cache-busters. Si se tocaron data.js / assets compartidos / paginas,
 # re-genera el ?v=<hash> y re-stagea las paginas afectadas. Asi NUNCA se sirve
 # una version vieja cacheada por olvidarse de bumpear ?v.
+#
+# OJO: aca habia una lista HARDCODEADA de paginas a re-stagear que NO incluia las 7
+# */DDD/competidores.html (ni dermatologia/competidores.html). Resultado: al actualizar el
+# DDD, el bump les cambiaba el ?v= pero el cambio quedaba SIN STAGEAR, y el commit subia el
+# competidores-data.js nuevo con el HTML apuntando al hash viejo. El navegador servia el
+# cacheado: dato nuevo publicado, mes viejo en pantalla, y ningun gate lo veia porque no
+# mueve ninguna suma. Detectado el 2026-08-05 al actualizar a Jun-2026.
+# Por eso ya no hay lista: se re-stagea CUALQUIER html cuyo unico cambio sea el ?v=, que es
+# exactamente lo que bump-cache-busters puede tocar. Si un html tiene ademas cambios de
+# contenido sin stagear, se lo deja como esta (no es de este hook decidir por el usuario).
 if git diff --cached --name-only | grep -qE '(data\.js|shared/.*\.(js|css)|index\.html|dermato_dashboard\.html|kpis\.html)$'; then
     echo "Bumping cache-busters (?v=hash)..."
     py shared/bump-cache-busters.py
-    git add cardio/index.html ATB/index.html OTC/index.html respiratorio/index.html \
-            mujer/index.html SNC/index.html dermatologia/dermato_dashboard.html \
-            kpis.html index.html 2>/dev/null
+    for f in $(git diff --name-only -- '*.html'); do
+        # lineas de cambio real (sin cabeceras del diff) que NO son un ?v=<hash>
+        otras=$(git diff -U0 -- "$f" | grep -E '^[-+][^-+]' | grep -cv '?v=[0-9a-f]\{6,\}')
+        if [ "$otras" -eq 0 ]; then
+            git add "$f"
+            echo "  re-stageado: $f"
+        else
+            echo "  OJO: $f tiene cambios ademas del ?v=, se deja sin stagear"
+        fi
+    done
 fi
 
 # Check 1: syntax y antipatrones (siempre que haya cambios en HTML/JS)
