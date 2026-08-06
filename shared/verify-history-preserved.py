@@ -69,10 +69,11 @@ def get_months_set(D):
         for p in v.get('products', []):
             mv = p.get('monthly_vals', {})
             all_months.update(mv.keys())
-    # mercadosATC: vista alternativa del mercado por clase terapeutica ATC. Se une (no
-    # reemplaza) porque tambien es historia mensual publicada y sin esto quedaba sin red:
-    # si un cierre la dejara con menos meses -- o vacia -- este gate daba OK igual.
-    for c in ((D.get('mercadosATC') or {}).get('clases') or {}).values():
+    # mercadosAteneo: vista alternativa por los mercados curados del Ateneo (antes era
+    # mercadosATC / clases ATC III, que el usuario rechazo). Se une (no reemplaza) porque
+    # tambien es historia mensual publicada y sin esto quedaba sin red: si un cierre la
+    # dejara con menos meses -- o vacia -- este gate daba OK igual.
+    for c in ((D.get('mercadosAteneo') or {}).get('mercados') or {}).values():
         if not isinstance(c, dict): continue
         for p in c.get('products', []):
             all_months.update((p.get('monthly_vals') or {}).keys())
