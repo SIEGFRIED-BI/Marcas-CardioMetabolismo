@@ -7,13 +7,19 @@
  *
  * ANTES ESTO ERA LA VISTA ATC III Y EL USUARIO LA RECHAZO ("pero no me armaste como los
  * mercados del ateneo"). Los mercados del Ateneo no son clases ATC: son agrupaciones
- * curadas a mano ('"'"'Roxolan (Hipolipemeantes)'"'"', '"'"'Betabloqueantes (Dilatrend-Nebilet)'"'"').
+ * curadas a mano ('Roxolan (Hipolipemeantes)', 'Betabloqueantes (Dilatrend-Nebilet)').
  *
- * UNA FAMILIA PUEDE TENER VARIOS MERCADOS, y esa es la gracia: los mercados del Ateneo
- * estan ANIDADOS. DILATREND se mide 13,66% contra '"'"'Carvedilol (Dilatrend)'"'"' y 3,84%
- * contra '"'"'Betabloqueantes (Dilatrend-Nebilet)'"'"'. Por eso porFamilia[fam] es una LISTA y
- * la tabla emite UNA FILA POR (familia, mercado): la misma marca aparece una vez por cada
- * universo en el que compite. Nunca se suman entre si -- se solapan a proposito.
+ * UN PRODUCTO PUEDE ESTAR EN VARIOS MERCADOS, y esa es la gracia: los mercados del Ateneo
+ * estan ANIDADOS. DILATREND se mide 13,66% contra 'Carvedilol (Dilatrend)' y 3,84% contra
+ * 'Betabloqueantes (Dilatrend-Nebilet)'. Nunca se suman entre si -- se solapan a proposito.
+ *
+ * La tabla emite UNA FILA POR (PRODUCTO PROPIO, MERCADO), no una por familia. Es decision
+ * del usuario, sobre un caso concreto: ACNECLIN (50mg tabl) y ACNECLIN AP (100mg caps
+ * A.P.) son productos DISTINTOS pero viven en la misma familia del tablero
+ * (dermatologia/MINOCYCLINE), que ademas no tiene budIqviaMap. Agrupando por familia
+ * salian sumados en un 17,43% que no describe a ninguno de los dos: ACNECLIN AP es el
+ * LIDER de su mercado con 15,42% y ACNECLIN esta 14no con 2,01%.
+ * Por eso mercadosAteneo.filas es una lista de {label, mercado, propios}.
  *
  * Pedido del usuario: "mantene los que estan pero agrega por ejemplo para roxolan el
  * mercado de hipolipemeantes" / "no quiero agregar productos y demas, son formas
@@ -36,8 +42,8 @@
  * Un mercado contiene VARIAS marcas Siegfried (en 'Ara II (Diov-Entr-Exfo)' estan DIOVAN,
  * DIOVAN D, ENTRESTO, EXFORGE y EXFORGE D). buildIqviaFamilies calcula
  * own = is_sie && ownList.indexOf(prod) !== -1, con ownList = budIqviaMap[familia]. Por
- * eso se pasa D.mercadosAteneo.propios como budIqviaMap: cada fila mide SOLO su propia
- * marca contra la clase, no todo lo Siegfried que haya adentro. Sin esto, DILATREND y
+ * eso cada fila pasa como budIqviaMap SU PROPIO producto (fila.propios), y mide solo ese
+ * contra el mercado, no todo lo Siegfried que haya adentro. Sin esto, DILATREND y
  * DILATREND AP mostrarian las dos el mismo 4,00% en vez de 4,00% y 0,33%.
  */
 (function (global) {
@@ -52,32 +58,27 @@
     return null;
   }
 
-  function famLabel(fam) {
-    return (global.FAM_LABEL && global.FAM_LABEL[fam]) || fam;
-  }
-
-  /* Arma el objeto sintetico que espera renderMultiPeriodTable. Las claves de familia
-   * llevan la clase pegada ("ROXOLAN · C10A - PRD REGULADORES LIPIDOS") porque la fila
-   * es la marca pero el universo es la clase, y sin eso la tabla diria solo "ROXOLAN"
-   * con numeros que no son los de su mercado de molecula. */
+  /* Arma el objeto sintetico que espera renderMultiPeriodTable. La clave lleva el mercado
+   * pegado ("ROXOLAN · Roxolan (Hipolipemeantes)") porque la fila es el producto pero el
+   * universo es el mercado, y sin eso la tabla diria solo "ROXOLAN" con numeros que no
+   * son los de su mercado de molecula. */
   function buildAtcData(D) {
     var mA = D && D.mercadosAteneo;
-    if (!mA || !mA.mercados || !mA.porFamilia) return null;
+    if (!mA || !mA.mercados || !mA.filas) return null;
     var mp = {}, bim = {}, n = 0;
-    Object.keys(mA.porFamilia).forEach(function (fam) {
-      var lista = mA.porFamilia[fam];
-      if (!lista) return;
-      // porFamilia[fam] es una LISTA (una familia puede competir en 2-3 mercados
-      // anidados). Se tolera el string suelto por si queda un data.js viejo.
-      if (typeof lista === 'string') lista = [lista];
-      lista.forEach(function (mkt) {
-        var c = mA.mercados[mkt];
-        if (!c || !c.products || !c.products.length) return;
-        var key = famLabel(fam) + ' · ' + mkt;
-        mp[key] = { products: c.products };
-        bim[key] = (mA.propios && mA.propios[fam]) || [];
-        n++;
-      });
+    // UNA FILA POR (PRODUCTO PROPIO, MERCADO), no una por familia.
+    // Decision del usuario: "no son el mismo producto". ACNECLIN (50mg tabl) y ACNECLIN AP
+    // (100mg caps A.P.) viven en la misma familia del tablero (dermatologia/MINOCYCLINE) y
+    // esa familia no tiene budIqviaMap, asi que agrupar por familia los sumaba en un 17,43%
+    // que no describe a ninguno: ACNECLIN AP es el LIDER de su mercado con 15,42% y
+    // ACNECLIN esta 14no con 2,01%.
+    mA.filas.forEach(function (f) {
+      var c = mA.mercados[f.mercado];
+      if (!c || !c.products || !c.products.length) return;
+      var key = f.label + ' · ' + f.mercado;
+      mp[key] = { products: c.products };
+      bim[key] = f.propios || [];
+      n++;
     });
     if (!n) return null;
     return { mol_perf: mp, budIqviaMap: bim };
@@ -105,6 +106,7 @@
     if (!buildAtcData(D)) return;   // la linea no tiene la vista -> no se muestra nada
     var mA = D.mercadosAteneo;
     var nClases = Object.keys(mA.mercados).length;
+    var nFilas = (mA.filas || []).length;
 
     var bar = document.createElement('div');
     bar.id = BAR_ID;
@@ -134,9 +136,9 @@
         botones[i].style.color = on ? '#fff' : '#525252';
       }
       hint.textContent = modo === 'atc'
-        ? 'Mercados del Ateneo — ' + nClases + ' mercados, universo más amplio que la '
-          + 'molécula. Una marca puede aparecer en más de uno (están anidados) y el MS% se '
-          + 'recalcula contra cada uno. No se suman entre sí: se solapan.'
+        ? 'Mercados del Ateneo — ' + nClases + ' mercados, ' + nFilas + ' filas. Universo '
+          + 'más amplio que la molécula: una fila por producto y mercado, y un producto puede '
+          + 'aparecer en más de uno (están anidados). No se suman entre sí: se solapan.'
         : 'Mercado de la molécula exacta.';
       render(modo);
     }

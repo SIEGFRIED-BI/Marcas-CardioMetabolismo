@@ -44,8 +44,18 @@ de mol_perf por la misma razon que la anterior (build-total.py y
 check-total-consistency.py recorren mol_perf para armar el mercado y el SIE de COMPANIA;
 meter aca un universo ancho inflaria el mercado total y bajaria el MS% publicado).
 
-Y por eso `porFamilia[fam]` es una LISTA, no un string como en la version ATC: una familia
-puede tener 2 o 3 mercados y hay que poder verlos todos.
+UNA FILA POR (PRODUCTO PROPIO, MERCADO)
+---------------------------------------
+La salida es `filas`: una lista de {label, mercado, propios}, NO un mapa familia->mercado.
+Decision del usuario, sobre un caso concreto: ACNECLIN (50mg tabl, 16.277 u) y ACNECLIN AP
+(100mg caps A.P., 124.664 u) son productos DISTINTOS pero viven en la misma familia del
+tablero (dermatologia/MINOCYCLINE), que ademas no tiene budIqviaMap. Agrupando por familia
+salian sumados en un 17,43% que no describe a ninguno de los dos: ACNECLIN AP es el LIDER
+de 'Tetraciclinas (Acneclin)' con 15,42% y ACNECLIN esta 14no con 2,01%.
+Un producto propio puede figurar en 2 familias del tablero ('MICOMAZOL (SIE)' esta en
+CLOTRIMAZOLE y en CICLOPIROX), asi que las filas se DEDUPLICAN por (producto, mercado): sin
+eso el toggle las colapsaba igual, por clave de objeto, pero en silencio -- `filas` decia 16
+y la tabla dibujaba 15.
 
 DECODIFICAR LAS COLUMNAS DE PERIODO DEL XLSB (para el cruce)
 ------------------------------------------------------------
@@ -140,11 +150,13 @@ def leer_xlsb(path):
     de_pack = defaultdict(set)
     del_mkt = defaultdict(set)
     mkt_mes = defaultdict(lambda: defaultdict(float))
+    pres_meta = {}          # pack_norm -> {marca, u12}: lo usa el rescate de huerfanas
     with open_xlsb(str(path)) as wb:
         with wb.get_sheet('DATOS') as sh:
             it = sh.rows()
             hdr = [c.v for c in next(it)]
             iT, iM, iMarca = hdr.index('TIPO'), hdr.index('Mercado'), hdr.index('Presentación')
+            iMarcaCol = hdr.index('Marca')
             # columnas de periodo: header numerico >= col 22. El indice 35 aparece dos
             # veces (col 22 y col 88); se toma la primera.
             vistos, pcols = set(), []
@@ -185,14 +197,19 @@ def leer_xlsb(path):
                     n_dup += 1
                     continue
                 vistos_par.add((mkt, mn))
+                u12 = 0.0
                 for i, mk in pcols:
                     x = v[i]
                     if isinstance(x, (int, float)):
                         mkt_mes[mkt][mk] += x
+                        u12 += x
+                if mn not in pres_meta:
+                    pres_meta[mn] = {'marca': norm(v[iMarcaCol] or ''), 'u12': u12,
+                                     'texto': str(v[iMarca] or '')}
     print('  xlsb: {} mercados, {:,} presentaciones, {:,} filas MINV (nacional) + {:,} CUP '
           '(region), {:,} filas MINV duplicadas por droga descartadas'
           .format(len(del_mkt), len(de_pack), n_minv, n_cup, n_dup))
-    return de_pack, del_mkt, mkt_mes
+    return de_pack, del_mkt, mkt_mes, pres_meta
 
 
 def leer_master(path):
@@ -254,7 +271,7 @@ def main():
     a = ap.parse_args()
 
     print('leyendo fuentes...')
-    DE_PACK, DEL_MKT, MKT_MES = leer_xlsb(a.xlsb)
+    DE_PACK, DEL_MKT, MKT_MES, PRES = leer_xlsb(a.xlsb)
     PACKS, MMONTHS = leer_master(a.master)
 
     # exclusiones canonicas: se filtran por el NOMBRE DE PRODUCTO del pack
@@ -265,16 +282,81 @@ def main():
             n_excl += 1
     if n_excl:
         print('  {} pack(s) de la lista de exclusiones salteados'.format(n_excl))
-    huerf = sum(1 for pk in DE_PACK if pk not in PACKS)
-    print('  presentaciones del xlsb sin pack en AR_PM: {} de {} ({:.1f}%) -- productos '
-          'discontinuados o renombrados entre el extracto de feb-26 y el de jul-26'
-          .format(huerf, len(DE_PACK), 100 * huerf / max(1, len(DE_PACK))))
+    # ventana comun a las dos fuentes: es la unica en la que el xlsb se puede comparar
+    W12_REF = [m for m in XLSB_MESES.values() if m in MMONTHS]
+    huerfanas = [pk for pk in DE_PACK if pk not in PACKS]
+    print('  presentaciones del xlsb sin pack en AR_PM: {} de {} ({:.1f}%)'
+          .format(len(huerfanas), len(DE_PACK), 100 * len(huerfanas) / max(1, len(DE_PACK))))
+
+    # ── rescate de huerfanas ──────────────────────────────────────────────────
+    # De las 76 huerfanas, 4 son de SIEGFRIED y valen 239.259 u -- y dos de ellas eran las
+    # que hundian los dos unicos mercados que no cerraban, los DOS nombrados por la marca
+    # que se estaba cayendo:
+    #   Tetraciclinas (Acneclin)   ACNECLIN salia 2,38% (16.277 u) en vez de ~17%
+    #   Monte Levo (Aireal Plus)   AIREAL PLUS salia 0,73% (2.993 u), ultimo del ranking
+    # Dos causas distintas, las dos de nomenclatura:
+    #   a) submarca en el prefijo: xlsb 'Acneclin Caps A.P 100Mg X 30'
+    #                             AR_PM 'ACNECLIN AP CAPS A.P 100MG x 30'  (Product ACNECLIN AP)
+    #   b) IQVIA corrigio el tamano del pack: xlsb '... 10Mg X 30 /5' -> AR_PM '... 10mg x 60 /5'
+    #
+    # La regla NO se queda en el parecido de nombres: EXIGE QUE LAS DOS FUENTES DEN EL
+    # MISMO NUMERO en la ventana Mar2025..Feb2026 (<=1%). Eso convierte el match en algo
+    # medido y no supuesto -- ACNECLIN AP cierra a -0,12% y AIREAL PLUS a +0,06%. Sin esa
+    # verificacion el parecido de descriptor tambien casaba 'Qura Jbe 100Ml X 1' con
+    # 'QURA PLUS JBE 100ML x 1', que son marcas DISTINTAS.
+    def sin_cant(tail):
+        """'TABL RECUBIE 10MG X 60 5' -> 'TABL RECUBIE 10MG X * 5' (el tamano del pack es
+        justo el atributo que IQVIA re-declara)."""
+        return re.sub(r'\bX \d+\b', 'X *', tail)
+
+    por_tail = defaultdict(list)
+    for pk, d in PACKS.items():
+        b = norm(sin_lab(d['prod']))
+        if pk.startswith(b):
+            t = pk[len(b):].strip()
+            if len(t) >= 8:
+                por_tail[sin_cant(t)].append((pk, b))
+
+    alias, rescatadas, rechazadas = {}, [], []
+    for pk in huerfanas:
+        meta = PRES.get(pk) or {}
+        ma = meta.get('marca') or ''
+        if not ma or not pk.startswith(ma):
+            continue
+        tail = sin_cant(pk[len(ma):].strip())
+        if len(tail) < 8:
+            continue
+        u_ref = meta.get('u12') or 0.0
+        cands = []
+        for cpk, b in por_tail.get(tail, []):
+            if not b.startswith(ma):
+                continue
+            u_ar = sum(PACKS[cpk]['monthly'].get(m, 0.0) for m in W12_REF)
+            if u_ref > 1000 and abs(u_ar / u_ref - 1) <= 0.01:
+                cands.append((cpk, u_ar))
+            else:
+                rechazadas.append((meta.get('texto', pk), PACKS[cpk]['prod'], u_ref, u_ar))
+        # unico candidato Y el pack de AR_PM no lo reclama ya otra presentacion
+        cands = [c for c in cands if c[0] not in DE_PACK]
+        if len(cands) == 1:
+            alias[pk] = cands[0][0]
+            rescatadas.append((meta.get('texto', pk), PACKS[cands[0][0]]['prod'],
+                               u_ref, cands[0][1]))
+    if rescatadas:
+        print('  RESCATADAS por descriptor + verificacion numerica: {}'.format(len(rescatadas)))
+        for x_pres, x_prod, ur, ua in sorted(rescatadas, key=lambda x: -x[2]):
+            print('    {:<44} -> {:<24} xlsb {:>9,.0f}  AR_PM {:>9,.0f}  {:+.2f}%'
+                  .format(x_pres[:44], x_prod[:24], ur, ua, (ua / ur - 1) * 100 if ur else 0))
+    if rechazadas:
+        print('  descartadas por no dar el mismo numero: {} (p.ej. {})'.format(
+            len(rechazadas), ' | '.join('{} vs {}'.format(x[0][:26], x[1][:22])
+                                        for x in rechazadas[:3])))
 
     def packs_del_mercado(mkt):
-        return [pk for pk in DEL_MKT[mkt] if pk in PACKS]
+        return [alias.get(pk, pk) for pk in DEL_MKT[mkt] if alias.get(pk, pk) in PACKS]
 
     # ── G1: cada mercado contra el propio xlsb, en su ventana Mar2025..Feb2026 ──
-    W12 = [m for m in XLSB_MESES.values() if m in MMONTHS]
+    W12 = W12_REF
     print()
     print('=' * 96)
     print('G1  cada mercado: suma AR_PM sobre sus marcas  vs  el total del propio xlsb '
@@ -312,9 +394,10 @@ def main():
 
     # ── armado por linea ──────────────────────────────────────────────────────
     print()
-    print('{:<14} {:<22} {:<38} {:>5} {:>13} {:>7}'.format(
-        'linea', 'familia', 'mercado del Ateneo', 'marc', 'MAT mercado', 'MS%'))
-    print('-' * 104)
+    print('{:<14} {:<22} {:<34} {:>5} {:>12} {:>7}'.format(
+        'linea', 'producto propio', 'mercado del Ateneo', 'marc', 'MAT mercado', 'MS%'))
+    print('-' * 100)
+    n_fila_dup = 0
     report = {'tol': a.tol, 'cruce': cruce, 'lineas': [], 'sin_mercado': []}
     planned = []
     for rel in LINES:
@@ -338,7 +421,7 @@ def main():
         i_u = MMONTHS.index(ult)
         w12_ln = MMONTHS[max(0, i_u - 11):i_u + 1]
 
-        mkts_out, por_fam, propios = {}, {}, {}
+        mkts_out, filas, vistas = {}, [], set()
         for fam, f in mp.items():
             sies = [p for p in (f.get('products') or []) if p.get('is_sie')]
             if not sies:
@@ -383,30 +466,55 @@ def main():
                 usados.append(mkt)
                 ps = mkts_out[mkt]['products']
                 mat = sum(sum(p['monthly_vals'].get(mk, 0) for mk in w12_ln) for p in ps)
-                mat_own = sum(sum(p['monthly_vals'].get(mk, 0) for mk in w12_ln)
-                              for p in ps if p['prod'] in own)
-                print('{:<14} {:<22} {:<38} {:>5} {:>13,} {:>6.2f}%'.format(
-                    linea[:14], fam[:22], mkt[:38], len(ps), mat,
-                    mat_own / mat * 100 if mat else 0))
-            if usados:
-                por_fam[fam] = usados
-                propios[fam] = own
+                # UNA FILA POR PRODUCTO PROPIO, no una por familia.
+                # Decision del usuario ("no son el mismo producto"): ACNECLIN (50mg tabl,
+                # 16.277 u) y ACNECLIN AP (100mg caps A.P., 124.664 u) viven en la MISMA
+                # familia del tablero (dermatologia/MINOCYCLINE) y esa familia no tiene
+                # budIqviaMap, asi que una fila por familia los habria sumado en un 17,43%
+                # que no describe a ninguno de los dos: ACNECLIN AP es el LIDER del mercado
+                # con 15,42% y ACNECLIN esta 14no con 2,01%.
+                # Es la misma logica que cardio ya aplica con DILATREND / DILATREND AP, solo
+                # que alla son familias separadas y aca no.
+                for prod_own in own:
+                    mat_own = sum(sum(p['monthly_vals'].get(mk, 0) for mk in w12_ln)
+                                  for p in ps if p['prod'] == prod_own)
+                    if not mat_own:
+                        continue
+                    # DEDUP EXPLICITO por (producto, mercado). Un mismo producto propio
+                    # puede figurar en dos familias del tablero -- 'MICOMAZOL (SIE)' esta
+                    # en CLOTRIMAZOLE y en CICLOPIROX -- y generaria dos filas identicas.
+                    # El toggle las colapsaria igual (misma clave de objeto), pero en
+                    # silencio: `filas` decia 16 y la tabla dibujaba 15. Un descuadre que
+                    # nadie mira es como se cuela el proximo bug, asi que se corta aca.
+                    clave = (prod_own, mkt)
+                    if clave in vistas:
+                        n_fila_dup += 1
+                        continue
+                    vistas.add(clave)
+                    filas.append({'label': sin_lab(prod_own), 'mercado': mkt,
+                                  'propios': [prod_own]})
+                    print('{:<14} {:<22} {:<34} {:>5} {:>12,} {:>6.2f}%'.format(
+                        linea[:14], sin_lab(prod_own)[:22], mkt[:34], len(ps), mat,
+                        mat_own / mat * 100 if mat else 0))
 
-        if not mkts_out:
+        if not mkts_out or not filas:
             continue
         D['mercadosAteneo'] = {'corte': ult, 'fuente': Path(a.xlsb).name,
-                               'mercados': mkts_out, 'porFamilia': por_fam,
-                               'propios': propios}
-        D.pop('mercadosATC', None)   # reemplaza a la vista ATC III que se rechazo
+                               'mercados': mkts_out, 'filas': filas}
+        D.pop('mercadosATC', None)      # reemplaza a la vista ATC III que se rechazo
+        D.pop('porFamilia', None)
         planned.append((rel, info))
-        report['lineas'].append({'linea': linea, 'familias': len(por_fam),
+        report['lineas'].append({'linea': linea, 'filas': len(filas),
                                  'mercados': len(mkts_out),
                                  'productos': sum(len(m['products']) for m in mkts_out.values())})
 
     print()
+    if n_fila_dup:
+        print('  {} fila(s) (producto, mercado) duplicadas descartadas: el mismo producto '
+              'propio figura en mas de una familia del tablero'.format(n_fila_dup))
     for r in report['lineas']:
-        print('  {:<14} {} familias -> {} mercados, {} productos'.format(
-            r['linea'], r['familias'], r['mercados'], r['productos']))
+        print('  {:<14} {} filas -> {} mercados, {} productos'.format(
+            r['linea'], r['filas'], r['mercados'], r['productos']))
     if report['sin_mercado']:
         print('  SIN mercado del Ateneo ({}): {}'.format(
             len(report['sin_mercado']),
