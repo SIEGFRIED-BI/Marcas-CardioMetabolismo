@@ -149,7 +149,8 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
 .mol-chip:hover{background:rgba(255,255,255,.05);}
 .mol-chip.on{background:#b01e1e;color:#ffffff;border-color:#b01e1e;}
 
-.perf-layout{display:grid;grid-template-columns:1fr 330px;gap:16px;}
+/* la 2da columna era la tabla lateral de 1 periodo, que se oculto (ver perf-table-oculta): un track explicito reserva su ancho aunque el contenido este en display:none, y el grafico quedaba angosto con el resto vacio. Las otras 5 lineas ya estaban en 1fr. */
+.perf-layout{display:grid;grid-template-columns:1fr;gap:16px;}
 @media(max-width:920px){.perf-layout{grid-template-columns:1fr;}}
 
 .pt{width:100%;border-collapse:collapse;font-size:11px;}
