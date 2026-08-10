@@ -222,4 +222,18 @@ if git diff --cached --name-only | grep -qE 'data\.js$'; then
         exit 1
     fi
 fi
+
+# Check 14: los agregados POR PRODUCTO (mat/ytd) suman el total de su familia.
+# Es distinto del Check 13: aquel valida las VENTANAS sumando monthly_vals, y por eso no
+# veia que 78 productos tuvieran mat={}. Ese hueco no movia ninguna suma -- solo rompia el
+# grafico anual, que renormaliza sobre p.mat (REXULTI salia 100% en vez de 84,13% y los 4
+# competidores de BREXPIPRAZOLE no se dibujaban).
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    py shared/check-molperf-agregados-por-producto.py
+    if [ $? -ne 0 ]; then
+        echo "BLOQUEADO: agregados por producto inconsistentes con su familia."
+        exit 1
+    fi
+fi
+
 exit 0

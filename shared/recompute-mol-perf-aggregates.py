@@ -40,7 +40,7 @@ def detect_cierre_month(monthly):
     return MES_INV.get(last[0])
 
 
-def aggregate_quarterly(monthly):
+def aggregate_quarterly(monthly, cobertura=None):
     """Suma por trimestre, pero SOLO si los 3 meses del trimestre existen en
     monthly. Un trimestre con 1-2 meses no es un trimestre: es una ventana
     parcial disfrazada de completa (mismo defecto que ytd/mat, ver mas abajo).
@@ -56,7 +56,12 @@ def aggregate_quarterly(monthly):
         q_num, y = qk.split()
         q_num, y = int(q_num[1:]), int(y)
         expected = {f'{NUM_TO_MES[m]} {y}' for m in range((q_num - 1) * 3 + 1, q_num * 3 + 1)}
-        if present >= expected:
+        completo = present >= expected
+        if not completo and cobertura is not None:
+            # mismo criterio que aggregate_mat: si la familia tiene el mes que le
+            # falta al producto, ese mes vale CERO y el trimestre es real
+            completo = (expected - present) <= cobertura
+        if completo:
             total = 0
             for mk in expected:
                 try: total += int(round(float(monthly.get(mk) or 0)))
@@ -65,13 +70,17 @@ def aggregate_quarterly(monthly):
     return out
 
 
-def aggregate_ytd(monthly, cierre_month):
+def aggregate_ytd(monthly, cierre_month, cobertura=None):
     """YTD per year ending in cierre_month. SOLO si los meses 1..cierre_month
     de ese año existen TODOS en monthly -- si no, el YTD es una suma parcial
     (ej. 3 de 6 meses) que se leeria como un YTD real y mentiria el % de
     variacion interanual. Se descarta la key entera en vez de publicar el
     numero truncado (bug real: derma/mujer/SNC arrancan meses despues del
-    1/enero de su primer año -> 'Jun 2021' sumaba 3/6 meses y se leia +332%)."""
+    1/enero de su primer año -> 'Jun 2021' sumaba 3/6 meses y se leia +332%).
+
+    `cobertura` = meses que SI tiene la familia. Un mes que le falta al producto
+    pero que la familia tiene NO es dato faltante: es un CERO real (el producto
+    todavia no se vendia). Ver la nota larga en aggregate_mat."""
     if not monthly: return {}
     cierre_lbl = NUM_TO_MES.get(cierre_month, 'Dec')
     by_year = defaultdict(dict)
@@ -83,7 +92,12 @@ def aggregate_ytd(monthly, cierre_month):
         by_year[parts[1]][m_num] = v
     out = {}
     for y, vals in by_year.items():
-        if set(vals.keys()) >= set(range(1, cierre_month + 1)):
+        esperados = set(range(1, cierre_month + 1))
+        completo = set(vals.keys()) >= esperados
+        if not completo and cobertura is not None:
+            faltan = {f'{NUM_TO_MES[m]} {y}' for m in esperados - set(vals.keys())}
+            completo = faltan <= cobertura      # la familia los tiene -> son ceros reales
+        if completo:
             total = 0
             for v in vals.values():
                 try: total += int(round(float(v or 0)))
@@ -92,15 +106,28 @@ def aggregate_ytd(monthly, cierre_month):
     return out
 
 
-def aggregate_mat(monthly, cierre_month):
+def aggregate_mat(monthly, cierre_month, cobertura=None):
     """MAT per year = rolling 12 months ending in cierre_month. SOLO si los 12
     meses de esa ventana existen TODOS en monthly -- si no, es un MAT con
     menos de 12 meses reales (bug real: el primer año de historia de cada
     linea/producto solo trae los meses desde que arranca el tracking; sumarlos
     y rotularlos 'MAT' los hace lucir como un trailing-12-meses genuino).
-    Cubre tambien productos/mercados que arrancan a mitad de la serie (ej. un
-    lanzamiento nuevo o un mercado reconstruido aparte): ahi el chequeo de
-    cobertura los excluye sin necesitar un piso aparte por linea."""
+
+    PERO HAY DOS CASOS DISTINTOS DETRAS DE UN MES AUSENTE, y tratarlos igual
+    rompia el grafico anual (detectado 2026-08-06 en SNC/BREXPIPRAZOLE):
+      a) NADIE tiene ese mes (el primer año de la linea, antes de que arranque
+         el tracking) -> el dato es DESCONOCIDO y el MAT no existe. Se descarta.
+      b) el PRODUCTO no lo tiene pero la FAMILIA si (un lanzamiento nuevo) -> el
+         valor real de esos meses es CERO, no desconocido, y el MAT de 12 meses
+         es genuino: BREXIL vendio 1.269 u en los ultimos 12 meses, esa ES su MAT.
+    Sin la distincion, 78 productos de mujer/SNC/derma (171.397 u) quedaban con
+    mat={} y ytd={}. La tabla no se entera porque suma monthly_vals, pero el
+    grafico anual renormaliza sobre p.mat: con 4 de 5 productos en cero, REXULTI
+    salia 100% cuando su MS% real es 84,13% -- y los cuatro competidores,
+    incluida la marca propia BREXIL, desaparecian del grafico.
+    `cobertura` = meses que tiene la familia. Sin el argumento el comportamiento
+    es el viejo, asi que el guard del caso (a) queda intacto: si la familia
+    tampoco tiene el mes, la key se sigue descartando."""
     if not monthly: return {}
     cierre_lbl = NUM_TO_MES.get(cierre_month, 'Dec')
     years_with = set()
@@ -109,16 +136,36 @@ def aggregate_mat(monthly, cierre_month):
         if len(parts) == 2 and parts[0] in MES_INV:
             try: years_with.add(int(parts[1]))
             except ValueError: pass
+    # Los años CANDIDATOS salen de la cobertura de la familia, no solo de los años
+    # calendario del producto: la ventana MAT cruza el año, asi que un producto con
+    # meses solo en Jul-Dic 2021 cae dentro del MAT 'Jun 2022' pero no emitia esa key.
+    # Sus unidades quedaban en el total de la familia y en ningun producto, y la suma
+    # no cerraba por 1-44 u (31 casos en mujer/SNC/derma). Abajo igual se exige que el
+    # producto tenga AL MENOS un mes en la ventana, asi que no se emiten keys en cero
+    # para años en los que el producto no existia.
+    if cobertura:
+        for mk in cobertura:
+            parts = mk.split()
+            if len(parts) == 2 and parts[0] in MES_INV:
+                try: years_with.add(int(parts[1]))
+                except ValueError: pass
     out = {}
     for y in sorted(years_with):
-        window = {}
+        window, faltan = {}, set()
         for back in range(11, -1, -1):
             total_idx = (y * 12 + (cierre_month - 1)) - back
             yy, mm = divmod(total_idx, 12)
             mk = f'{NUM_TO_MES[mm + 1]} {yy}'
             if mk in monthly:
                 window[mk] = monthly[mk]
-        if len(window) == 12:
+            else:
+                faltan.add(mk)
+        completo = not faltan
+        if faltan and cobertura is not None:
+            completo = faltan <= cobertura      # la familia los tiene -> son ceros reales
+        # sin ningun mes propio en la ventana, el producto no existia: no se emite la key
+        # (aportaria 0 al total de la familia igual, asi que la suma cierra lo mismo)
+        if completo and window:
             total = 0
             for v in window.values():
                 try: total += int(round(float(v or 0)))
@@ -169,9 +216,10 @@ def recompute_family(fam_obj, cierre_month):
         if not isinstance(p, dict): continue
         mv = p.get('monthly_vals') or {}
         if not mv: continue
-        p_quarterly = aggregate_quarterly(mv)
-        p_ytd = aggregate_ytd(mv, cierre_month)
-        p_mat = aggregate_mat(mv, cierre_month)
+        cob = set(fam_monthly)
+        p_quarterly = aggregate_quarterly(mv, cob)
+        p_ytd = aggregate_ytd(mv, cierre_month, cob)
+        p_mat = aggregate_mat(mv, cierre_month, cob)
         p['quarterly_vals'] = p_quarterly
         p['ytd'] = p_ytd
         p['mat'] = p_mat
