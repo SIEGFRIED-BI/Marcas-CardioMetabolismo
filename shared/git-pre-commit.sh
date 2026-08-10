@@ -236,4 +236,17 @@ if git diff --cached --name-only | grep -qE 'data\.js$'; then
     fi
 fi
 
+
+# Check 15: la ficha por marca (brandKpis/kpiByBrand) al dia con mol_perf. Es lo que
+# export-dashboard.js usa para exportar MS%/IE/Mercado por marca, y no la valida ningun
+# otro gate: en SNC quedo congelada en enero (units_ytd = 1 mes en vez de 6) mientras el
+# tablero mostraba junio, y nadie se entero porque no rompe ninguna suma.
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    py shared/check-brandkpis-al-dia.py
+    if [ $? -ne 0 ]; then
+        echo "BLOQUEADO: la ficha por marca no coincide con mol_perf."
+        exit 1
+    fi
+fi
+
 exit 0
