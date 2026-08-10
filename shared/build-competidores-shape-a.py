@@ -152,8 +152,15 @@ SIE_PATTERNS_BY_LINE = {
     'mujer': [r'^ISIS\b', r'^SIDERBLUT\b', r'^SIDER\b', r'^TRIP\b',
               r'^CALCIO BASE\b', r'^CALCIO CITRATO\b', r'^CLIMATIX\b',
               r'^DELTROX\b', r'^GYNODERM\b', r'^ROXOLAN\b', r'^ALUMPAK\b'],
+    # BREXIL faltaba y por eso brexpiprazol nunca llegaba al DDD: el builder solo arma un
+    # mercado cuando encuentra una marca SIE adentro. El dato SI estaba en la fuente --
+    # Qlik trae 'Antipsicoticos' con las 4 presentaciones de BREXIL (617 u en Jun-2026, 42
+    # regiones) -- pero al no matchear ningun patron, la molecula se descartaba entera y
+    # BREXIL no tenia MS% por provincia ni figuraba en la pagina de competidores.
+    # Reportado por el usuario 2026-08-06: "y en ddd y competidores no esta BREXIL".
     'SNC': [r'^VALIUM\b', r'^MADOPAR\b', r'^QTP\b', r'^PGB\b', r'^EMERAL\b',
-            r'^LURAP\b', r'^VALQUIR\b', r'^MELERIL\b', r'^LEVITAL\b', r'^VISDON\b'],
+            r'^LURAP\b', r'^VALQUIR\b', r'^MELERIL\b', r'^LEVITAL\b', r'^VISDON\b',
+            r'^BREXIL\b'],
 }
 
 
