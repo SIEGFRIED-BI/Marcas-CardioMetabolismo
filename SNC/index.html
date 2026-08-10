@@ -358,13 +358,13 @@ body{background:var(--bg);font-family:'IBM Plex Sans',sans-serif;color:var(--tex
         <div style="margin-left:auto;"><div class="yr-ctrl" id="bud-yr"></div></div>
       </div>
       <div class="g2">
-        <div><div class="chart-h280"><canvas id="budChart"></canvas></div><div id="bud-iqvia-note" style="display:none;font-size:9px;color:#d97706;margin-top:4px;text-align:center;">⚠ Real derivado de IQVIA PM · dato SAP no disponible</div><div class="bud-cap" style="margin-top:10px;padding:8px 12px;background:#fffaeb;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#78350f;line-height:1.5;"><div style="display:flex;flex-wrap:wrap;gap:14px;font-family:IBM Plex Mono,monospace;font-size:10px;color:#4b5563;margin-bottom:6px;"><span><span style="display:inline-block;width:11px;height:11px;background:rgba(107,114,128,.25);border:1px solid rgba(55,65,81,.5);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Budget original (lo planificado para el mes)</span><span><span style="display:inline-block;width:11px;height:11px;background:rgba(245,158,11,.55);border:1px solid rgba(217,119,6,.85);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Redistribuido (extra agregado por shortfall acumulado)</span><span><span style="display:inline-block;width:11px;height:11px;background:#b01e1e;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Real PM (vendido)</span></div><div>El segmento <b style="color:#92400e">ámbar</b> en los <b>próximos 3 meses</b> indica la <b>parte redistribuida</b>: el déficit acumulado en meses pasados se reparte en el siguiente trimestre. Eso significa que para cerrar el año en plan, en cada uno de esos 3 meses hay que vender lo planificado <b>más</b> la porción ámbar. El total anual de Budget se mantiene constante.</div></div></div>
+        <div><div class="chart-h280"><canvas id="budChart"></canvas></div><div id="bud-iqvia-note" style="display:none;font-size:9px;color:#d97706;margin-top:4px;text-align:center;">⚠ Real derivado de IQVIA PM · dato SAP no disponible</div><div class="bud-cap" style="margin-top:10px;padding:8px 12px;background:#fffaeb;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#78350f;line-height:1.5;"><div style="display:flex;flex-wrap:wrap;gap:14px;font-family:IBM Plex Mono,monospace;font-size:10px;color:#4b5563;margin-bottom:6px;"><span><span style="display:inline-block;width:11px;height:11px;background:rgba(107,114,128,.25);border:1px solid rgba(55,65,81,.5);border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Budget original (lo planificado para el mes)</span><span><span style="display:inline-block;width:11px;height:11px;background:#b01e1e;border-radius:2px;vertical-align:middle;margin-right:4px;"></span>Real PM (vendido)</span></div></div></div>
         <div class="card-sm">
           <p style="font-size:9px;font-weight:700;color:#4b5563;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;">% Cumplimiento mensual</p>
           <div id="bud-meter"></div>
           <div class="bm-legend">
             <span><span class="bm-sq" style="background:#fecaca;border:1px solid #b01e1e;"></span>Budget</span>
-            <span><span class="bm-sq" style="background:rgba(245,158,11,.55);border:1px solid rgba(217,119,6,.85);"></span>Redistribuido</span><span><span class="bm-sq" style="background:#b01e1e"></span>Real PM</span>
+            <span><span class="bm-sq" style="background:#b01e1e"></span>Real PM</span>
           </div>
         </div>
       </div>
@@ -998,31 +998,14 @@ function renderBudget(){
     const iqvArr = getIQVIAReal2026(bProd);
     if(iqvArr) real = iqvArr;
   }
-  // ── Redistribución trimestral: shortfall se redistribuye en los proximos 3 meses ──
+  // Totales del año. Ya NO se redistribuye el shortfall en el siguiente trimestre
+  // (se saco 2026-08-06 a pedido del usuario: "no es mas redistribuido"). El budget
+  // que se muestra es el original mes a mes, sin ajuste.
   const __origBudgetArr = budget.slice();
-  let __sfReal = 0, __sfBudget = 0, __sfShortPast = 0, __firstPending = -1;
+  let __sfReal = 0, __sfBudget = 0;
   for(let i=0;i<12;i++){
-    const b = +budget[i]||0, r = real[i];
-    __sfBudget += b;
-    if(r!=null){
-      __sfReal += +r||0;
-      if(b>0) __sfShortPast += Math.max(0, b - (+r||0));
-    } else if(__firstPending<0 && b>0){
-      __firstPending = i;
-    }
-  }
-  // Targets de redistribucion: proximos 3 meses con budget desde firstPending
-  const __sfTriIdx = [];
-  if(__firstPending>=0){
-    for(let i=__firstPending;i<12 && __sfTriIdx.length<3;i++){
-      if((+budget[i]||0)>0) __sfTriIdx.push(i);
-    }
-  }
-  let __adjBudget = budget.slice();
-  let __sfExtra = 0;
-  if(__sfTriIdx.length>0 && __sfShortPast>0){
-    __sfExtra = __sfShortPast / __sfTriIdx.length;
-    for(const i of __sfTriIdx){ __adjBudget[i] = (+budget[i]||0) + __sfExtra; }
+    __sfBudget += +budget[i]||0;
+    if(real[i]!=null) __sfReal += +real[i]||0;
   }
   const __sfPct = __sfBudget>0 ? Math.round(__sfReal/__sfBudget*100) : null;
   const __sfPend = Math.max(0, __sfBudget - __sfReal);
@@ -1035,13 +1018,6 @@ function renderBudget(){
   if(__sfTotalsEl){
     const fmtU = n=>Number(n||0).toLocaleString('es-AR');
     const pctCls = __sfPct==null?'color:#4b5563':__sfPct>=100?'color:#15803d':__sfPct>=85?'color:#ca8a04':'color:#b01e1e';
-    let __triHtml = '';
-    if(__sfTriIdx.length>0 && __sfExtra>0){
-      const i0 = __sfTriIdx[0];
-      const nxtMes = __sfMESES[i0];
-      const nxtNew = +__adjBudget[i0]||0;
-      __triHtml = '<span style="color:#92400e">Próximo (' + nxtMes + '): <b>+' + fmtU(Math.round(__sfExtra)) + '</b> u. redistribuidas → target <b>' + fmtU(Math.round(nxtNew)) + '</b> u.</span>';
-    }
     __sfTotalsEl.innerHTML =
       '<span><b style="color:#111827">Año ' + bYear + '</b></span>'
       + '<span>Budget <b style="color:#111827">' + fmtU(__sfBudget) + '</b> u.</span>'
@@ -1050,9 +1026,9 @@ function renderBudget(){
       + '<span>Estim. YTD <b style="color:#111827">' + fmtU(__budYtd) + '</b> u.</span>'
       + '<span style="' + (__pctYtd==null?'color:#4b5563':__pctYtd>=100?'color:#15803d':__pctYtd>=85?'color:#ca8a04':'color:#b01e1e') + '">Cumpl. YTD <b>' + (__pctYtd==null?'—':__pctYtd+'%') + '</b></span>'
       + (__sfPend>0?'<span>Pendiente <b style="color:#b01e1e">' + fmtU(__sfPend) + '</b> u.</span>':'')
-      + __triHtml;
+      ;
   }
-  window.__sfBudgetTotals = {budget:__sfBudget, real:__sfReal, pct:__sfPct, pending:__sfPend, adjusted:__adjBudget, triExtra:__sfExtra, triIdx:__sfTriIdx};
+  window.__sfBudgetTotals = {budget:__sfBudget, real:__sfReal, pct:__sfPct, pending:__sfPend};
   const isIQVIADerived = bYear==='2026' && !(src.real||[]).some(v=>v!=null) && real.some(v=>v!=null);
   const color  = (COLORS[bProd] && COLORS[bProd]!=='#38bdf8') ? COLORS[bProd] : '#b01e1e';
   const maxVal = Math.max(...[...budget,...real].filter(Boolean), 1);
@@ -1065,9 +1041,6 @@ function renderBudget(){
       {label:'Budget',data:budget,
        backgroundColor:'rgba(107,114,128,.15)',borderColor:'rgba(55,65,81,.5)',
        borderWidth:1,borderRadius:0,order:3,stack:'budget'},
-      {label:'Redistribuido',data:__adjBudget.map((v,i)=>Math.max(0,(+v||0)-(+budget[i]||0))),
-       backgroundColor:'rgba(245,158,11,.55)',borderColor:'rgba(217,119,6,.85)',
-       borderWidth:1,borderRadius:3,order:2,stack:'budget'},
       {label:'Real PM',stack:'real',data:real,
        backgroundColor:MESES.map((_,i)=>real[i]==null?'rgba(0,0,0,0)':(color==='#38bdf8'?'#b01e1e':hex2rgba(color,.9))),
        borderColor:MESES.map((_,i)=>real[i]==null?'transparent':(color==='#38bdf8'?'#8f1515':color)),
@@ -1077,7 +1050,7 @@ function renderBudget(){
       plugins:{legend:{display:false},
         tooltip:{backgroundColor:'#ffffff',borderColor:'rgba(0,0,0,.12)',borderWidth:1,titleColor:'#111827',bodyColor:'#111827',
           callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.parsed.y)} u.`,
-            afterLabel:c=>{if(c.datasetIndex!==1)return '';
+            afterLabel:c=>{if(c.dataset.label!=='Real PM')return '';
               const b=budget[c.dataIndex],r=real[c.dataIndex];
               return (b&&r)?`Cumpl.: ${Math.round(r/b*100)}%`:'';}}}},
       scales:{
