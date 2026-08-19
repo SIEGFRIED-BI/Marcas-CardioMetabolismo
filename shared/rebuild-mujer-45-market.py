@@ -31,7 +31,44 @@ REPO = Path(__file__).resolve().parent.parent
 # index.html. El regex de abajo acepta ambos anchors, pero el archivo a
 # leer/escribir es data.js.
 DATA_FILE = REPO / 'mujer' / 'data.js'
-MASTER = Path(r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs\_iqvia-master\2026-06\AR_PM_FV_Standard_Jul-2026.xlsx')
+
+# El master NO se hardcodea. Estaba clavado en
+# '_iqvia-master\2026-06\AR_PM_FV_Standard_Jul-2026.xlsx', un archivo que TERMINA
+# EN Jun-2026 y que ningun otro paso del pipeline lee. Como este script es un hook
+# de sync-mujer-pm.py (mercado de composicion fija) y ese sync ignora su exit code,
+# el mercado '45' quedaba congelado en junio en cada cierre sin que nadie se
+# enterara: en Jul-2026 TRIP +45 (SIE) publicaba 0 contra 3.105 del master, y
+# VIASEK MENOCARE igual. Lo caza shared/check-molperf-vs-master.py.
+# Orden de resolucion: --master > manifiesto > el AR_PM* mas nuevo del ciclo.
+LEGACY_MASTER = Path(
+    r'C:\Users\camarinaro\OneDrive - Portalcorp\Documentos\Hub-Marcas-Inputs'
+    r'\_iqvia-master\2026-06\AR_PM_FV_Standard_Jul-2026.xlsx')
+
+
+def resolve_master(cli_value=None):
+    """Path del master a usar, o None. Nunca silencioso: imprime de donde salio."""
+    if cli_value:
+        print(f'  master (--master): {cli_value}')
+        return Path(cli_value)
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import manifest
+        m = manifest.resolve_source('iqvia_master')
+        if m and Path(m).is_file():
+            print(f'  master (manifiesto): {m}')
+            return Path(m)
+    except Exception as e:
+        print(f'  (manifiesto no resolvio el master: {e})')
+    base = LEGACY_MASTER.parent.parent
+    if base.is_dir():
+        pool = sorted(base.glob('*/AR_PM*.xlsx'), key=lambda p: p.stat().st_mtime)
+        if pool:
+            print(f'  master (AR_PM mas reciente): {pool[-1]}')
+            return pool[-1]
+    if LEGACY_MASTER.is_file():
+        print(f'  ADVERTENCIA: cayendo al master legacy hardcodeado {LEGACY_MASTER}')
+        return LEGACY_MASTER
+    return None
 
 # Productos que SI deben ir en el mercado '45':
 # (Product, ATC prefix, molecule_must_contain or None)
@@ -109,9 +146,16 @@ def aggregate_mat(monthly, cierre=4):
 
 
 def main():
-    if not MASTER.is_file():
-        print(f'ERROR: master not found at {MASTER}', file=sys.stderr); return 2
     if hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(encoding='utf-8')
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--master', default=None,
+                    help='AR_PM a usar; por defecto lo resuelve el manifiesto')
+    args = ap.parse_args()
+
+    MASTER = resolve_master(args.master)
+    if MASTER is None or not MASTER.is_file():
+        print(f'ERROR: master not found ({MASTER})', file=sys.stderr); return 2
 
     print(f'Reading {MASTER.name}...')
     wb = openpyxl.load_workbook(MASTER, read_only=True, data_only=True)

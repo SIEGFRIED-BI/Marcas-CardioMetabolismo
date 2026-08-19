@@ -643,6 +643,32 @@ function Get-ConfigAtcRules {
   return @($rules)
 }
 
+function Test-TextEqualsAny {
+  param(
+    [string]$Text,
+    [string[]]$Candidates
+  )
+
+  # Igualdad EXACTA, no substring. El filtro `molecules` del config nombra LA molecula
+  # del mercado ('VALSARTAN'), y matchear con .Contains() metia los COMBOS en el mercado
+  # mono: 'HYDROCHLOROTHIAZIDE_VALSARTAN'.Contains('VALSARTAN') = $true.
+  # En Jul-2026 eso inflo 11 familias de cardio -- DIOVAN x1,90 (el mercado de valsartan
+  # mono pasaba de 731.273 a 1.389.281 sumando los combos, que YA tienen su propia
+  # familia DIOVAN D), TERLOC x1,98, SILTRAN x1,84, ROXOLAN x1,16. Es exactamente la
+  # regla critica #2 de CLAUDE.md (una familia = UN mercado de la fuente) y el bug
+  # historico de ROXOLAN (rosuvastatina vs rosuvastatina/ezetimibe).
+  # Ningun gate lo veia: sum(productos) == total de familia cerraba sobre el universo
+  # equivocado. Se verifico contra el master que con igualdad ninguna familia queda en
+  # cero y todas caen a <=0,25% del valor publicado.
+  if (-not $Text -or -not $Candidates -or $Candidates.Count -eq 0) { return $false }
+  foreach ($candidate in $Candidates) {
+    if ($candidate -and $Text -eq $candidate) {
+      return $true
+    }
+  }
+  return $false
+}
+
 function Test-TextContainsAny {
   param(
     [string]$Text,
@@ -1178,6 +1204,33 @@ finally {
   [GC]::WaitForPendingFinalizers()
 }
 
+# --- Columnas del PM por NOMBRE de header (NO por posicion) ------------------
+# El export de IQVIA reordeno sus columnas: el AR_PM viejo (317 cols) traia
+# Manufacturer/Product/Pack en 1/2/3, y el de Ago-2026 (329 cols) trae
+# Pack/Manufacturer/ATC IV/Ph.Forms III/Product. Leerlas por posicion escribia
+# el laboratorio en 'prod' y el pack en 'manuf' -> is_sie caia a false en TODOS
+# los productos y NINGUNA marca SIE quedaba en mol_perf, sin mover una sola
+# suma (el audit daba 16.626/16.634 con las 4 lineas vacias de SIE).
+$pmColProduct = $null; $pmColManuf = $null; $pmColPack = $null
+for ($_pc = 1; $_pc -le [Math]::Min(12, $pmMatrix.GetLength(1)); $_pc++) {
+  $_ph = ((Normalize-Text $pmMatrix[1, $_pc]) -replace '\s+', ' ').Trim().ToUpper()
+  if (-not $_ph) { continue }
+  if ($_ph -eq 'PRODUCT' -and $null -eq $pmColProduct) { $pmColProduct = $_pc }
+  elseif ($_ph -eq 'MANUFACTURER' -and $null -eq $pmColManuf) { $pmColManuf = $_pc }
+  elseif ($_ph -eq 'PACK' -and $null -eq $pmColPack) { $pmColPack = $_pc }
+}
+if ($null -eq $pmColProduct -or $null -eq $pmColManuf) {
+  # Sin headers canonicos (ej. slices legacy) volvemos a las posiciones viejas,
+  # pero RUIDOSAMENTE: si el layout cambio otra vez esto tiene que verse.
+  Write-Warning "PM: no encontre los headers Product/Manufacturer en la fila 1; caigo a las posiciones legacy 1/2/3. Verificar que 'prod' no quede con el laboratorio."
+  if ($null -eq $pmColManuf)   { $pmColManuf = 1 }
+  if ($null -eq $pmColProduct) { $pmColProduct = 2 }
+  if ($null -eq $pmColPack)    { $pmColPack = 3 }
+}
+if ($null -eq $pmColPack) { $pmColPack = 3 }
+Write-Host ("   PM cols por header: Product={0} Manufacturer={1} Pack={2}" -f $pmColProduct, $pmColManuf, $pmColPack) -ForegroundColor DarkGray
+# ----------------------------------------------------------------------------
+
 Write-Host "[Respiratorio] Fuentes cargadas."
 
 $budgetMonths = @()
@@ -1687,9 +1740,9 @@ foreach ($family in $dashboardFamilyOrder) {
 }
 
 for ($r = 2; $r -le $pmMatrix.GetLength(0); $r++) {
-  $manufacturer = Normalize-Text $pmMatrix[$r, 1]
-  $product = Normalize-Text $pmMatrix[$r, 2]
-  $pack = Normalize-Text $pmMatrix[$r, 3]
+  $manufacturer = Normalize-Text $pmMatrix[$r, $pmColManuf]
+  $product = Normalize-Text $pmMatrix[$r, $pmColProduct]
+  $pack = Normalize-Text $pmMatrix[$r, $pmColPack]
   $segment = if ((Get-Variable pmColMap -ErrorAction Ignore) -and $pmColMap.segment) { Get-SegmentKey $pmMatrix[$r, $pmColMap.segment] } else { 'all' }
   $meta = @{
     segment = $segment
@@ -2138,8 +2191,8 @@ foreach ($family in $dashboardFamilyOrder) {
   }
 
   for ($r = 2; $r -le $pmMatrix.GetLength(0); $r++) {
-    $product = Normalize-Text $pmMatrix[$r, 2]
-    $manufacturer = Normalize-Text $pmMatrix[$r, 1]
+    $product = Normalize-Text $pmMatrix[$r, $pmColProduct]
+    $manufacturer = Normalize-Text $pmMatrix[$r, $pmColManuf]
     $segment = if ((Get-Variable pmColMap -ErrorAction Ignore) -and $pmColMap.segment) { Get-SegmentKey $pmMatrix[$r, $pmColMap.segment] } else { 'all' }
     $atc = Normalize-Text $pmMatrix[$r, $pmColMap.atc]
     $molecule = Normalize-Text $pmMatrix[$r, $pmColMap.molecule]
@@ -2150,7 +2203,7 @@ foreach ($family in $dashboardFamilyOrder) {
     $productUpper = $product.ToUpper()
     $atcUpper = $atc.ToUpper()
     $moleculeUpper = $molecule.ToUpper()
-    $moleculeMatch = Test-TextContainsAny -Text $moleculeUpper -Candidates $moleculeRules
+    $moleculeMatch = Test-TextEqualsAny -Text $moleculeUpper -Candidates $moleculeRules
     $atcMatch = Test-AtcStartsAny -Text $atcUpper -Candidates $atcRules
     if (-not $moleculeMatch -and -not $atcMatch) {
       continue

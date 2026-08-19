@@ -25,14 +25,52 @@ import re as _re
 LINE_FILES = {'cardio':'cardio/data.js','antibio':'ATB/data.js','otx':'OTC/data.js',
               'resp':'respiratorio/data.js','mujer':'mujer/data.js','snc':'SNC/data.js',
               'derma':'dermatologia/data.js'}
-# cierre = Jun 2026 -> indices de mes (0=Ene): ventana por periodo del ano corriente
-CIERRE_IDX = 5  # Jun (0-based)
+# Cierre de VENTA -> indices de mes (0=Ene) para la ventana de cada periodo.
+#
+# ESTABA HARDCODEADO ('CIERRE_IDX = 5  # Jun') y habia que bumpearlo a mano en cada cierre.
+# En Jul-2026 nadie lo movio: build-total sumaba la venta de Ene..Jun contra los KPIs de
+# Ene..Jul y abortaba con 'venta budget.real=10,350,483 vs kpis=12,238,008 (dif 15.4%)'.
+# Como aborta no reescribe total/data.js, y el gate check-total-consistency falla en
+# cascada contra los valores viejos. Ahora sale del manifiesto (global.ventaCutoff).
+def _cierre_venta():
+    """(anio, idx_mes_0based) del ultimo mes COMPLETO de venta interna."""
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import manifest
+        cm = manifest._g('global', 'ventaCutoff') or manifest.cierre_month()
+        y, m = str(cm).split('-')[:2]
+        return int(y), int(m) - 1
+    except Exception as e:
+        raise SystemExit(
+            f'FATAL: no resuelvo el cierre de venta desde el manifiesto ({e}). Antes esto '
+            'era una constante hardcodeada y publicaba un mes viejo en silencio; abortamos.')
+
+
+CIERRE_YEAR, CIERRE_IDX = _cierre_venta()
+
+
+def _ultimos(n):
+    """Los n meses que terminan en el cierre, como [(anio, idx0), ...] ASC.
+    Misma semantica que month_range() de build-kpis.py: rolling, cruza de anio."""
+    out = []
+    for k in range(n - 1, -1, -1):
+        t = CIERRE_YEAR * 12 + CIERRE_IDX - k
+        out.append((t // 12, t % 12))
+    return out
+
+
+# 'semestre' era [Ene..cierre], IGUAL que ytd -- pero build-kpis.py lo define como los
+# ULTIMOS 6 MESES (month_range(end, 6)). Con un cierre de junio las dos definiciones dan
+# Ene..Jun y coinciden por casualidad, asi que el bug era invisible; en Jul-2026 se
+# separaron (7 meses vs 6) y build-total aborto con 'semestre: venta budget.real=
+# 12,238,008 vs kpis=10,749,694 (dif 13.8%)'. Ahora todas las ventanas rolling salen de
+# _ultimos(), que es la misma cuenta que hace build-kpis.
 PERIOD_IDX = {
-    'mensual':   [(2026, CIERRE_IDX)],
-    'ytd':       [(2026, i) for i in range(0, CIERRE_IDX + 1)],
-    'semestre':  [(2026, i) for i in range(0, CIERRE_IDX + 1)],
-    'trimestre': [(2026, i) for i in range(CIERRE_IDX - 2, CIERRE_IDX + 1)],
-    'mat':       [(2025, i) for i in range(CIERRE_IDX + 1, 12)] + [(2026, i) for i in range(0, CIERRE_IDX + 1)],
+    'mensual':   _ultimos(1),
+    'ytd':       [(CIERRE_YEAR, i) for i in range(0, CIERRE_IDX + 1)],
+    'semestre':  _ultimos(6),
+    'trimestre': _ultimos(3),
+    'mat':       _ultimos(12),
 }
 
 

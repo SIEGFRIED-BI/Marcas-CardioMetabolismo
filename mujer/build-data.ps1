@@ -769,6 +769,33 @@ finally {
   [GC]::WaitForPendingFinalizers()
 }
 
+# --- Columnas del PM por NOMBRE de header (NO por posicion) ------------------
+# El export de IQVIA reordeno sus columnas: el AR_PM viejo (317 cols) traia
+# Manufacturer/Product/Pack en 1/2/3, y el de Ago-2026 (329 cols) trae
+# Pack/Manufacturer/ATC IV/Ph.Forms III/Product. Leerlas por posicion escribia
+# el laboratorio en 'prod' y el pack en 'manuf' -> is_sie caia a false en TODOS
+# los productos y NINGUNA marca SIE quedaba en mol_perf, sin mover una sola
+# suma (el audit daba 16.626/16.634 con las 4 lineas vacias de SIE).
+$pmColProduct = $null; $pmColManuf = $null; $pmColPack = $null
+for ($_pc = 1; $_pc -le [Math]::Min(12, $pmMatrix.GetLength(1)); $_pc++) {
+  $_ph = ((Normalize-Text $pmMatrix[1, $_pc]) -replace '\s+', ' ').Trim().ToUpper()
+  if (-not $_ph) { continue }
+  if ($_ph -eq 'PRODUCT' -and $null -eq $pmColProduct) { $pmColProduct = $_pc }
+  elseif ($_ph -eq 'MANUFACTURER' -and $null -eq $pmColManuf) { $pmColManuf = $_pc }
+  elseif ($_ph -eq 'PACK' -and $null -eq $pmColPack) { $pmColPack = $_pc }
+}
+if ($null -eq $pmColProduct -or $null -eq $pmColManuf) {
+  # Sin headers canonicos (ej. slices legacy) volvemos a las posiciones viejas,
+  # pero RUIDOSAMENTE: si el layout cambio otra vez esto tiene que verse.
+  Write-Warning "PM: no encontre los headers Product/Manufacturer en la fila 1; caigo a las posiciones legacy 1/2/3. Verificar que 'prod' no quede con el laboratorio."
+  if ($null -eq $pmColManuf)   { $pmColManuf = 1 }
+  if ($null -eq $pmColProduct) { $pmColProduct = 2 }
+  if ($null -eq $pmColPack)    { $pmColPack = 3 }
+}
+if ($null -eq $pmColPack) { $pmColPack = 3 }
+Write-Host ("   PM cols por header: Product={0} Manufacturer={1} Pack={2}" -f $pmColProduct, $pmColManuf, $pmColPack) -ForegroundColor DarkGray
+# ----------------------------------------------------------------------------
+
 $rxMasterMap = @{}
 $budgetMasterMap = @{}
 for ($r = 3; $r -le $maestroMatrix.GetLength(0); $r++) {
@@ -1864,8 +1891,15 @@ foreach ($family in $dashboardFamilyOrder) {
   foreach ($key in $pmQuarterKeys) { $marketQuarterly[$key] = 0.0 }
 
   for ($r = 2; $r -le $pmMatrix.GetLength(0); $r++) {
-    $product = Normalize-Text $pmMatrix[$r, 2]
-    $manufacturer = Normalize-Text $pmMatrix[$r, 1]
+    $product = Normalize-Text $pmMatrix[$r, $pmColProduct]
+    $manufacturer = Normalize-Text $pmMatrix[$r, $pmColManuf]
+    # PENDIENTE: molecula y ATC siguen leyendose por POSICION. Son las dos ultimas
+    # lecturas posicionales del PM que quedan en los 5 builders (ver CLAUDE.md regla 8:
+    # el reorden de columnas de Jul-2026 borro las 49 marcas SIE sin mover una suma).
+    # No se convirtieron a header porque mujer lee un PM SLICEADO (useSlicedIqvia en
+    # close-manifest) cuyo layout no se pudo verificar, y porque update-all.ps1 NO
+    # reconstruye mujer: se sincroniza con sync-mujer-pm.py, que si resuelve por header.
+    # Antes de volver a correr mujer/build-data.ps1: confirmar el layout del slice.
     $molecule = Normalize-Text $pmMatrix[$r, 4]
     $atc = Normalize-Text $pmMatrix[$r, 5]
     if (-not $product) {

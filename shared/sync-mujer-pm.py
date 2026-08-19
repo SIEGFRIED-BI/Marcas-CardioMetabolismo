@@ -358,10 +358,19 @@ def main():
             print(f'  SKIP: {script} no existe')
             continue
         print(f'  > {script}: {desc}')
-        result = subprocess.run([sys.executable, str(script_path)],
+        # Pasarle el MISMO master que uso el sync. El hook lo tenia hardcodeado a un
+        # AR_PM que termina en Jun-2026, asi que el mercado '45' se congelaba en
+        # junio en cada cierre (TRIP +45 publicaba 0 contra 3.105 de la fuente).
+        result = subprocess.run([sys.executable, str(script_path),
+                                 '--master', str(pm_path)],
                                 capture_output=True, text=True, encoding='utf-8')
         if result.returncode != 0:
+            # NO seguir como si nada: este hook define la composicion de un mercado
+            # entero. Si falla y el sync igual devuelve 0, el mes queda sin actualizar
+            # y ningun gate de sumas lo ve.
             print(f'    ERROR (rc={result.returncode}):', result.stderr[:500])
+            print(f'    ABORTA: {script} define el mercado; no se publica a medias.')
+            return 3
         else:
             # Solo printear la ultima linea util del subscript
             last_lines = [l for l in result.stdout.strip().split('\n') if l.strip()][-2:]

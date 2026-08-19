@@ -67,6 +67,8 @@ $closeMonth  = $cp.CloseMonth
 # atrasado ~2 meses). Corta la tabla Venta vs Estimado y el KPI de venta; el resto
 # (IQVIA/IE de mercado) usa closeMonth. Default = closeMonth (manifest global.ventaCutoff).
 $ventaCutoff = if ($cp.VentaCutoff) { $cp.VentaCutoff } else { $closeMonth }
+# '2026-07' -> 'Jul 2026', el month_key que usan mol_perf y los gates.
+$closeLabel = (@('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec')[[int]$closeMonth.Split('-')[1] - 1]) + ' ' + $closeMonth.Split('-')[0]
 $cycleFolder = if ($Month) { $Month } else { $cp.CycleFolder }
 $master = $cp.src_iqvia_master
 $ateneo = $cp.src_ateneo_mat
@@ -79,10 +81,18 @@ Write-Host "   master: $(Split-Path $master -Leaf)" -ForegroundColor Cyan
 Write-Host "   venta : $(if($venta){Split-Path $venta -Leaf}else{'(no resuelta)'})" -ForegroundColor Cyan
 Write-Host "================================================================" -ForegroundColor Cyan
 
+$script:failedSteps = @()
 function Step($name, $block) {
   Write-Host "`n>>> $name" -ForegroundColor Cyan
   & $block
-  if ($LASTEXITCODE -ne 0) { Write-Warning "$name termino con exit $LASTEXITCODE" }
+  if ($LASTEXITCODE -ne 0) {
+    # Un Write-Warning suelto en un log de miles de lineas no se ve. En el cierre
+    # de Jul-2026 fallaron en silencio pasos post-build y el diff quedo con la
+    # mitad de los productos y sin la clave mercadosAteneo, sin que ningun gate
+    # de sumas lo notara. Se acumulan y se re-imprimen al final.
+    Write-Warning "$name termino con exit $LASTEXITCODE"
+    $script:failedSteps += "$name (exit $LASTEXITCODE)"
+  }
 }
 
 # 1. build data.js (4 lineas: cardio/ATB/OTC/respi). build-all mergea venta SIN
@@ -108,6 +118,13 @@ Step 'sync derma'          { & $py (Join-Path $PSScriptRoot 'sync-dermato-pm.py'
 # (cero drift). Se re-aplica siempre por si el sync los volviera a mezclar
 # (mismo patron que los rebuilds de SNC arriba); si ya estan separados, no-opea.
 Step 'derma ACNECLIN split' { & $py (Join-Path $PSScriptRoot 'fix-dermato-acneclin-split.py') --master $master }
+
+# sync-dermato-pm ya trae ACNECLIN y ACNECLIN AP separados del master, asi que el split
+# de arriba es no-op. Si por lo que sea quedan filas HOMONIMAS (Jul-2026: ACNECLIN AP dos
+# veces, 10.597 y 1.354), este paso las deduplica contra el master. Dos productos con el
+# mismo nombre suman bien pero rompen toda agregacion por marca: dejaban 8 campos mal en
+# check-brandkpis-al-dia y hacian abortar a rebuild-kpibybrand-snc (148/156).
+Step 'derma ACNECLIN dedup' { & $py (Join-Path $PSScriptRoot 'fix-dermato-acneclin-dedup.py') --master $master }
 Step 'sync mujer'          { & $py (Join-Path $PSScriptRoot 'sync-mujer-pm.py') --master $master }
 
 # 7. Preservar meses pre-ventana que los syncs borran (regla #7)
@@ -199,6 +216,22 @@ Step 'mercado MAGNUS (IQVIA)' { & $py (Join-Path $PSScriptRoot 'rebuild-otc-magn
 # Sin esto las dos familias muestran datos identicos y la linea cuenta el mercado 2 veces.
 Step 'CEFALEXINA comun/DUO' { & $py (Join-Path $PSScriptRoot 'split-atb-cefalexina-duo.py') --master $master }
 
+# ROXOLAN (rosuvastatina) vs ROXOLAN PLUS (rosuvastatina+ezetimibe). Con el matcheo de
+# molecula por igualdad (Test-TextEqualsAny) el build ya no los mezcla, pero este paso
+# es la red: reparte por nombre y es idempotente. NO estaba cableado.
+Step 'ROXOLAN mono/combo' { & $py (Join-Path $PSScriptRoot 'split-cardio-roxolan.py') }
+
+# 12.57 MOMETASONE: IQVIA junta bajo una sola molecula tres mercados terapeuticos
+# (D07A0 topicos -> derma MOMETAX, R01A1 nasal -> respi HEXALER NASAL, R03D1 inhalantes
+# -> respi HEXALER BRONQUIAL). Sin este split las tres familias publican el total de la
+# molecula entera y cada marca calcula su share contra un universo ajeno: dermato mostraba
+# MS% 72,4% para MOMETAX sumando dos marcas de respiratorio (el real es 58,7%).
+# MISMO PATRON QUE CEFALEXINA, y hasta 2026-08-18 NO estaba en el pipeline: se corrigio a
+# mano el 2026-07-30 y el primer rebuild de respiratorio lo volvio a pisar (MOMETAX
+# reaparecio en HEXALER NASAL y HEXALER BRONQUIAL). Lo detecta check-mercados-cross-linea.py.
+# Va DESPUES de build-all (rehace respi) y de 'sync derma' (rehace derma): toca las dos.
+Step 'MOMETASONE por ATC' { & $py (Join-Path $PSScriptRoot 'split-mometasone-atc.py') --master $master }
+
 # 12.6 Mercado antimigranoso de TETRALGIN / TETRALGIN NOVO desde el export curado de MKT
 # ('mercado tetralgin*.xlsx' en hub). Redefine SOLO los competidores; las unidades SIE se
 # conservan del cierre oficial (AR_PM). Antes del recompute. Skipea si falta el xlsx.
@@ -218,14 +251,17 @@ Step 'ranking completo mercados' { & $py (Join-Path $PSScriptRoot 'itemize-molpe
 
 Step 'recompute aggregates' { & $py (Join-Path $PSScriptRoot 'recompute-mol-perf-aggregates.py') --cierre $closeMonth }
 
-# Vista alternativa del mercado por clase terapeutica ATC (clave mercadosATC): permite
-# medir cada marca contra su universo amplio ademas de contra su molecula exacta
-# (ROXOLAN: 2,0% en ROSUVASTATIN vs 1,05% en C10A - PRD REGULADORES LIPIDOS). La
-# clasificacion sale del Ateneo y las unidades del master. Igual que el paso anterior,
-# TIENE que correr despues de build-all porque el literal $dashboardData de build-data.ps1
-# no conoce esta clave y la borraria. Valida el cruce AR_PM vs Ateneo por clase y aborta
-# si alguna no cierra.
-Step 'mercados ATC (vista amplia)' { & $py (Join-Path $PSScriptRoot 'build-mercados-atc.py') --ateneo $ateneo --master $master }
+# Vista alternativa del mercado por los 79 MERCADOS CURADOS DEL ATENEO (clave
+# mercadosAteneo): permite medir cada marca contra su universo amplio ademas de contra su
+# molecula exacta. Igual que el paso anterior, TIENE que correr despues de build-all
+# porque el literal $dashboardData de build-data.ps1 no conoce esta clave y la borraria.
+#
+# OJO: este paso llamaba a 'build-mercados-atc.py', que quedo SUPERSEDIDO (su propio
+# docstring lo dice: la version por clase ATC III fue rechazada y la reemplaza
+# build-mercados-ateneo.py). Como el pipeline seguia llamando al viejo, la clave
+# mercadosAteneo se borraba en cada cierre y habia que regenerarla a mano; en Jul-2026
+# nadie la regenero y las 4 lineas quedaron sin ella. Corregido 2026-08-18.
+Step 'mercados Ateneo (vista amplia)' { & $py (Join-Path $PSScriptRoot 'build-mercados-ateneo.py') --master $master }
 # brandKpis de MAGNUS 36 (no lo crea build-data; lo arma desde mol_perf MAGNUS 36 +
 # budget + rec_ms, y lo suma a sieProds). Tras el recompute (necesita ytd/mat). Idempotente.
 Step 'MAGNUS 36 brandKpis' { & $py (Join-Path $PSScriptRoot 'ensure-magnus36-brandkpis.py') }
@@ -234,6 +270,13 @@ Step 'MAGNUS 36 brandKpis' { & $py (Join-Path $PSScriptRoot 'ensure-magnus36-bra
 Step 'build-kpis'     { & $py (Join-Path $PSScriptRoot 'build-kpis.py') --repo $repo }
 Step 'build-families' { & $py (Join-Path $PSScriptRoot 'build-families-perf.py') }
 Step 'sync-kpistrip'  { & $py (Join-Path $PSScriptRoot 'sync-kpistrip-with-kpis-json.py') }
+# brandKpis[marca].units / units_prev / ie recalculados desde mol_perf. Va ANTES que los
+# otros tres fix-brandkpis, que refinan sobre estos valores.
+# NO ESTABA EN EL PIPELINE hasta 2026-08-18: se corria a mano despues de cada cierre. Tras
+# un rebuild real la ficha por marca queda con las units del cierre anterior y el audit
+# tira ~165 FAIL de 'MAT units_prev' / 'MAT IE' (Jul-2026). Como el cierre de Jun-2026 fue
+# un roll quirurgico, el hueco no se noto por meses. Idempotente.
+Step 'brandKpis desde molperf' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-from-molperf.py') }
 # brandKpis[marca].market_total/ms/units = agregado autoritativo de mol_perf[fam].ytd/mat
 # (build-data a veces deja un mercado más amplio o valores del mes). Va PRIMERO porque
 # corrige units, de las que depende el IE. Idempotente.
@@ -251,6 +294,22 @@ Step 'canales trimestral' { & $py (Join-Path $PSScriptRoot 'build-canales-quarte
 Step 'brandKpis rec.ms' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-rec.py') }
 
 # 15-16. Etiquetas + Total Siegfried (consolidado) + cache-busters
+# Persiste en data.js lo que budget-overrides.js computa en runtime (kpiStrip.bud_*,
+# brandKpis[fam].budget, summary). Sin esto la ficha por marca queda con el mes de venta
+# del cierre ANTERIOR y check-brandkpis-al-dia bloquea el commit. NO estaba cableado.
+Step 'kpistrip budget' { & $py (Join-Path $PSScriptRoot 'fix-kpistrip-budget.py') }
+
+# kpiByBrand de SNC (estructura plana propia de esa linea). Valida reproduciendo
+# dermatologia/brandKpis campo por campo, asi que depende del dedup de ACNECLIN.
+Step 'kpiByBrand SNC' { & $py (Join-Path $PSScriptRoot 'rebuild-kpibybrand-snc.py') }
+
+# Rotula en molLabels los mercados que van atrasados respecto del cierre de su linea
+# (fuentes curadas por MKT que llegan tarde). El sufijo se borra solo al ponerse al dia.
+Step 'rotulo mercados atrasados' { & $py (Join-Path $PSScriptRoot 'label-mercados-atrasados.py') }
+
+# Rotula el gap DDD (panel de Qlik) vs Mercado IQVIA en las paginas DDD.
+Step 'rotulo frescura DDD' { & $py (Join-Path $PSScriptRoot 'label-ddd-frescura.py') }
+
 Step 'finalize-labels' { & $py (Join-Path $PSScriptRoot 'finalize-labels.py') }
 Step 'total-siegfried' { & $py (Join-Path $PSScriptRoot 'build-total.py') --master $master }
 Step 'cache-busters'   { & $py (Join-Path $PSScriptRoot 'bump-cache-busters.py') }
@@ -273,6 +332,16 @@ foreach ($g in @(
     @{n='bk-rec';  s='fix-brandkpis-rec.py';            a=@('--check')},
     @{n='audit';   s='audit-full.py';                   a=@()},
     @{n='total';   s='check-total-consistency.py';      a=@()},
+    # Los dos de abajo NO miran sumas: miran etiquetas y fuente. Son los unicos que
+    # ven un reordenamiento de columnas del master (Jul-2026: 'prod' quedo con el
+    # laboratorio, is_sie en false y 0 marcas SIE en mol_perf, con audit 16.626/16.634).
+    @{n='sie-pres';s='check-molperf-sie-presente.py';   a=@()},
+    @{n='forma';   s='check-forma-vs-baseline.py';      a=@()},
+    @{n='vs-master';s='check-molperf-vs-master.py';     a=@('--month', $closeLabel)},
+    # El de arriba concilia el NUMERADOR (marcas SIE). Este el DENOMINADOR: el total de
+    # cada familia contra el master por molecula exacta. Sin el, un mercado inflado pasa
+    # todos los gates (Jul-2026: DIOVAN x1,90 por matcheo de molecula con substring).
+    @{n='mercado-src';s='check-mercado-vs-master.py';   a=@('--month', $closeLabel)},
     @{n='history'; s='verify-history-preserved.py';     a=@('--baseline','HEAD','--strict')}
 )) {
   $gp = Join-Path $PSScriptRoot $g.s
@@ -286,8 +355,13 @@ Write-Host "`n================================================================" 
 Push-Location $repo
 git status -s
 Pop-Location
-if ($gateFail) {
-  Write-Host "`n[!] Algun gate fallo. Revisar antes de commitear." -ForegroundColor Red
+if ($script:failedSteps.Count -gt 0) {
+  Write-Host "`n[!] PASOS QUE FALLARON (el data.js puede haber quedado a medio construir):" -ForegroundColor Red
+  foreach ($s in $script:failedSteps) { Write-Host "      - $s" -ForegroundColor Red }
+}
+if ($gateFail -or $script:failedSteps.Count -gt 0) {
+  Write-Host "`n[!] Algo fallo. Revisar antes de commitear." -ForegroundColor Red
+  exit 1
 } else {
   Write-Host "`n[OK] Listo. Revisa el git diff y, si esta bien, commit + push (Cloudflare redeploya)." -ForegroundColor Green
 }

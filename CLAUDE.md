@@ -26,6 +26,39 @@
    después, o correr la corrección de la línea puntual.
 6. **IE solo con base previa significativa** (crecimiento <5×); si no, "—".
 7. **Los merges AGREGAN meses, nunca reemplazan** (lo bloquea verify-history).
+8. **Ninguna columna del master IQVIA se lee por POSICIÓN — siempre por header.**
+   El export nuevo (`REM - Base Plana_*`, 329 cols) reordenó todo respecto del
+   `AR_PM_FV_Standard` viejo (317 cols): col1 pasó de `Manufacturer` a `Pack` y
+   col2 de `Product` a `Manufacturer`. Los 5 `build-data.ps1` leían producto y
+   laboratorio por posición → `prod` quedó con el laboratorio ("GADOR"), `manuf`
+   con la presentación, `is_sie` en false en los 384 productos y **las 49 marcas
+   SIE desaparecieron** de cardio/ATB/OTC/respiratorio. **Ningún gate lo vio**:
+   es un cambio de etiqueta, no de aritmética — `audit-full` daba 16.626/16.634 y
+   `verify-history-preserved --strict` daba OK. Arreglado 2026-08-18: el bloque
+   `PM cols por header:` (se imprime en el log del build) resuelve
+   Product/Manufacturer/Pack por nombre, y si no los encuentra avisa con
+   `Write-Warning` en vez de caer en silencio. Lo cubren dos gates nuevos:
+   `check-molperf-sie-presente.py` (Check 16 del hook, mira etiquetas) y
+   `check-molperf-vs-master.py` (concilia contra el xlsx, corre en update-all).
+   Cuando entre una fuente con nombre distinto, **diffear forma contra el
+   publicado** (productos, marcas SIE, claves de primer nivel), no sólo totales.
+
+9. **El filtro de molécula compara por IGUALDAD, nunca por substring.** Los nombres
+   de combo CONTIENEN al mono: `HYDROCHLOROTHIAZIDE_VALSARTAN` contiene `VALSARTAN`,
+   `EZETIMIBE_ROSUVASTATIN` contiene `ROSUVASTATIN`. Con `.Contains()` los combos se
+   colaban al mercado mono —que ya los cuenta en su propia familia— e inflaban 11
+   familias de cardio (DIOVAN ×1,90, TERLOC ×1,98, SILTRAN ×1,84, ROXOLAN ×1,16),
+   toda la serie, ~+34% del mercado de la línea. Es la regla #2 otra vez.
+   Arreglado 2026-08-18 con `Test-TextEqualsAny` en cardio/ATB/respiratorio.
+   **Ningún gate lo veía**: `sum(productos) == total de familia` cerraba exacto sobre
+   el universo equivocado y las marcas SIE estaban perfectas — se movía sólo el
+   DENOMINADOR. Lo cubre el gate nuevo `check-mercado-vs-master.py` (concilia el total
+   de cada familia contra el master por molécula exacta, leyendo el mapa
+   familia→molécula del propio config del build).
+10. **Antes de publicar, diffear los VALORES contra `HEAD`, no sólo correr los gates.**
+    El bug de arriba pasó los 19 checks del pre-commit. Lo cazó comparar la suma de
+    `mol_perf` mes a mes contra lo publicado: cualquier familia con ratio fuera de
+    ±1% se investiga hasta la causa (re-expresión de IQVIA son décimas).
 
 ## Convenciones de naming (importantes — no equivocarse)
 
@@ -92,16 +125,22 @@ NO usar la API de Qlik para detectar esto: devuelve agregados a medio calcular y
 test dio resultados distintos entre corridas, con la dirección contenedor/contenido
 invertida (marcaba `Hexaler ⊆ Alergical` con Hexaler en 18,0M y Alergical en 9,5M).
 
-**Vista alternativa del mercado por clase terapéutica (`mercadosATC`).** En Mercado IQVIA
-hay un selector *Universo: Molécula / Clase terapéutica*. La segunda mide cada marca
-contra su clase ATC III del Ateneo (ROXOLAN: 2,0% en ROSUVASTATIN vs 1,05% en
-`C10A - PRD REGULADORES LIPIDOS`, y de #10 pasa a #24 de 135). La genera
-`shared/build-mercados-atc.py` — clasificación del Ateneo, unidades del master AR_PM,
-porque el Ateneo viene en MAT móvil y la tabla necesita mensual. Valida el cruce AR_PM vs
-Ateneo por clase (265/265 cierran) y aborta si alguna se pasa de `--tol`.
+**Vista alternativa del mercado (`mercadosAteneo`).** En Mercado IQVIA hay un selector
+*Universo: Molécula / Mercado del Ateneo*. El segundo mide cada marca contra su universo
+amplio usando los **79 mercados curados del Ateneo** (`Roxolan (Hipolipemeantes)`,
+`Betabloqueantes (Dilatrend-Nebilet)`). La genera `shared/build-mercados-ateneo.py`:
+clasificación del `Ateneo Febrero-26.xlsb` (hoja DATOS, es el único archivo con la
+columna `Mercado`), unidades del master AR_PM porque el Ateneo viene en MAT móvil y la
+tabla necesita mensual. **Los mercados se solapan a propósito — nunca sumarlos entre sí**
+(15,6% de las marcas cae en más de uno).
+La generaba `shared/build-mercados-atc.py` (clases ATC III), **rechazado por el usuario**:
+los mercados del Ateneo no son clases ATC. Ese script quedó supersedido pero
+`update-all.ps1` lo siguió llamando hasta 2026-08-18, así que `mercadosAteneo` se borraba
+en cada cierre y había que regenerarla a mano; en Jul-2026 nadie la regeneró y las 4
+líneas quedaron sin ella. Ya está corregido: el paso llama al script del Ateneo.
 Vive en una clave **aparte** de `mol_perf` a propósito: `build-total.py:260` y
 `check-total-consistency.py:54` recorren `mol_perf` para armar el mercado de compañía, y
-el universo ATC ancho bajaría el MS% publicado. **Ese paso tiene que correr después de
+el universo ancho bajaría el MS% publicado. **Ese paso tiene que correr después de
 `build-all`**: el literal `$dashboardData` de cada `build-data.ps1` (27 claves) reescribe
 `data.js` entero y borra cualquier clave que no conozca. Ya está encadenado en
 `update-all.ps1`, igual que `itemize-molperf-otros.py`.

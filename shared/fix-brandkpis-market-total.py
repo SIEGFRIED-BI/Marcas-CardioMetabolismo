@@ -51,18 +51,34 @@ def all_months(mol):
     return sorted(s, key=msort)
 
 
-def windows(mol):
+def _abs_idx(mk):
+    p = mk.split(); return int(p[1]) * 12 + MES.index(p[0])
+
+
+def _mk(idx):
+    return f'{MES[idx % 12]} {idx // 12}'
+
+
+def windows(mol, line_last=None):
+    """Ventanas ytd/mat. Se anclan al cierre de la LINEA, no al ultimo mes de la
+    familia: si una familia va atrasada (su fuente no cubre el cierre), anclarla en
+    su propio ultimo mes le da un denominador de 12 meses contra un numerador de 11.
+    Jul-2026, MAGNUS congelado en Jun: units salian de Ago25..Jul26 (11 meses reales)
+    y market_total de Jul25..Jun26 (12) -> MS% 30,2 en vez de 33,2. psum() trata los
+    meses ausentes como 0, asi que generar la ventana completa del cierre es correcto
+    y deja numerador y denominador sobre EXACTAMENTE los mismos meses."""
     am = all_months(mol)
     if not am:
         return None
-    last = am[-1]; yr = last.split()[1]
-    ytd_c = [m for m in am if m.split()[1] == yr and msort(m) <= msort(last)]
-    ytd_p = [f'{m.split()[0]} {int(yr)-1}' for m in ytd_c]
-    i = am.index(last)
-    mat_c = am[max(0, i-11):i+1]
-    # mat prev = 12 meses anteriores a mat_c
-    j = max(0, i-11)
-    mat_p = am[max(0, j-12):j]
+    last = am[-1]
+    if line_last and msort(line_last) > msort(last):
+        last = line_last
+    i = _abs_idx(last)
+    mes0 = i % 12                      # 0=Ene
+    ytd_c = [_mk(i - k) for k in range(mes0, -1, -1)]
+    ytd_p = [_mk(j - 12) for j in (_abs_idx(m) for m in ytd_c)]
+    mat_c = [_mk(i - k) for k in range(11, -1, -1)]
+    mat_p = [_mk(j - 12) for j in (_abs_idx(m) for m in mat_c)]
     return {'ytd': (ytd_c, ytd_p), 'mat': (mat_c, mat_p)}
 
 
@@ -86,12 +102,21 @@ def patch_line(path, check_only=False):
     bk = D.get('brandKpis', {}); mp = D.get('mol_perf', {})
     if not bk or not mp:
         return 0, 'sin brandKpis/mol_perf'
+    # Cierre de la LINEA = mes mas reciente de cualquier familia. Ancla las ventanas
+    # para que una familia atrasada no compare 11 meses de units contra 12 de mercado.
+    _all = set()
+    for _o in mp.values():
+        if isinstance(_o, dict):
+            for _p in _o.get('products', []):
+                _all.update((_p.get('monthly_vals') or {}).keys())
+    _valid = [m for m in _all if len(m.split()) == 2 and m.split()[0] in MES]
+    line_last = max(_valid, key=msort) if _valid else None
     changed = 0
     for fam, kp in bk.items():
         mol = mp.get(fam)
         if not isinstance(mol, dict):
             continue
-        win = windows(mol)
+        win = windows(mol, line_last)
         if not win:
             continue
         for per in ('ytd', 'mat'):
@@ -99,11 +124,23 @@ def patch_line(path, check_only=False):
             if not isinstance(st, dict):
                 continue
             curr_months, prev_months = win[per]
-            # 1) market_total autoritativo
-            mkt = last_agg(mol, per)
-            if mkt is None:
-                continue
-            new_mkt = int(round(mkt))
+            # 1) market_total autoritativo = suma de TODOS los products sobre la MISMA
+            #    ventana con la que se calculan las units. Antes salia de last_agg(), que
+            #    devuelve el agregado de la clave mas reciente QUE EXISTA -- y si la
+            #    familia no llega al cierre, esa clave es la del ANIO ANTERIOR.
+            #    Jul-2026: MAGNUS quedo congelado en Jun (su fuente curada de MKT no
+            #    cubria julio) y su unico agregado era {'Jul 2025': 1.503.716}, el YTD
+            #    Ene..Jul 2025. brandKpis publicaba units de Ene..Jun 2026 contra el
+            #    mercado de Ene..Jul 2025 -> MS% 27,4 en vez de 35,0: 6 meses contra 7.
+            #    Sumar sobre curr_months es simetrico por construccion.
+            mkt_win = sum(psum(p, curr_months) for p in mol.get('products', []))
+            if mkt_win:
+                new_mkt = int(round(mkt_win))
+            else:
+                mkt = last_agg(mol, per)
+                if mkt is None:
+                    continue
+                new_mkt = int(round(mkt))
             # 2) units: conservar, salvo anomalía MAT<YTD (units del mes, no MAT)
             new_units = st.get('units')
             new_uprev = st.get('units_prev')

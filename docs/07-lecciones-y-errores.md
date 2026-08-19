@@ -207,6 +207,163 @@ detectar saltos de unidad/escala.
 
 ---
 
+## ❌ Bug 11 — IQVIA reordenó las columnas del master y desaparecieron las 49 marcas SIE
+
+**Cuándo:** cierre de Jul-2026 (detectado 2026-08-18, antes de publicar).
+
+**Síntoma que se veía:** 8 FAIL en `audit-full.py`, todos `kpiStrip.mkt_ytd26` /
+`mkt_mat26 = None` en cardio/ATB/OTC/respiratorio. Parecía un bug de ventana temporal
+en `build-kpis.py`.
+
+**Lo que pasaba en realidad:** el master nuevo (`REM - Base Plana_Aug-18-2026.xlsx`,
+copiado como `AR_PM_FV_Standard_Aug-18-2026.xlsx`) trae **329 columnas en otro orden**:
+
+| col (1-based) | AR_PM viejo (317) | export nuevo (329) |
+|---|---|---|
+| 1 | `Manufacturer` | **`Pack`** |
+| 2 | `Product` | **`Manufacturer`** |
+| 5 | `Ph. Forms III` | **`Product`** |
+
+Los 5 `build-data.ps1` leían `$pmMatrix[$r,1]` = laboratorio y `$pmMatrix[$r,2]` =
+producto **por posición**, mientras resolvían molécula y ATC por header (`$pmColMap`).
+Con el layout nuevo quedó `prod = "GADOR"` (el laboratorio) y
+`manuf = "SINLIP CAPS 20mg x 30"` (la presentación). Como
+`is_sie = $manufacturer.ToUpper().Contains('SIEGFRIED')` nunca matchea una presentación,
+**los 384 productos quedaron con `is_sie: false` y las 49 marcas SIE desaparecieron de
+`mol_perf`**: cardio 22→0, ATB 4→0, OTC 8→0, respiratorio 15→0. De ahí el `None`: sin
+productos SIE, `compute_iqvia_kpi` no encuentra cobertura y anula el período entero.
+
+**Por qué no lo vio ningún gate:** *es un cambio de etiqueta, no de aritmética.* Las
+filas del master son las mismas y suman lo mismo, sólo cambió qué string va en qué campo.
+`audit-full.py` daba **16.626/16.634**, `verify-history-preserved.py --strict` daba
+`OK: history preserved`, y `check-molperf-suma-productos.py` cerraba exacto: todos
+comparan el artefacto **consigo mismo**. Las 3 líneas Python (`sync-*-pm.py`) no se
+rompieron porque resuelven las columnas por nombre de header.
+
+**Fix:** los 5 `build-data.ps1` resuelven `Product`/`Manufacturer`/`Pack` por header
+(bloque `PM cols por header:` que se imprime en el log). Si no encuentra los headers cae
+a las posiciones viejas **con `Write-Warning`**, nunca en silencio.
+
+**Gates nuevos** (los únicos que no miran sumas):
+- `shared/check-molperf-sie-presente.py` — Check 16 del hook. (A) cada línea tiene ≥1
+  producto `is_sie`; (B) el set de marcas SIE no se achica vs baseline git; (C) los
+  `manuf` no parecen presentaciones.
+- `shared/check-molperf-vs-master.py` — G1 real: lee el master con openpyxl **por header**
+  y concilia unidades por (Producto, mes) contra `mol_perf`. Corre en `update-all.ps1`,
+  no en el hook (lee 41 MB).
+
+**Reglas:**
+1. **Ninguna columna del master se lee por posición.** Siempre por nombre de header, y
+   si el header no aparece, ruido — nunca fallback silencioso.
+2. **Un gate de sumas no puede validar un cambio de etiqueta.** Cuando entra una fuente
+   nueva, diffear **forma** contra el publicado (cantidad de productos, marcas SIE,
+   claves de primer nivel), no sólo totales.
+
+**Colateral del mismo cierre, misma causa raíz (pasos que fallaron sin frenar nada):**
+`Step` en `update-all.ps1` sólo hacía `Write-Warning` y seguía. Quedaron sin efecto
+`itemize-molperf-otros.py` (cardio 364→182 productos, ranking truncado otra vez) y la
+clave `mercadosAteneo` (borrada en las 4 líneas). Además el paso llamaba a
+`build-mercados-atc.py`, que está **supersedido** por `build-mercados-ateneo.py`. Los
+tres arreglados: `Step` acumula y re-imprime los fallos y el script sale con exit≠0.
+
+---
+
+## ❌ Bug 12 — Correcciones post-build que el rebuild pisa y nadie vuelve a aplicar
+
+**Cuándo:** mismo cierre de Jul-2026. Salió a la luz porque fue el **primer rebuild real
+de las 4 líneas en meses** (el cierre de Jun-2026 fue un "roll quirúrgico", commit
+`4d2f13a`, que sólo agregaba un mes sin reconstruir).
+
+**El patrón.** `build-data.ps1` reescribe `data.js` entero desde el literal
+`$dashboardData` (27 claves). Todo lo que se arregló *después* del build —una clave
+extra, un mercado splitteado, un ranking itemizado— **desaparece en el próximo
+rebuild**. Si ese arreglo no está encadenado en `update-all.ps1`, vuelve el bug viejo y
+ningún gate lo ve, porque ninguno de esos arreglos mueve una suma.
+
+Cuatro casos en la misma corrida:
+
+| Corrección | Qué pasaba sin ella | Estado |
+|---|---|---|
+| `build-mercados-ateneo.py` | la clave `mercadosAteneo` se borraba en las 4 líneas | el paso llamaba al script **supersedido** `build-mercados-atc.py` → corregido |
+| `split-mometasone-atc.py` | MOMETAX (derma) reaparecía dentro de HEXALER NASAL/BRONQUIAL; dermato publicaba **MS% 72,4% en vez de 58,7%** | **no estaba en el pipeline** → agregado al lado del split de CEFALEXINA |
+| `itemize-molperf-otros.py` | ranking truncado (cardio 364 → 182 productos) | estaba encadenado pero falló sin frenar nada → `Step` ahora acumula y aborta |
+| `rebuild-mujer-45-market.py` | mercado `45` congelado: TRIP +45 publicaba **0** contra 3.105 de la fuente | master **hardcodeado** a un AR_PM que termina en Jun-2026 → se resuelve por manifiesto |
+
+**Masters hardcodeados.** Tres scripts apuntaban por ruta absoluta al mismo archivo
+`_iqvia-master\2026-06\AR_PM_FV_Standard_Jul-2026.xlsx`, que **termina en Jun-2026** y que
+ningún otro paso lee. Un master hardcodeado no falla: devuelve datos viejos y el mes nuevo
+simplemente no aparece. Resolverlo siempre por `manifest.resolve_source('iqvia_master')`,
+aceptar `--master`, e **imprimir de dónde salió**.
+
+**Reglas:**
+1. **Toda corrección post-build va encadenada en `update-all.ps1`.** Si se arregla a mano
+   y no se cablea, dura hasta el próximo rebuild.
+2. **Ningún paso que define un mercado puede fallar en silencio.** `sync-mujer-pm.py`
+   imprimía `ERROR` del hook y devolvía 0 igual; ahora aborta.
+3. **Ningún master por ruta absoluta.** Manifiesto o `--master`, y que se loguee.
+4. Ojo: `check-mercados-cross-linea.py` **reporta pero sale con exit 0** a propósito (una
+   molécula puede ser compartida legítimamente por 2 líneas). Hay que leerlo, no confiar
+   en su exit code.
+
+---
+
+## ❌ Bug 13 — El mercado "mono" se comía los combos (matcheo de molécula por substring)
+
+**Cuándo:** cierre de Jul-2026, detectado en el ÚLTIMO chequeo antes de commitear —
+el diff de valores contra lo publicado. Ningún gate lo vio.
+
+**Qué pasaba.** `build-data.ps1` filtraba la molécula con `Test-TextContainsAny`, que
+hace `$Text.Contains($candidate)`. El config declara `DIOVAN = molecules @('VALSARTAN')`
+y `DIOVAN D = molecules @('HYDROCHLOROTHIAZIDE_VALSARTAN')`, pero
+`'HYDROCHLOROTHIAZIDE_VALSARTAN'.Contains('VALSARTAN')` es `$true` → **los combos
+entraban también al mercado mono**, que ya los tiene contados en su propia familia.
+
+Verificado contra el master (Jun-2026):
+
+```
+VALSARTAN mono          756.265      <- lo que publicaba HEAD (756.235)
+VALSARTAN combo/otros   693.581
+                      ---------
+suma                  1.449.846      <- lo que produjo el rebuild
+```
+
+**Alcance (May-2026): 11 familias de cardio** — TERLOC ×1,98 · DIOVAN ×1,90 ·
+SILTRAN ×1,84 · TELPRES ×1,48 · DIOVAN D ×1,39 · METGLUCON AP ×1,31 · ROXOLAN ×1,16 ·
+EMPAX ×1,11 — más 1 de OTC (ACERPES ×1,05). ATB y respiratorio, limpias. Afectaba
+**toda la serie**, no sólo el mes nuevo: inflaba el mercado de la línea ~34% y hundía
+todos los MS%.
+
+Es la **regla crítica #2** (una familia de `mol_perf` = UN mercado de la fuente) y el
+mismo bug histórico de ROXOLAN (rosuvastatina vs rosuvastatina/ezetimibe), que había
+sido corregido a mano con `split-cardio-roxolan.py` — script que **nunca se cableó** al
+pipeline (ver Bug 12).
+
+**Por qué ningún gate lo vio.** Todos miran el numerador o la consistencia interna:
+`sum(productos) == total de familia` cerraba **exacto** sobre el universo equivocado;
+`verify-history-preserved` sólo controla que no falten meses; y
+`check-molperf-vs-master.py` reconciliaba las **marcas SIE**, que estaban perfectas —
+lo único que se movía era el **denominador**.
+
+**Fix:** `Test-TextEqualsAny` (igualdad exacta) para el filtro de moléculas, en cardio,
+ATB y respiratorio (las 3 líneas que usan ese matcher; `mol_perf` sale de
+`perfBuckets.molecule.all`). Se simuló contra el master ANTES de aplicarlo: ninguna de
+las 29 familias queda en cero y todas caen a **≤0,25%** del valor publicado.
+
+**Gate nuevo:** `shared/check-mercado-vs-master.py` — concilia el TOTAL de cada familia
+contra la suma del master filtrando por igualdad de molécula, leyendo el mapa
+familia→molécula del propio config del build (no lo duplica). Es el complemento de
+`check-molperf-vs-master.py`: aquel valida el numerador, éste el denominador.
+
+**Reglas:**
+1. **Filtro de molécula = igualdad, nunca substring.** Los nombres de combo contienen
+   al mono (`AMLODIPINE_VALSARTAN`, `EZETIMIBE_ROSUVASTATIN`).
+2. **Un gate del numerador no valida el mercado.** Todo cierre tiene que conciliar
+   también el denominador contra la fuente.
+3. **Diffear valores contra lo publicado, no sólo correr los gates.** Este bug pasó los
+   19 checks del hook; lo cazó comparar mes a mes contra `HEAD`.
+
+---
+
 ## ✅ Reglas de oro (resumen)
 
 1. **`?v=<hash>` siempre fresco** — automático (build-all + pre-commit). Nunca
@@ -218,6 +375,15 @@ detectar saltos de unidad/escala.
 6. **Splits de Venta Interna se RE-APLICAN después de cada merge.**
 7. **Los merges AGREGAN meses, nunca reemplazan** (lo bloquea el guardian).
 8. **El estimado ("Estimado de Ventas") nunca se llama "Presupuesto"** (ver CLAUDE.md).
+9. **Ninguna columna del master se lee por posición** — siempre por header, con ruido
+   si no aparece. Un reorden de columnas no mueve ninguna suma y ningún gate de
+   aritmética lo ve (Bug 11).
+10. **Toda corrección post-build va cableada en `update-all.ps1`.** Si se arregla a
+    mano y no se encadena, dura hasta el próximo rebuild (Bug 12).
+11. **Filtro de molécula por IGUALDAD, nunca substring** — los combos contienen al
+    mono y se cuelan en su mercado (Bug 13).
+12. **Antes de publicar, diffear valores contra `HEAD`**, no sólo correr los gates:
+    Bug 13 pasó los 19 checks del hook.
 
 ## Antes de pushear un corte, correr SIEMPRE:
 ```

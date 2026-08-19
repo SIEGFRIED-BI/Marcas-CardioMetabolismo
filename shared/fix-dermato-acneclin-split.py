@@ -292,12 +292,21 @@ def main():
 
     mol_obj = D['mol_perf'][MOL_KEY]
     products = mol_obj['products']
+    # La premisa de este script es que mol_perf.MINOCYCLINE trae ACNECLIN y ACNECLIN AP
+    # MERGEADOS en una sola entrada. Desde que sync-dermato-pm.py los trae YA SEPARADOS
+    # (el AR_PM reporta ambos Product), esa premisa no se cumple, y volver a partir el
+    # ACNECLIN residual crea una TERCERA fila con el nombre repetido. Paso en Jul-2026:
+    # ACNECLIN AP quedo dos veces (10.597 y 1.354). Las tres filas sumaban el total del
+    # master, asi que check-molperf-suma-productos cerraba y nadie lo veia; pero dos
+    # productos homonimos rompen la agregacion por marca -> 8 campos mal en
+    # check-brandkpis-al-dia, y eso hacia abortar a rebuild-kpibybrand-snc (148/156).
+    # Si AP ya existe por su cuenta, no hay nada que separar.
+    if any(p['prod'] == 'ACNECLIN AP (SIE)' for p in products):
+        print('ACNECLIN ya viene separado del master (sync-dermato-pm). Nada para hacer.')
+        print('  (si quedaron filas homonimas: py shared/fix-dermato-acneclin-dedup.py)')
+        return 0
     idx = next((i for i, p in enumerate(products) if p['prod'] == MERGED_NAME), None)
     if idx is None:
-        already = any(p['prod'] == 'ACNECLIN AP (SIE)' for p in products)
-        if already:
-            print('ACNECLIN ya esta separado en mol_perf.MINOCYCLINE. Nada para hacer.')
-            return 0
         print("ERROR: no se encontro el producto '{}' en mol_perf.{}".format(MERGED_NAME, MOL_KEY), file=sys.stderr)
         return 4
 

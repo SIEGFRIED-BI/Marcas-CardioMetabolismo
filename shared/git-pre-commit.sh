@@ -249,4 +249,38 @@ if git diff --cached --name-only | grep -qE 'data\.js$'; then
     fi
 fi
 
+# Check 16: las marcas SIEGFRIED siguen en mol_perf con is_sie=true. Es el UNICO gate
+# que mira ETIQUETAS y no sumas. En Jul-2026 el export de IQVIA reordeno sus columnas
+# (317 -> 329) y los build-data.ps1 leian producto/laboratorio por POSICION: 'prod'
+# quedo con el laboratorio ("GADOR"), 'manuf' con la presentacion ("SINLIP CAPS 20mg
+# x 30"), is_sie cayo a false en los 384 productos y las 49 marcas SIE desaparecieron
+# de cardio/ATB/OTC/respiratorio. No se movio UNA sola suma: audit-full daba
+# 16.626/16.634 y verify-history-preserved daba OK.
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    py shared/check-molperf-sie-presente.py
+    if [ $? -ne 0 ]; then
+        echo "BLOQUEADO: faltan marcas SIE en mol_perf (o 'manuf' trae presentaciones)."
+        echo "Casi siempre es el master con las columnas reordenadas: verificar que"
+        echo "build-data.ps1 resuelva Product/Manufacturer por HEADER y re-correr el build."
+        exit 1
+    fi
+fi
+
+# Check 17: FORMA vs baseline (claves de primer nivel, productos y familias de
+# mol_perf). El otro gate que no mira sumas. En Jul-2026 el mismo cierre borro la
+# clave 'mercadosAteneo' de las 4 lineas (el literal $dashboardData conoce 27 claves
+# y reescribe data.js entero) y dejo mol_perf con la mitad de los productos (cardio
+# 364 -> 182: itemize-molperf-otros.py fallo sin frenar el pipeline). Las dos cosas
+# pasaron todos los gates de aritmetica.
+if git diff --cached --name-only | grep -qE 'data\.js$'; then
+    py shared/check-forma-vs-baseline.py
+    if [ $? -ne 0 ]; then
+        echo "BLOQUEADO: la forma de algun data.js se degrado vs HEAD."
+        echo "Si falta una clave top-level, la borro el rebuild y hay que regenerarla"
+        echo "(mercadosAteneo -> py shared/build-mercados-ateneo.py --master <AR_PM>)."
+        echo "Si se derrumbaron los productos: py shared/itemize-molperf-otros.py --master <AR_PM>"
+        exit 1
+    fi
+fi
+
 exit 0

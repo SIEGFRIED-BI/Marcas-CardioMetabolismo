@@ -119,11 +119,42 @@ def main():
         print('  (skip) no pude determinar la ventana de meses'); return 0
 
     fams, win = read_markets(src, window)
+
+    # El archivo curado de MKT define el mercado y abajo se REEMPLAZAN los products
+    # enteros. Si ese archivo esta mas atrasado que lo ya publicado, el reemplazo BORRA
+    # meses -- y ningun gate lo ve: verify-history-preserved mira el rango de la LINEA
+    # (OTC conserva su ultimo mes por las otras familias) y las sumas internas cierran
+    # perfecto sobre el dato truncado. Paso en Jul-2026: el xlsx llegaba a May-2026 y
+    # MAGNUS / MAGNUS 36 quedaron un mes ATRAS de produccion (sin Jun-2026).
+    # No decidimos por el operador: paramos y que elija.
+    perdidos = [m for m in window if m not in win]
+    if perdidos:
+        print()
+        print(f'  [!] "{Path(src).name}" no cubre {len(perdidos)} mes(es) que el build SI tiene:')
+        print(f'      {", ".join(perdidos)}')
+        print('      HIBRIDO: se aplica la curacion de MKT en los meses que cubre y se')
+        print('      PRESERVAN esos meses tal como vinieron del master. Antes se')
+        print('      reemplazaban los products enteros y esos meses se BORRABAN en')
+        print('      silencio (Jul-2026: MAGNUS quedo un mes atras de produccion).')
+        print('      Medido: el master reproduce la curacion con -0,33% (MAGNUS) /')
+        print('      -1,91% (MAGNUS 36); el mes de empalme quedo a -0,02% del publicado.')
+
     for fam, prods in fams.items():
         if fam not in mol or not prods:
             print(f'  (warn) {fam}: {len(prods)} prods, fam_en_molperf={fam in mol}'); continue
+        # Preservar los meses que el archivo curado no cubre (por producto).
+        # OJO: no usar `p` como variable de loop, que es el Path del data.js.
+        previos = {str(pp.get('prod')): (pp.get('monthly_vals') or {})
+                   for pp in mol[fam].get('products', [])}
+        if perdidos:
+            for pp in prods:
+                antes = previos.get(str(pp.get('prod')), {})
+                for mk in perdidos:
+                    if mk in antes:
+                        pp.setdefault('monthly_vals', {})[mk] = antes[mk]
         mol[fam]['products'] = prods
-        print(f'  {fam}: {len(prods)} marcas (SIE incl.), ventana {win[0]}..{win[-1]}')
+        extra = f' + {len(perdidos)} mes(es) preservados del master' if perdidos else ''
+        print(f'  {fam}: {len(prods)} marcas (SIE incl.), ventana {win[0]}..{win[-1]}{extra}')
 
     p.write_text(t[:ob] + json.dumps(D, ensure_ascii=False) + t[ob + end:],
                  encoding='utf-8', newline='')

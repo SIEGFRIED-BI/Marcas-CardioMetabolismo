@@ -22,23 +22,61 @@ def msort(k):
     p = k.split(); return int(p[1]) * 100 + MES.index(p[0])
 
 
-def period_kpi(mol, sie, per):
-    d = mol.get(per, {})
-    if not d:
-        return None
-    keys = sorted(d, key=msort)
-    if len(keys) < 2:
-        return None
-    cur, prev = keys[-1], keys[-2]
-    units = sie.get(per, {}).get(cur)
-    units_prev = sie.get(per, {}).get(prev)
-    mkt = d.get(cur)
+def _abs_idx(mk):
+    p = mk.split(); return int(p[1]) * 12 + MES.index(p[0])
+
+
+def _mk(i):
+    return f'{MES[i % 12]} {i // 12}'
+
+
+def _win(last, per):
+    """Ventana (curr, prev) anclada en `last`, simetrica entre anios."""
+    i = _abs_idx(last)
+    n = (i % 12) + 1 if per == 'ytd' else 12
+    curr = [_mk(i - k) for k in range(n - 1, -1, -1)]
+    return curr, [_mk(_abs_idx(m) - 12) for m in curr]
+
+
+def _sum(prods, months):
+    return sum(float((p.get('monthly_vals') or {}).get(m, 0) or 0)
+               for p in prods for m in months)
+
+
+def period_kpi(mol, sie, per, line_last=None):
+    """KPI del periodo calculado sobre monthly_vals, no sobre las claves de agregado.
+
+    Antes exigia >=2 claves en mol_perf[FAM][per] y devolvia None si no. Esas claves solo
+    se emiten cuando el YTD/MAT esta COMPLETO hasta el cierre (aggregate_ytd exige los
+    meses 1..cierre), asi que una familia atrasada se queda unicamente con la del anio
+    anterior. Jul-2026: MAGNUS 36 quedo congelado en Jun (su fuente curada de MKT no
+    cubria julio), su unico agregado era {'Jul 2025': ...}, este script skipeaba y
+    brandKpis['MAGNUS 36'] + su entrada en sieProds DESAPARECIERON del tablero.
+    Sumando sobre la ventana del cierre, numerador y denominador caen sobre los mismos
+    meses (los ausentes suman 0) y la marca se sigue publicando.
+    """
+    if line_last:
+        prods = mol.get('products', [])
+        cw, pw = _win(line_last, per)
+        mkt, mkt_prev = _sum(prods, cw), _sum(prods, pw)
+        units, units_prev = _sum([sie], cw), _sum([sie], pw)
+    else:
+        d = mol.get(per, {})
+        if not d:
+            return None
+        keys = sorted(d, key=msort)
+        if len(keys) < 2:
+            return None
+        cur, prev = keys[-1], keys[-2]
+        units = sie.get(per, {}).get(cur)
+        units_prev = sie.get(per, {}).get(prev)
+        mkt = d.get(cur)
+        mkt_prev = d.get(prev)
     if units is None or not mkt:
         return None
     ms = round(units / mkt * 100, 1) if mkt else None
     growth = round((units / units_prev - 1) * 100, 1) if units_prev else None
     ie = None
-    mkt_prev = d.get(prev)
     if units_prev and mkt and mkt_prev:
         bg = units / units_prev; mg = mkt / mkt_prev
         if bg < 5 and 0.2 < mg < 5:
@@ -64,8 +102,17 @@ def main():
     if not sie:
         print(f'  (skip) {FAM} sin producto SIE'); return 0
 
-    ytd = period_kpi(mol, sie, 'ytd')
-    mat = period_kpi(mol, sie, 'mat')
+    # Cierre de la LINEA: ancla las ventanas para que una familia atrasada no compare
+    # ventanas distintas entre numerador y denominador.
+    _all = set()
+    for _o in D.get('mol_perf', {}).values():
+        if isinstance(_o, dict):
+            for _p in _o.get('products', []):
+                _all.update((_p.get('monthly_vals') or {}).keys())
+    _valid = [m for m in _all if len(m.split()) == 2 and m.split()[0] in MES]
+    line_last = max(_valid, key=msort) if _valid else None
+    ytd = period_kpi(mol, sie, 'ytd', line_last)
+    mat = period_kpi(mol, sie, 'mat', line_last)
     if not ytd or not mat:
         print(f'  (skip) no pude computar ytd/mat de {FAM}'); return 0
 
