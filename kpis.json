@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-18T23:03:12",
+  "generated_at": "2026-09-02T09:18:58",
   "as_of_month": "Jul 2026",
   "periods": [
     "mensual",
@@ -25,7 +25,7 @@
       "owner": "Romina De Nigris",
       "recetas_through": "May 2026",
       "iqvia_through": "Jul 2026",
-      "venta_through": "Jul 2026",
+      "venta_through": "Aug 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         373708,
@@ -86,9 +86,9 @@
             "ie": 106.2
           },
           "venta_interna": {
-            "curr": 341545,
-            "prev": 371926,
-            "ie": 91.8
+            "curr": 332493,
+            "prev": 321690,
+            "ie": 103.4
           }
         },
         "ytd": {
@@ -121,9 +121,9 @@
             "ie": 106.3
           },
           "venta_interna": {
-            "curr": 2314138,
-            "prev": 2323761,
-            "ie": 99.6
+            "curr": 2646631,
+            "prev": 2645451,
+            "ie": 100.0
           }
         },
         "trimestre": {
@@ -156,9 +156,9 @@
             "ie": 106.9
           },
           "venta_interna": {
-            "curr": 975728,
-            "prev": 1041164,
-            "ie": 93.7
+            "curr": 986420,
+            "prev": 991765,
+            "ie": 99.5
           }
         },
         "semestre": {
@@ -191,9 +191,9 @@
             "ie": 105.8
           },
           "venta_interna": {
-            "curr": 1956074,
-            "prev": 1981638,
-            "ie": 98.7
+            "curr": 1981288,
+            "prev": 2000544,
+            "ie": 99.0
           }
         },
         "mat": {
@@ -226,9 +226,9 @@
             "ie": 103.3
           },
           "venta_interna": {
-            "curr": 3819717,
-            "prev": 2323761,
-            "ie": 164.4
+            "curr": 3830520,
+            "prev": 2645451,
+            "ie": 144.8
           }
         }
       }
@@ -242,7 +242,7 @@
       "owner": "Antonella Mariani",
       "recetas_through": "May 2026",
       "iqvia_through": "Jul 2026",
-      "venta_through": "Jul 2026",
+      "venta_through": "Aug 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         175794,
@@ -303,9 +303,9 @@
             "ie": 89.1
           },
           "venta_interna": {
-            "curr": 234006,
-            "prev": 245690,
-            "ie": 95.2
+            "curr": 194601,
+            "prev": 208787,
+            "ie": 93.2
           }
         },
         "ytd": {
@@ -338,9 +338,9 @@
             "ie": 94.3
           },
           "venta_interna": {
-            "curr": 1615644,
-            "prev": 1675637,
-            "ie": 96.4
+            "curr": 1810245,
+            "prev": 1884424,
+            "ie": 96.1
           }
         },
         "trimestre": {
@@ -373,9 +373,9 @@
             "ie": 92.8
           },
           "venta_interna": {
-            "curr": 693994,
-            "prev": 746800,
-            "ie": 92.9
+            "curr": 657447,
+            "prev": 691750,
+            "ie": 95.0
           }
         },
         "semestre": {
@@ -408,9 +408,9 @@
             "ie": 93.0
           },
           "venta_interna": {
-            "curr": 1384719,
-            "prev": 1441629,
-            "ie": 96.1
+            "curr": 1340718,
+            "prev": 1425008,
+            "ie": 94.1
           }
         },
         "mat": {
@@ -443,9 +443,9 @@
             "ie": 94.8
           },
           "venta_interna": {
-            "curr": 2659360,
-            "prev": 1675637,
-            "ie": 158.7
+            "curr": 2645174,
+            "prev": 1884424,
+            "ie": 140.4
           }
         }
       }
@@ -459,7 +459,7 @@
       "owner": "María Hernández",
       "recetas_through": "May 2026",
       "iqvia_through": "Jul 2026",
-      "venta_through": "Jul 2026",
+      "venta_through": "Aug 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         248823,
@@ -520,9 +520,9 @@
             "ie": 97.2
           },
           "venta_interna": {
-            "curr": 312086,
-            "prev": 292992,
-            "ie": 106.5
+            "curr": 282264,
+            "prev": 258339,
+            "ie": 109.3
           }
         },
         "ytd": {
@@ -555,9 +555,9 @@
             "ie": 100.8
           },
           "venta_interna": {
-            "curr": 1961826,
-            "prev": 1869833,
-            "ie": 104.9
+            "curr": 2244090,
+            "prev": 2128172,
+            "ie": 105.4
           }
         },
         "trimestre": {
@@ -590,9 +590,9 @@
             "ie": 99.5
           },
           "venta_interna": {
-            "curr": 867970,
-            "prev": 848956,
-            "ie": 102.2
+            "curr": 885450,
+            "prev": 803571,
+            "ie": 110.2
           }
         },
         "semestre": {
@@ -625,8 +625,8 @@
             "ie": 100.2
           },
           "venta_interna": {
-            "curr": 1687363,
-            "prev": 1585969,
+            "curr": 1706485,
+            "prev": 1603775,
             "ie": 106.4
           }
         },
@@ -660,9 +660,9 @@
             "ie": 101.3
           },
           "venta_interna": {
-            "curr": 3232357,
-            "prev": 3222750,
-            "ie": 100.3
+            "curr": 3256282,
+            "prev": 3189515,
+            "ie": 102.1
           }
         }
       }
@@ -676,7 +676,7 @@
       "owner": "Juan Filidoro",
       "recetas_through": "May 2026",
       "iqvia_through": "Jul 2026",
-      "venta_through": "Jul 2026",
+      "venta_through": "Aug 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         91111,
@@ -737,9 +737,9 @@
             "ie": 101.8
           },
           "venta_interna": {
-            "curr": 112127,
-            "prev": 118156,
-            "ie": 94.9
+            "curr": 99533,
+            "prev": 88718,
+            "ie": 112.2
           }
         },
         "ytd": {
@@ -772,9 +772,9 @@
             "ie": 104.0
           },
           "venta_interna": {
-            "curr": 742219,
-            "prev": 731504,
-            "ie": 101.5
+            "curr": 841752,
+            "prev": 820222,
+            "ie": 102.6
           }
         },
         "trimestre": {
@@ -807,9 +807,9 @@
             "ie": 103.4
           },
           "venta_interna": {
-            "curr": 309084,
-            "prev": 325283,
-            "ie": 95.0
+            "curr": 307717,
+            "prev": 302056,
+            "ie": 101.9
           }
         },
         "semestre": {
@@ -842,9 +842,9 @@
             "ie": 103.0
           },
           "venta_interna": {
-            "curr": 611614,
-            "prev": 617280,
-            "ie": 99.1
+            "curr": 605808,
+            "prev": 610257,
+            "ie": 99.3
           }
         },
         "mat": {
@@ -877,9 +877,9 @@
             "ie": 103.4
           },
           "venta_interna": {
-            "curr": 1180222,
-            "prev": 1239146,
-            "ie": 95.2
+            "curr": 1191037,
+            "prev": 1219483,
+            "ie": 97.7
           }
         }
       }
@@ -893,7 +893,7 @@
       "owner": "Antonella Mariani",
       "recetas_through": "May 2026",
       "iqvia_through": "Jul 2026",
-      "venta_through": "Jul 2026",
+      "venta_through": "Aug 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         577335,
@@ -954,9 +954,9 @@
             "ie": 90.9
           },
           "venta_interna": {
-            "curr": 625787,
-            "prev": 758235,
-            "ie": 82.5
+            "curr": 435254,
+            "prev": 432448,
+            "ie": 100.6
           }
         },
         "ytd": {
@@ -989,8 +989,8 @@
             "ie": 96.9
           },
           "venta_interna": {
-            "curr": 3849770,
-            "prev": 3850771,
+            "curr": 4285024,
+            "prev": 4283219,
             "ie": 100.0
           }
         },
@@ -1024,9 +1024,9 @@
             "ie": 102.5
           },
           "venta_interna": {
-            "curr": 2430168,
-            "prev": 2229179,
-            "ie": 109.0
+            "curr": 2106091,
+            "prev": 2076964,
+            "ie": 101.4
           }
         },
         "semestre": {
@@ -1059,9 +1059,9 @@
             "ie": 96.4
           },
           "venta_interna": {
-            "curr": 3640144,
-            "prev": 3633967,
-            "ie": 100.2
+            "curr": 3860502,
+            "prev": 3814628,
+            "ie": 101.2
           }
         },
         "mat": {
@@ -1094,9 +1094,9 @@
             "ie": 97.3
           },
           "venta_interna": {
-            "curr": 5786755,
-            "prev": 3850771,
-            "ie": 150.3
+            "curr": 5789561,
+            "prev": 4283219,
+            "ie": 135.2
           }
         }
       }
@@ -1110,7 +1110,7 @@
       "owner": "Tatiana Peker",
       "recetas_through": "May 2026",
       "iqvia_through": "Jul 2026",
-      "venta_through": "Jul 2026",
+      "venta_through": "Aug 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         135924,
@@ -1171,9 +1171,9 @@
             "ie": 85.1
           },
           "venta_interna": {
-            "curr": 140460,
-            "prev": 58797,
-            "ie": 238.9
+            "curr": 126221,
+            "prev": 46921,
+            "ie": 269.0
           }
         },
         "ytd": {
@@ -1206,9 +1206,9 @@
             "ie": 113.6
           },
           "venta_interna": {
-            "curr": 963373,
-            "prev": 346904,
-            "ie": 277.7
+            "curr": 1089594,
+            "prev": 393825,
+            "ie": 276.7
           }
         },
         "trimestre": {
@@ -1241,9 +1241,9 @@
             "ie": 105.1
           },
           "venta_interna": {
-            "curr": 411111,
-            "prev": 149419,
-            "ie": 275.1
+            "curr": 406066,
+            "prev": 143942,
+            "ie": 282.1
           }
         },
         "semestre": {
@@ -1276,9 +1276,9 @@
             "ie": 112.6
           },
           "venta_interna": {
-            "curr": 800075,
-            "prev": 288955,
-            "ie": 276.9
+            "curr": 781943,
+            "prev": 286304,
+            "ie": 273.1
           }
         },
         "mat": {
@@ -1311,9 +1311,9 @@
             "ie": 111.2
           },
           "venta_interna": {
-            "curr": 1324434,
-            "prev": 346904,
-            "ie": 381.8
+            "curr": 1403734,
+            "prev": 393825,
+            "ie": 356.4
           }
         }
       }
@@ -1327,7 +1327,7 @@
       "owner": "Felipe Mendizábal",
       "recetas_through": "May 2026",
       "iqvia_through": "Jul 2026",
-      "venta_through": "Jul 2026",
+      "venta_through": "Aug 2026",
       "has_recetas": true,
       "sparkline_units_sie": [
         115679,
@@ -1388,9 +1388,9 @@
             "ie": 94.5
           },
           "venta_interna": {
-            "curr": 121514,
-            "prev": 132280,
-            "ie": 91.9
+            "curr": 127693,
+            "prev": 112785,
+            "ie": 113.2
           }
         },
         "ytd": {
@@ -1423,9 +1423,9 @@
             "ie": 98.3
           },
           "venta_interna": {
-            "curr": 791038,
-            "prev": 779902,
-            "ie": 101.4
+            "curr": 918731,
+            "prev": 892687,
+            "ie": 102.9
           }
         },
         "trimestre": {
@@ -1458,9 +1458,9 @@
             "ie": 98.6
           },
           "venta_interna": {
-            "curr": 332284,
-            "prev": 355552,
-            "ie": 93.5
+            "curr": 350788,
+            "prev": 353655,
+            "ie": 99.2
           }
         },
         "semestre": {
@@ -1493,9 +1493,9 @@
             "ie": 98.0
           },
           "venta_interna": {
-            "curr": 669705,
-            "prev": 655561,
-            "ie": 102.2
+            "curr": 686071,
+            "prev": 672876,
+            "ie": 102.0
           }
         },
         "mat": {
@@ -1528,9 +1528,9 @@
             "ie": 100.3
           },
           "venta_interna": {
-            "curr": 1359815,
-            "prev": 1309906,
-            "ie": 103.8
+            "curr": 1374723,
+            "prev": 1297310,
+            "ie": 106.0
           }
         }
       }

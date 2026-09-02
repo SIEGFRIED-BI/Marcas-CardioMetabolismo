@@ -371,6 +371,11 @@ def main():
 
             if args.dry_run:
                 print(f'  [{line["key"]}] DRY: actualizaria {updated} familias, sin match: {len(unmatched)}, limpiaria {capped} valores post-cierre'.encode('ascii','replace').decode())
+                # el dry-run tiene que NOMBRAR lo que descarta, igual que la corrida real:
+                # un "sin match: 2" sin nombres es un descarte silencioso, que es la forma
+                # en que se cuela una familia que dejo de matchear por un renombre.
+                if unmatched:
+                    print(('       sin match -> ' + ', '.join(map(str, unmatched[:8]))).encode('ascii','replace').decode())
                 continue
 
             if line['kind'] == 'data.js':

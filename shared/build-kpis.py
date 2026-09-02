@@ -868,6 +868,16 @@ def main():
         venta_latest = find_latest_venta(D)
         rec_windows = windows_for(*rec_latest) if rec_latest else None
         iq_windows  = windows_for(*iq_latest)  if iq_latest  else None
+        # La VENTA tiene su propia ventana. Iba sobre la de IQVIA (i_curr) y por eso el
+        # KPI se quedaba en el corte de IQVIA aunque la venta tuviera un mes mas: con
+        # IQVIA en Jul-2026 y venta en Ago-2026, kpis daba 12.238.008 (Ene-Jul) contra
+        # 13.836.067 de budget.real (Ene-Ago), y build-total.py lo reportaba como
+        # inconsistencia del 13,1%.  ya se calculaba aca pero solo se
+        # imprimia. build-total.py ya tomaba el corte de venta del manifiesto
+        # (global.ventaCutoff) -- el arreglo habia entrado en un script y no en el otro.
+        # La venta puede ir ADELANTE de IQVIA a proposito: SAP esta al dia y IQVIA
+        # reporta con ~2 meses de atraso.
+        venta_windows = windows_for(*venta_latest) if venta_latest else None
         rec_cut = month_key(*rec_latest) if rec_latest else None
         iq_cut  = month_key(*iq_latest)  if iq_latest  else None
         venta_cut = month_key(*venta_latest) if venta_latest else None
@@ -904,8 +914,9 @@ def main():
             iqvia = compute_iqvia_kpi(D, i_curr, i_prev)
             # Internal sales (sum of all family budget.real). Periodos compartidos
             # con iqvia (mismo cierre por linea).
-            int_curr = line_internal_sales(set(i_curr)) if i_curr else None
-            int_prev = line_internal_sales(set(i_prev)) if i_prev else None
+            v_curr, v_prev = venta_windows[period] if venta_windows else (i_curr, i_prev)
+            int_curr = line_internal_sales(set(v_curr)) if v_curr else None
+            int_prev = line_internal_sales(set(v_prev)) if v_prev else None
             if int_curr == 0 and int_prev == 0:
                 int_curr = int_prev = None
             def safe_ms(num, den):
