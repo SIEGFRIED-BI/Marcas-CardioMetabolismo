@@ -290,6 +290,12 @@ Step 'convenios dedup' { & $py (Join-Path $PSScriptRoot 'dedup-convenios-exact.p
 # canales_quarterly (Mostrador vs Convenios trimestral) desde las planillas
 # 'convenios NUEVO/*' del hub. Skipea si no estan. Solo familias del tablero.
 Step 'canales trimestral' { & $py (Join-Path $PSScriptRoot 'build-canales-quarterly.py') }
+# canales ANUAL (D.canales) en YTD vs YTD desde las mismas planillas. VA DESPUES de
+# build-all a proposito: los 5 build-data.ps1 dejan canales_label HARDCODEADO en
+# '2025 vs 2024' y, en cardio, las familias en 0 (busca 'Convenios vs mostrador*.xlsx'
+# en fuentes-originales, donde no estan). Esto lo re-arma desde el dato y deriva el
+# label. Idempotente; skipea si falta la carpeta del hub.
+Step 'canales YTD'        { & $py (Join-Path $PSScriptRoot 'build-canales-ytd.py') }
 # brandKpis[marca].rec.ms: rellena desde rec_ms si quedó en 0 con dato (MOMETAX). Idempotente.
 Step 'brandKpis rec.ms' { & $py (Join-Path $PSScriptRoot 'fix-brandkpis-rec.py') }
 
