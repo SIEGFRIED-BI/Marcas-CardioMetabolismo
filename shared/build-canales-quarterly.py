@@ -44,6 +44,23 @@ LINES = ['cardio/data.js','ATB/data.js','OTC/data.js','respiratorio/data.js',
 SUBDIR = 'convenios NUEVO'
 QMAP = {'1er':'Q1','1ER':'Q1','2do':'Q2','2DO':'Q2','3er':'Q3','3ER':'Q3','4to':'Q4','4TO':'Q4'}
 
+# mujer: segmento de marketing -> familias de producto de la fuente. Fuente real:
+# close-manifest.json (seg mujer_venta_segments), igual que merge-ventas-internas.py.
+_MUJER_FALLBACK = {
+    'SIN ESTROGENO': ['ISIS FREE'], 'ALTA DOSIS': ['ISIS'],
+    'BAJA DOSIS 21+7': ['ISIS MINI'], 'BAJA DOSIS 24': ['ISIS MINI 24'],
+    'COMPLEX': ['SIDERBLUT COMPLEX', 'SIDERBLUT FOLIC'],
+    'SOLO': ['SIDERBLUT', 'SIDERBLUT POLI', 'FERINSOL'],
+    'DELTROX': ['DELTROX'], 'BASE': ['CALCIO BASE DUPOMAR'],
+    'BASE D': ['CALCIO BASE DUPOMAR D', 'CALCIO BASE DUPOMAR D3', 'CALCIO CITRATO DUPOMAR D3'],
+    'CLIMATIX': ['CLIMATIX'], 'D3': [], 'D3 PLUS': [], '45': [], 'MAGNESIO': [],
+}
+try:
+    import manifest as _mf
+    MUJER_SEG = _mf.seg_get('mujer_venta_segments', 'segmentToFams', _MUJER_FALLBACK)
+except Exception:
+    MUJER_SEG = _MUJER_FALLBACK
+
 
 def hub_dir():
     try:
@@ -225,6 +242,25 @@ def main():
         # familias del tablero (las que hoy existen): mol_perf + budget + canales
         fams = set(D.get('mol_perf', {})) | set(D.get('budget', {})) | set(D.get('canales', {}))
         cq = {fam: accum[fam] for fam in accum if fam in fams}
+        # mujer keyea por SEGMENTO (ALTA DOSIS, SIN ESTROGENO...) y la fuente trae
+        # FAMILIAS de producto (ISIS, ISIS FREE...): sin el mapa quedaban 2 de 12
+        # segmentos. Mismo mapa que build-canales-ytd y merge-ventas-internas.
+        if rel.startswith('mujer/'):
+            for seg, fuentes in MUJER_SEG.items():
+                if seg not in fams or seg in cq or not fuentes:
+                    continue
+                por_anio = {}
+                for f in fuentes:
+                    for y, to in (accum.get(f) or {}).items():
+                        for q, cm in to.items():
+                            por_anio.setdefault(y, {}).setdefault(q, []).append(cm)
+                # el % de un segmento no es el promedio de sus familias: se pondera por
+                # las unidades, que no estan en accum -> solo se toma cuando el segmento
+                # se compone de UNA sola familia (el resto queda sin dato, no mal sumado).
+                if len(fuentes) == 1:
+                    unico = accum.get(fuentes[0])
+                    if unico:
+                        cq[seg] = unico
         new = {k: cq[k] for k in sorted(cq)}
         if D.get('canales_quarterly') != new:
             total_changed += 1
