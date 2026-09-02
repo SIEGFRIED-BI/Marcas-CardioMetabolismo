@@ -6,8 +6,29 @@ La seccion 'Mostrador vs Convenios (trimestral)' del tablero ya espera ese campo
 (renderCanQuartTable lee D.canales_quarterly) pero estaba vacio. Esto lo puebla por
 trimestre/anio, SOLO para las familias que hoy estan en cada tablero (no agrega extra).
 
-Fuente: filas a nivel FAMILIA (col 'Producto' == 'Totales'), columnas '% convenio UNI'
-y '% mostrador UNI' (se detectan por header, robusto a ambos formatos de planilla).
+Fuente: filas a nivel FAMILIA, columnas '% convenio UNI' y '% mostrador UNI' (se
+detectan por header). Los % vienen como fraccion (0..1) y en la fuente se cumple
+SIEMPRE %mostrador == 1 - %convenio (verificado: 0 de 1264 filas lo violan), o sea
+mostrador es un RESIDUO, no una medicion propia.
+
+DOS FORMATOS de planilla, y la fila de familia se marca distinto en cada uno:
+    'Convenios vs mostrador - <fecha> <N> trimestre <AAAA>.xlsx'  -> Producto == 'Totales'
+    '<N> trm <AAAA>.xlsx'  (formato viejo)                        -> Producto VACIO
+Antes solo se aceptaba 'Totales', asi que los 13 archivos viejos se leian y se
+descartaban EN SILENCIO -> 2023 y 2024 enteros (8 trimestres) nunca llegaban al
+tablero. Ahora se aceptan los dos. Son mutuamente excluyentes (0 familias aparecen
+con las dos marcas en un mismo archivo), asi que no hay doble conteo.
+Control que habilita mezclarlos: en 2025 Q1/Q2/Q3, donde existen ambos archivos, los
+dos formatos dan el MISMO % en las 70 familias comunes (0 difieren >0.15pp).
+Donde hay dos archivos para el mismo (anio,Q) gana el 'Convenios vs mostrador': en
+2026 Q1 factura lo mismo pero trae mas consumo (CloseUp madura: llegan reportes tarde).
+
+ANOMALIA %convenio > 100: pasa cuando el consumo por convenio del trimestre (CloseUp)
+supera las unidades facturadas del trimestre (SAP) -- desfasaje entre facturacion y
+dispensa, no un error de cuenta. El residuo 'mostrador' se vuelve NEGATIVO y el tablero
+llegaba a mostrar '-156% mostrador' (DELTROX 2026Q1). Se conserva el %convenio REAL (no
+se clampea: es la senal) y se marca la celda con x=True + m=None -> el render ya pinta
+None como '—' y agrega la nota al pie.
 Idempotente. Skipea si falta openpyxl o la carpeta.
 """
 from __future__ import annotations
@@ -49,14 +70,14 @@ def parse_yq2(fname):
 
 
 def read_file_familia(path):
-    """Devuelve {familia: {'c':pct, 'm':pct}} a nivel familia."""
+    """Devuelve ({familia: {'c':pct, 'm':pct[, 'x':True]}}, motivo_si_vacio)."""
     import openpyxl
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     ws = wb.worksheets[0]
     rows = list(ws.iter_rows(values_only=True))
     wb.close()
     if not rows:
-        return {}
+        return {}, 'archivo vacio'
     hdr = [str(c or '').strip().lower() for c in rows[0]]
     def col(*names):
         for i, h in enumerate(hdr):
@@ -67,21 +88,46 @@ def read_file_familia(path):
     c_prod = col('producto')
     c_conv = col('% convenio', 'convenio uni', '%convenio')
     c_most = col('% mostrador', 'mostrador uni', '%mostrador')
+    c_fact = col('unidades facturadas')
     if None in (c_fam, c_prod, c_conv, c_most):
-        return {}
+        falta = [n for n, c in (('familia', c_fam), ('producto', c_prod),
+                                ('% convenio', c_conv), ('% mostrador', c_most)) if c is None]
+        return {}, f'faltan columnas: {", ".join(falta)}'
     out = {}
     for r in rows[1:]:
         fam = str(r[c_fam] or '').strip()
         prod = str(r[c_prod] or '').strip()
-        if not fam or fam.lower() in ('totales', 'total') or prod.lower() != 'totales':
+        if not fam or fam.lower() in ('totales', 'total'):
+            continue
+        # nivel FAMILIA: 'Totales' en el formato nuevo, VACIO en el viejo
+        if prod.lower() not in ('', 'totales'):
             continue
         try:
             conv = float(r[c_conv]); most = float(r[c_most])
         except (TypeError, ValueError):
             continue
+        fact = r[c_fact] if c_fact is not None else None
         # los % vienen como fraccion (0..1)
-        out[fam] = {'c': round(conv * 100, 1), 'm': round(most * 100, 1)}
-    return out
+        c = round(conv * 100, 1)
+        m = round(most * 100, 1)
+
+        # Los tres casos, explicitos. El % de convenio es consumo/facturado del
+        # trimestre, y el de mostrador sale por RESTA -- asi que el resultado solo es
+        # interpretable si el denominador es positivo y el consumo no lo supera.
+        if isinstance(fact, (int, float)) and fact <= 0:
+            # base <= 0: las devoluciones netas del trimestre igualan o superan lo
+            # facturado. No hay universo contra el que medir: ni convenio ni mostrador
+            # significan nada (se vieron ratios de -1160% y +255%).
+            out[fam] = {'c': None, 'm': None, 'x': 'base'}
+        elif c > 100 or m < 0 or c < 0 or m > 100:
+            # consumo del trimestre > facturado del trimestre: el residuo 'mostrador'
+            # no es medible. Se conserva el %convenio real y se declara el limite.
+            out[fam] = {'c': c, 'm': None, 'x': 'desfasaje'}
+        else:
+            out[fam] = {'c': c, 'm': m}
+    if not out:
+        return {}, f'0 filas a nivel familia (se miraron {len(rows) - 1} filas)'
+    return out, ''
 
 
 def main():
@@ -100,28 +146,72 @@ def main():
 
     # accum[familia][anio][Q] = {c,m}. Si hay 2 archivos para el mismo (anio,Q),
     # gana el de nombre 'Convenios vs mostrador' (mas nuevo) sobre 'Ner trm'.
+    # Se leen TODAS y se ordena por prioridad DESPUES, para poder reportar los archivos
+    # que no aportan nada (antes se descartaban en silencio: 13 planillas, 8 trimestres).
     files = sorted(d.glob('*.xlsx'))
-    accum = {}
-    seen = {}  # (anio,Q) -> prioridad usada
+    leidos = {}   # (anio,Q) -> [(prio, nombre, fam_data)]
+    vacios = []
+    ignorados = []
     for f in files:
         yq = parse_yq2(f.name)
         if not yq:
+            ignorados.append(f.name)
             continue
         year, q = yq
         prio = 2 if 'convenios vs mostrador' in f.name.lower() else 1
-        if seen.get((year, q), 0) >= prio:
-            continue
-        fam_data = read_file_familia(f)
+        fam_data, motivo = read_file_familia(f)
         if not fam_data:
+            vacios.append((f.name, motivo))
             continue
-        seen[(year, q)] = prio
-        for fam, cm in fam_data.items():
-            accum.setdefault(fam, {}).setdefault(year, {})[q] = cm
+        leidos.setdefault((year, q), []).append((prio, f.name, fam_data))
 
-    if not accum:
+    if not leidos:
         print('  (skip) sin datos en las planillas')
         return 0
-    print(f'  planillas: {len(seen)} (anio,Q); familias en fuente: {len(accum)}')
+
+    accum = {}
+    anomalias = []
+    for (year, q), cands in sorted(leidos.items()):
+        cands.sort(key=lambda x: -x[0])
+        prio, name, fam_data = cands[0]
+        # control: si hay dos fuentes para el mismo trimestre, cuanto difieren
+        if len(cands) > 1:
+            otro = cands[1][2]
+            comunes = set(fam_data) & set(otro)
+            difs = [k for k in comunes
+                    if abs((fam_data[k]['c'] or 0) - (otro[k]['c'] or 0)) > 0.15]
+            if difs:
+                print(f'    {year} {q}: 2 fuentes, gana {name[:44]!r} '
+                      f'({len(difs)}/{len(comunes)} familias difieren >0.15pp)')
+        for fam, cm in fam_data.items():
+            accum.setdefault(fam, {}).setdefault(year, {})[q] = cm
+            if cm.get('x'):
+                anomalias.append((cm['x'], fam, year, q, cm.get('c')))
+
+    print(f'  planillas: {len(leidos)} (anio,Q) de {len(files)} archivos; '
+          f'familias en fuente: {len(accum)}')
+    print(f'  trimestres: {", ".join(f"{y}{q}" for y, q in sorted(leidos))}')
+    if vacios:
+        print(f'  ATENCION: {len(vacios)} planilla(s) sin filas utilizables '
+              f'(antes se descartaban en silencio):')
+        for name, motivo in vacios:
+            print(f'      {name[:60]:<60} {motivo}')
+    desf = [a for a in anomalias if a[0] == 'desfasaje']
+    base = [a for a in anomalias if a[0] == 'base']
+    if desf:
+        print(f'  {len(desf)} celda(s) con consumo del trimestre > facturado: se publica el '
+              f'%convenio real y el mostrador (residuo) queda "—".')
+        for _, fam, y, q, c in desf[:5]:
+            print(f'      {fam} {y}{q} convenio={c}%')
+        if len(desf) > 5:
+            print(f'      ... y {len(desf) - 5} mas')
+    if base:
+        print(f'  {len(base)} celda(s) con Unidades facturadas <= 0 (devoluciones netas '
+              f'>= facturacion): NADA medible, van "—"/"—".')
+        for _, fam, y, q, c in base[:5]:
+            print(f'      {fam} {y}{q}')
+        if len(base) > 5:
+            print(f'      ... y {len(base) - 5} mas')
 
     total_changed = 0
     for rel in LINES:

@@ -23,6 +23,8 @@ import argparse, json, re, subprocess, sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gitcmd import GIT as _GIT  # noqa: E402  (git no esta en el PATH fuera del hook)
 
 LINES = [
     ('cardio', 'cardio/data.js'), ('antibio', 'ATB/data.js'),
@@ -61,7 +63,7 @@ def load_now(rel):
 
 
 def load_baseline(rel, baseline):
-    r = subprocess.run(['git', '--no-pager', 'show', f'{baseline}:{rel}'],
+    r = subprocess.run([_GIT, '--no-pager', 'show', f'{baseline}:{rel}'],
                        cwd=REPO, capture_output=True, text=True,
                        encoding='utf-8', errors='replace')
     if r.returncode != 0 or not r.stdout.strip():

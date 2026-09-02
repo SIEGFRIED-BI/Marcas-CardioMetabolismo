@@ -20,6 +20,8 @@ import argparse, json, re, subprocess, sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gitcmd import git_show as _git_show, available as _git_available  # noqa: E402
 
 LINES = [
     ('cardio',  'cardio/data.js',                     'window.OTC_DASHBOARD'),
@@ -81,11 +83,10 @@ def get_months_set(D):
 
 
 def get_baseline(path, commit):
-    r = subprocess.run(['git', 'show', f'{commit}:{path}'],
-                       capture_output=True, text=True, encoding='utf-8')
-    if r.returncode != 0:
-        return None
-    return r.stdout
+    # git via gitcmd: lanzado por el pre-commit hook git esta en el PATH, pero lanzado
+    # por update-all.ps1 desde PowerShell NO -> el gate crasheaba con FileNotFoundError
+    # en cada cierre y se leia como si hubiera encontrado un problema.
+    return _git_show(commit, path, cwd=REPO) or None
 
 
 def verify_line(line, path, var_pattern, baseline_commit):
@@ -136,13 +137,24 @@ def main():
     args = ap.parse_args()
 
     print(f'Verifying historical preservation vs baseline: {args.baseline}')
+    # Sin git no hay baseline: TODAS las lineas caerian en NO_BASELINE_AT_COMMIT, que
+    # este gate trata como aceptable, y terminaria imprimiendo "OK: history preserved"
+    # sin haber comparado NADA. Un gate que no puede correr se declara AUSENTE, no
+    # pasado.
+    if not _git_available():
+        print('FAIL: no encuentro el ejecutable de git -> no hay baseline contra la cual '
+              'comparar. El gate NO corrio (no es un OK).', file=sys.stderr)
+        sys.exit(2)
     print()
     any_fail = False
     print(f'{"linea":8s} | {"status":15s} | {"baseline":40s} | {"current":40s} | {"missing":10s}')
     print('-' * 130)
+    sin_baseline = 0
     for line, path, var in LINES:
         r = verify_line(line, path, var, args.baseline)
         status = r.get('status', '?')
+        if status == 'NO_BASELINE_AT_COMMIT':
+            sin_baseline += 1
         baseline = r.get('baseline_range', '-')
         current = r.get('current_range', '-')
         missing = len(r.get('missing', []))
@@ -158,6 +170,15 @@ def main():
             for m_ in r.get('missing', [])[:5]:
                 print(f'    [{line}] LOST: {m_}')
     print()
+    # Que UNA linea no exista en el baseline es legitimo (migracion de archivo/anchor).
+    # Que no exista NINGUNA significa que el commit de baseline no existe -- un typo en
+    # --baseline, o un repo sin ese ancestro. Sin baseline no hay comparacion, y el gate
+    # imprimia "OK: history preserved" igual. Se declara AUSENTE, no pasado.
+    if sin_baseline == len(LINES):
+        print(f'FAIL: ninguna linea existe en el baseline {args.baseline!r} -> el commit no '
+              f'existe o no tiene estos archivos. El gate NO comparo nada (no es un OK).',
+              file=sys.stderr)
+        sys.exit(2)
     if any_fail and args.strict:
         print('FAIL: history was lost in at least one line. Use --baseline to compare against earlier commit if needed.')
         sys.exit(1)

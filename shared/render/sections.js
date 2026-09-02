@@ -184,10 +184,28 @@ function renderCanQuartTable(){
   if(!data){ el.innerHTML='<p style="color:#4b5563;font-size:11px;padding:8px;">Sin datos para esta marca.</p>'; return; }
   const years = Object.keys(data).sort();
   const quarters = ['Q1','Q2','Q3','Q4'];
+  // v.x marca el trimestre donde el % no es interpretable, con el motivo:
+  //   'desfasaje' -> consumo por convenio del trimestre > unidades facturadas. El
+  //                  %convenio es real (se muestra, NO se clampea: es la senal), pero
+  //                  el mostrador, que sale por resta, seria negativo -> '—'.
+  //   'base'      -> unidades facturadas <= 0 (devoluciones netas >= facturacion). No
+  //                  hay universo contra el que medir: los dos van '—'.
+  const TIP = {
+    desfasaje: 'El consumo por convenio del trimestre supera las unidades facturadas',
+    base: 'Unidades facturadas ≤ 0 en el trimestre (devoluciones netas ≥ facturación)'
+  };
+  const motivos = new Set();
+  Object.values(data).forEach(y => Object.values(y||{}).forEach(v => { if(v && v.x) motivos.add(v.x); }));
   const valCell = (v, key) => {
-    if(!v || v[key]==null) return '<span style="color:#6b7280;">—</span>';
+    if(!v || v[key]==null){
+      const t = (v && v.x) ? ` title="${TIP[v.x]||'Sin dato'}"` : '';
+      return `<span style="color:#6b7280;"${t}>—</span>`;
+    }
     const col = key==='c' ? '#2563eb' : '#d97706';
-    return `<span style="color:${col};font-weight:700;">${v[key].toFixed(0)}%</span>`;
+    const star = (v.x && key==='c')
+      ? `<sup style="color:#dc2626;font-weight:700;" title="${TIP[v.x]||''}">*</sup>`
+      : '';
+    return `<span style="color:${col};font-weight:700;">${v[key].toFixed(0)}%</span>${star}`;
   };
   let html = '<div style="overflow-x:auto;border-radius:6px;border:1px solid rgba(0,0,0,.08);"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
   // First header row: Año + 4 colspan=2 quarters
@@ -220,5 +238,19 @@ function renderCanQuartTable(){
   }
   html += '</tbody></table></div>';
   html += '<p style="margin-top:12px;font-size:10px;color:#6b7280;letter-spacing:.04em;"><span style="color:#2563eb;font-weight:700">■</span> Convenio OS &nbsp;·&nbsp; <span style="color:#d97706;font-weight:700">■</span> Mostrador</p>';
+  if(motivos.size){
+    html += '<p style="margin-top:4px;font-size:10px;color:#6b7280;line-height:1.5;">';
+    if(motivos.has('desfasaje')){
+      html += '<span style="color:#dc2626;font-weight:700">*</span> El consumo por convenio del trimestre (CloseUp) '
+           +  'supera las unidades facturadas (SAP) — desfasaje entre facturación y dispensa. '
+           +  'El % de convenio es el real; el de mostrador, que sale por resta, no es medible y va como «—».';
+    }
+    if(motivos.has('base')){
+      if(motivos.has('desfasaje')) html += '<br>';
+      html += '«—» en ambas columnas: las unidades facturadas del trimestre fueron ≤ 0 '
+           +  '(devoluciones netas ≥ facturación), así que no hay base contra la cual medir el reparto.';
+    }
+    html += '</p>';
+  }
   el.innerHTML = html;
 }

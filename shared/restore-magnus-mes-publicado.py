@@ -30,6 +30,8 @@ import argparse, json, re, subprocess, sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gitcmd import GIT as _GIT  # noqa: E402  (git no esta en el PATH fuera del hook)
 TARGET = 'OTC/data.js'
 FAMILIAS = ('MAGNUS', 'MAGNUS 36')
 
@@ -58,7 +60,7 @@ def main():
         print(f'FATAL: no parseo {TARGET}', file=sys.stderr)
         return 2
 
-    r = subprocess.run(['git', '--no-pager', 'show', f'{args.ref}:{TARGET}'],
+    r = subprocess.run([_GIT, '--no-pager', 'show', f'{args.ref}:{TARGET}'],
                        cwd=REPO, capture_output=True, text=True,
                        encoding='utf-8', errors='replace')
     if r.returncode != 0 or not r.stdout.strip():

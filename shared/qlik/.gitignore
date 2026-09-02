@@ -5,3 +5,15 @@ node_modules/
 # archivos intermedios de extracción
 ventas_qlik*.json
 *.xlsx
+# Cualquier archivo de credencial, no solo el de tableros.us. Se agrego al sumar el
+# tenant rofina.us (2026-09-02): '.rofina-key.txt' NO estaba cubierto por el patron
+# anterior y se habria commiteado.
+.rofina-key.txt
+*-key.txt
+*.secret
+*credential*
+# Cookies de sesion del navegador (tenant rofina.us, que no tiene API key). Dan acceso
+# como el usuario y vencen solas; NUNCA se commitean.
+.rofina-session
+*session*
+*.cookies

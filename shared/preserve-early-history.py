@@ -19,6 +19,8 @@ import argparse, json, re, subprocess, sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from gitcmd import GIT as _GIT  # noqa: E402  (git no esta en el PATH fuera del hook)
 # Solo las inline (const D): son las de historia larga que el sync recorta.
 # Las data.js (cardio/ATB/OTC/respi) tienen ventana Feb-2024+ -> no sufren esto.
 FILES = ['SNC/data.js', 'dermatologia/data.js', 'mujer/data.js']
@@ -48,7 +50,7 @@ def main():
         D, ob, end = load_D(text)
         if D is None:
             print(f'  (skip) {rel}: sin const D'); continue
-        old_raw = subprocess.run(['git', 'show', f'HEAD:{rel}'],
+        old_raw = subprocess.run([_GIT, 'show', f'HEAD:{rel}'],
                                  capture_output=True, cwd=str(REPO)).stdout.decode('utf-8', 'replace')
         if not old_raw:
             print(f'  (skip) {rel}: sin version en HEAD'); continue
