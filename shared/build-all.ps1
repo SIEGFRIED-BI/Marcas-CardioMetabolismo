@@ -332,7 +332,24 @@ if (-not $DryRun) {
         if (Test-Path -LiteralPath $ventasScript) {
             Write-Host ""
             Write-Host "Actualizando venta interna desde: $resolvedVentas" -ForegroundColor Cyan
-            & $pyExe $ventasScript --file $resolvedVentas
+            # El CUTOFF sale del manifiesto (global.ventaCutoff), igual que en
+            # build-total.py y build-kpis.py. Sin el, merge-ventas-internas.py escribe
+            # TODOS los meses de la planilla -- incluido el mes en curso, que esta a
+            # medias. Caso real (2026-09-02): la planilla de Qlik traia Sep-2026 con
+            # 216.732 u = 10%% de un mes (2 dias) y se habria publicado como mes cerrado.
+            $ventaCutoff = $null
+            try {
+                $mf = Join-Path $PSScriptRoot 'manifest.py'
+                if (Test-Path -LiteralPath $mf) { $ventaCutoff = (& $pyExe $mf --get global.ventaCutoff 2>$null) }
+            } catch { $ventaCutoff = $null }
+            if ($ventaCutoff) { $ventaCutoff = ($ventaCutoff | Out-String).Trim() }
+            if ($ventaCutoff -match '^\d{4}-\d{2}$') {
+                Write-Host "  cutoff de venta (manifiesto): $ventaCutoff" -ForegroundColor DarkGray
+                & $pyExe $ventasScript --file $resolvedVentas --cutoff $ventaCutoff
+            } else {
+                Write-Warning "No resolvi global.ventaCutoff del manifiesto; mergeando SIN cutoff (puede entrar un mes parcial)."
+                & $pyExe $ventasScript --file $resolvedVentas
+            }
             if ($LASTEXITCODE -ne 0) {
                 Write-Warning "merge-ventas-internas.py fallo (exit $LASTEXITCODE)."
             }

@@ -58,8 +58,19 @@ def shape(D):
             for p in o.get('products', []):
                 nprod += 1
                 months.update(p.get('monthly_vals', {}).keys())
+    # Mercado por familia (suma de monthly_vals de TODOS sus productos, incluida la
+    # fila de residuo 'Otros'). Sirve para separar dos cosas que el conteo de
+    # productos mezcla: perder NOMBRES de competidores vs perder MERCADO.
+    mkt = {}
+    for fam, o in mol.items():
+        if isinstance(o, dict):
+            s = 0.0
+            for p in o.get('products', []):
+                for v in (p.get('monthly_vals') or {}).values():
+                    s += float(v or 0)
+            mkt[fam] = s
     return {'keys': set(D.keys()), 'fams': len(mol), 'prods': nprod,
-            'months': len(months)}
+            'months': len(months), 'mkt': mkt}
 
 
 def main():
@@ -106,9 +117,32 @@ def main():
         else:
             ratio = sn['prods'] / sb['prods']
             if ratio < (1 - args.drop):
-                add('FAIL', f'{key}: E productos mol_perf',
-                    f'{sn["prods"]} ahora vs {sb["prods"]} en baseline '
-                    f'(ratio {ratio:.3f} < {1-args.drop:.3f})')
+                # Bajar el conteo de productos NO es lo mismo que perder mercado. El
+                # itemizador (itemize-molperf-otros.py) expande la fila 'Otros' en
+                # competidores con nombre, pero RECHAZA la expansion si sobre-contaria
+                # el bucket; en ese caso las unidades siguen ahi, agrupadas en 'Otros',
+                # y el total del mercado no se mueve. Caso real (2026-09-02):
+                # ATB/MACROMAX paso de 30 a 9 productos con nombre porque expandir la
+                # molecula AZITHROMYCIN sobre-contaba el bucket un 3%, y su MAT quedo
+                # en -0,13%. Perder NOMBRES no mueve ningun MS%; perder MERCADO si.
+                afectadas, mkt_ok = [], True
+                for fam, m_b in (sb.get('mkt') or {}).items():
+                    m_n = (sn.get('mkt') or {}).get(fam)
+                    if m_n is None:
+                        afectadas.append(fam + ': FAMILIA PERDIDA'); mkt_ok = False
+                    elif m_b > 0 and abs(m_n / m_b - 1) > 0.02:
+                        afectadas.append('{}: mercado {:,.0f} -> {:,.0f} ({:+.1%})'
+                                         .format(fam, m_b, m_n, m_n / m_b - 1))
+                        mkt_ok = False
+                det = ('{} ahora vs {} en baseline (ratio {:.3f} < {:.3f})'
+                       .format(sn['prods'], sb['prods'], ratio, 1 - args.drop))
+                if mkt_ok:
+                    add('WARN', key + ': E productos mol_perf',
+                        det + ' -- pero el MERCADO de cada familia se preserva (<=2%): '
+                        'es menos desglose por nombre, no menos dato')
+                else:
+                    add('FAIL', key + ': E productos mol_perf',
+                        det + ' Y el mercado se movio en: ' + '; '.join(afectadas[:4]))
             else:
                 add('PASS', f'{key}: E productos mol_perf',
                     f'{sn["prods"]} ahora vs {sb["prods"]} en baseline '
