@@ -638,6 +638,33 @@ function Get-SegmentKey {
   return 'unknown'
 }
 
+# Forma farmaceutica parseada del nombre de producto IQVIA (el token de forma esta
+# en el nombre: 'HEXALER PLUS CAPS ...', 'AEROTINA JBE.PAED ...'). Debe quedar
+# sincronizado con scratchpad/forma_parser.py (usado para generar el cubo detalle).
+$script:FormaTokens = @{
+  'TABL' = 'Comprimidos'; 'TAB' = 'Comprimidos'; 'TABLETAS' = 'Comprimidos'; 'COMP' = 'Comprimidos'; 'COMPR' = 'Comprimidos'; 'CPR' = 'Comprimidos'
+  'GRAG' = 'Grageas'; 'GRAGEAS' = 'Grageas'; 'CAPS' = 'Cápsulas'; 'CAP' = 'Cápsulas'; 'PERL' = 'Perlas'
+  'JBE' = 'Jarabe'; 'JARABE' = 'Jarabe'; 'JAR' = 'Jarabe'; 'GTS' = 'Gotas'; 'GOTAS' = 'Gotas'; 'GOT' = 'Gotas'; 'GOTA' = 'Gotas'
+  'SOL' = 'Solución'; 'SOLN' = 'Solución'; 'SOLUC' = 'Solución'; 'SUSP' = 'Suspensión'; 'SUS' = 'Suspensión'; 'SUSPEN' = 'Suspensión'
+  'AMP' = 'Ampollas'; 'AMPOLLA' = 'Ampollas'; 'CREM' = 'Crema'; 'CREMA' = 'Crema'; 'UNG' = 'Ungüento'; 'UNGUENTO' = 'Ungüento'; 'POM' = 'Pomada'
+  'SPRAY' = 'Spray'; 'SPR' = 'Spray'; 'AER' = 'Aerosol'; 'AEROS' = 'Aerosol'; 'AEROSOL' = 'Aerosol'
+  'POLVO' = 'Polvo'; 'PDR' = 'Polvo'; 'PWD' = 'Polvo'; 'PVO' = 'Polvo'; 'GRAN' = 'Granulado'; 'GRANUL' = 'Granulado'; 'LIOF' = 'Liofilizado'
+  'SOBRE' = 'Sobres'; 'SOB' = 'Sobres'; 'SOBRES' = 'Sobres'; 'INH' = 'Inhalador'; 'INHAL' = 'Inhalador'; 'NEB' = 'Nebulización'; 'INY' = 'Inyectable'
+  'VIAL' = 'Vial'; 'PAST' = 'Pastillas'; 'PASTIL' = 'Pastillas'; 'PASTILLA' = 'Pastillas'; 'PASTILLAS' = 'Pastillas'
+  'LIQ' = 'Líquido'; 'LIQD' = 'Líquido'; 'ELIX' = 'Elixir'; 'ELIXIR' = 'Elixir'; 'EMULS' = 'Emulsión'; 'EMU' = 'Emulsión'
+  'PARCHE' = 'Parche'; 'CARAM' = 'Caramelos'; 'CARAMEL' = 'Caramelos'; 'CARAMELO' = 'Caramelos'; 'CARAMELOS' = 'Caramelos'; 'CARA' = 'Caramelos'; 'CARAME' = 'Caramelos'; 'CARMELOS' = 'Caramelos'; 'CAR' = 'Caramelos'
+  'COLUT' = 'Colutorio'; 'COLUTORIO' = 'Colutorio'; 'BUC' = 'Bucal'; 'CHICLE' = 'Chicle'; 'GEL' = 'Gel'; 'CRIS' = 'Cristales'; 'EFERV' = 'Efervescente'
+}
+function Get-FormaFarmaceutica {
+  param([object]$Product)
+  $up = ([string]$Product).ToUpper()
+  foreach ($raw in ($up -split '[\s./,]+')) {
+    $t = ($raw -replace '[^A-Z]', '')
+    if ($t -and $script:FormaTokens.ContainsKey($t)) { return $script:FormaTokens[$t] }
+  }
+  return ''
+}
+
 function Get-ConfigMoleculeRules {
   param([hashtable]$Config)
 
@@ -1684,10 +1711,11 @@ foreach ($family in $dashboardFamilyOrder) {
   $familySiePatterns[$family] = @($patterns | Sort-Object { $_.Length } -Descending)
 }
 
-# Deteccion dinamica de columnas del PM. El "AR_PM_FV_Standard" centralizado
-# tiene Pack=3, ATC IV=4, Ph. Forms III=5, Molecules Long=6 (sin Market Type).
-# El layout legacy usado por respi tenia ATC=4, molecule=5, segment=6.
-# Escaneamos los headers de row 1 para mappear correctamente.
+# Deteccion dinamica de columnas del PM. El "AR_PM_FV_Standard" (Premium standard)
+# real trae: Manufacturer=1, Product=2, Pack=3, ATC IV=4, Molecules Long=5,
+# Market (E/OTC)=6 -> el segment (ETICO/POPULAR) esta en col 6 con header
+# "Market (E/OTC)", NO "Market Type". El layout legacy tenia ATC=4, molecule=5,
+# segment=6. Escaneamos los headers de row 1 para mappear correctamente.
 $pmColMap = [ordered]@{
   pack = 3
   atc = 4
@@ -1699,15 +1727,15 @@ for ($_c = 1; $_c -le [Math]::Min(8, $pmMatrix.GetLength(1)); $_c++) {
   if (-not $_h) { continue }
   if ($_h -match '^MOLECULES?(\s+LONG)?$') { $pmColMap.molecule = $_c }
   elseif ($_h -match '^ATC([\s-]?(IV|4))?$') { $pmColMap.atc = $_c }
-  elseif ($_h -eq 'MARKET TYPE') { $pmColMap.segment = $_c }
+  elseif ($_h -eq 'MARKET TYPE' -or $_h -match 'E/?OTC') { $pmColMap.segment = $_c }
   elseif ($_h -eq 'PACK') { $pmColMap.pack = $_c }
 }
-# Si el AR_PM no trae Market Type, no hay segment (lo dejamos null para que
-# el codigo abajo caiga al default 'all' en lugar de leer una columna que
-# no existe o que tiene otra cosa).
-if ($pmColMap.segment -eq 6) {
-  $_segHdr = ((Normalize-Text $pmMatrix[1, 6]) -replace '\s+', ' ').Trim().ToUpper()
-  if ($_segHdr -ne 'MARKET TYPE') { $pmColMap.segment = $null }
+# Solo dejamos segment si la col apuntada trae realmente el eje etico/popular
+# ("Market Type" del layout legacy o "Market (E/OTC)" del Premium standard).
+# Si no, lo anulamos para caer al default 'all' en vez de leer otra cosa.
+if ($pmColMap.segment) {
+  $_segHdr = ((Normalize-Text $pmMatrix[1, $pmColMap.segment]) -replace '\s+', ' ').Trim().ToUpper()
+  if ($_segHdr -ne 'MARKET TYPE' -and $_segHdr -notmatch 'E/?OTC') { $pmColMap.segment = $null }
 }
 
 for ($r = 2; $r -le $pmMatrix.GetLength(0); $r++) {
@@ -1737,6 +1765,10 @@ $respDddAgg = @{}
 $compareModes = @('molecule', 'atc')
 $segmentModes = @('all', 'etico', 'popular')
 $familyAtcRules = @{}
+# Dedup combo-por-droga del export qlik (1 fila por mes/region/cod_producto) y cubo
+# detalle nacional por producto (filtros forma/condicion/molecula del panel Competidores).
+$dddDedupSet = New-Object 'System.Collections.Generic.HashSet[string]'
+$dddDetailAgg = @{}
 
 foreach ($family in $dashboardFamilyOrder) {
   $respDddAgg[$family] = @{}
@@ -1775,8 +1807,17 @@ for ($r = 2; $r -le $dddMatrix.GetLength(0); $r++) {
   $product = Normalize-Text $dddMatrix[$r, 8]
   $productKey = Normalize-ProductKey $product
   $atcCode = (Normalize-Text $dddMatrix[$r, 6]).ToUpper()
+  $molecule = Normalize-Text $dddMatrix[$r, 3]
+  $codProducto = Normalize-Text $dddMatrix[$r, 7]
   $units = To-Number $dddMatrix[$r, 9]
   if (-not $month -or -not $region -or -not $product -or $units -le 0) { continue }
+
+  # Dedup combo-por-droga del export qlik: un combo aparece 1 fila por molecula con
+  # las MISMAS unidades / atc / cod_producto. Conservamos 1 fila por (mes, region,
+  # cod_producto). Sin esto respDdd queda inflado (ACEMUK ~2x en la API vs el manual).
+  $dedupKey = "$month|$region|$codProducto"
+  if ($dddDedupSet.Contains($dedupKey)) { continue }
+  $dddDedupSet.Add($dedupKey) | Out-Null
 
   $dddMonthsSet.Add($month) | Out-Null
 
@@ -1802,6 +1843,26 @@ for ($r = 2; $r -le $dddMatrix.GetLength(0); $r++) {
   }
 
   $family = $dddMarketConfig[$market].family
+  # Cubo detalle nacional: solo mercado por molecula (no la expansion ATC), keyed por
+  # familia + nombre de producto, unidades nacionales por mes. Alimenta los filtros del
+  # panel Competidores. Certificado 0-diff vs molecule.all (suma == total del mercado).
+  $detFam = $dddDetailAgg[$family]
+  if ($null -eq $detFam) { $detFam = @{}; $dddDetailAgg[$family] = $detFam }
+  $pRec = $detFam[$product]
+  if ($null -eq $pRec) {
+    $segOut = if (@('etico', 'popular') -contains $segmentKey) { $segmentKey } else { '' }
+    $forma = Get-FormaFarmaceutica $product
+    $pRec = @{
+      mol    = $molecule
+      forma  = $(if ($forma) { $forma } else { '(s.d.)' })
+      seg    = $segOut
+      sie    = $(if ($sieOwner -eq $family) { 1 } else { 0 })
+      months = @{}
+    }
+    $detFam[$product] = $pRec
+  }
+  if ($pRec.months.ContainsKey($month)) { $pRec.months[$month] += $units } else { $pRec.months[$month] = $units }
+
   Add-DddBucketRow -Bucket $respDddAgg[$family].molecule.all -Month $month -Region $region -Product $product -Units $units -IsSie ($sieOwner -eq $family)
   if ($segmentModes -contains $segmentKey) {
     Add-DddBucketRow -Bucket $respDddAgg[$family].molecule[$segmentKey] -Month $month -Region $region -Product $product -Units $units -IsSie ($sieOwner -eq $family)
@@ -1830,6 +1891,31 @@ foreach ($family in $dashboardFamilyOrder) {
     }
   }
   $dddMarketsOut[$family] = Convert-DddBucket -Bucket $respDddAgg[$family].molecule.all -Months $dddMonths -Family $family
+}
+
+# Cubo detalle nacional -> respDdd.detail (filtros forma/condicion/molecula). Por familia,
+# lista de productos {p, mol, forma, seg, sie, u:{mes:unidades}}, ordenada SIE primero y
+# luego por unidades totales desc (igual que scratchpad/graft del cierre 2026-07).
+$respDddDetailOut = [ordered]@{}
+foreach ($family in $dashboardFamilyOrder) {
+  $prods = if ($dddDetailAgg.ContainsKey($family)) { $dddDetailAgg[$family] } else { @{} }
+  $items = foreach ($name in $prods.Keys) {
+    $rec = $prods[$name]
+    $tot = 0.0
+    $u = [ordered]@{}
+    foreach ($m in $dddMonths) {
+      if ($rec.months.ContainsKey($m)) {
+        $u[$m] = [math]::Round($rec.months[$m], 0)
+        $tot += $rec.months[$m]
+      }
+    }
+    [pscustomobject]@{ p = $name; mol = $rec.mol; forma = $rec.forma; seg = $rec.seg; sie = $rec.sie; u = $u; _tot = $tot }
+  }
+  $sorted = @($items | Sort-Object @{ Expression = 'sie'; Descending = $true }, @{ Expression = '_tot'; Descending = $true })
+  $plist = foreach ($it in $sorted) {
+    [ordered]@{ p = $it.p; mol = $it.mol; forma = $it.forma; seg = $it.seg; sie = $it.sie; u = $it.u }
+  }
+  $respDddDetailOut[$family] = [ordered]@{ products = @($plist) }
 }
 
 Write-Host "[Respiratorio] DDD procesadas."
@@ -2812,6 +2898,7 @@ $data = [ordered]@{
     order = $dashboardFamilyOrder
     months = $dddMonths
     families = $respDddOut
+    detail = $respDddDetailOut
   }
 }
 

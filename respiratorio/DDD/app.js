@@ -5,6 +5,12 @@ const RESP_FAMILIES = RESP_DDD.families || {};
 const MKT_MAP = Object.keys(RESP_FAMILIES).length ? RESP_FAMILIES : (DD.markets || {});
 const MONTHS = RESP_DDD.months || DD.months || [];
 const FAMILY_MAP = ROOT.familyToMarkets || {};
+// Cubo nacional por producto para los filtros de la pagina Competidores
+// (forma farmaceutica / condicion etico-popular / molecula). Certificado 0-diff
+// contra respDdd.molecule.all (sum por producto == total del mercado por familia/mes).
+// Solo respiratorio lo trae; si falta, los filtros quedan inertes y la pagina
+// se comporta identico a antes.
+const RESP_DETAIL = RESP_DDD.detail || {};
 function hasMeaningfulDddMarket(market){
   const views = MKT_MAP[market];
   if (!views) return false;
@@ -47,6 +53,12 @@ let ztSort = { col:'ms', dir:-1 };
 // Sort para la tabla de productos nacionales (rComp). 'default' = SIE primero
 // + units desc; otras opciones: 'ms' | 'units' | 'var' con dir asc/desc.
 let pSort = { col:'default', dir:'desc' };
+// Filtros del panel de competidores (operan sobre RESP_DETAIL, mercado nacional).
+// filForma/filMol vacios = sin filtro (todas). filCond: 'all'|'etico'|'popular'.
+let filForma = new Set((PARAMS.get('forma') || '').split('|').filter(Boolean));
+let filMol = new Set((PARAMS.get('mol') || '').split('|').filter(Boolean));
+let filCond = PARAMS.get('cond') || 'all';
+if (!['all','etico','popular'].includes(filCond)) filCond = 'all';
 
 function fmt(n){ return Number(n || 0).toLocaleString('es-AR'); }
 function fms(n){ return Number(n || 0).toFixed(1) + '%'; }
@@ -64,6 +76,57 @@ function marketObj(){
     return familyViews?.[cmp]?.[seg] || familyViews?.[cmp]?.all || familyViews?.molecule?.all || null;
   }
   return familyViews;
+}
+// ---- Filtros de competidores (cubo nacional RESP_DETAIL) ----
+function detailFor(family){ return (RESP_DETAIL[family] && RESP_DETAIL[family].products) || []; }
+function familyHasDetail(family){ return detailFor(family).length > 0; }
+function familyFormas(family){ return [...new Set(detailFor(family).map(p => p.forma || '(s.d.)'))].sort((a,b)=>a.localeCompare(b,'es')); }
+function familyMolecules(family){ return [...new Set(detailFor(family).map(p => p.mol).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')); }
+function passFilters(p){
+  if (filForma.size && !filForma.has(p.forma || '(s.d.)')) return false;
+  if (filMol.size && !filMol.has(p.mol)) return false;
+  if (filCond !== 'all' && p.seg !== filCond) return false;
+  return true;
+}
+function filterActive(){ return familyHasDetail(cur) && (filForma.size > 0 || filMol.size > 0 || filCond !== 'all'); }
+function filteredProducts(family){ return detailFor(family).filter(passFilters); }
+// Sintetiza un objeto con forma de bucket (monthly/regionsByMonth/productsByMonth)
+// a partir del cubo nacional filtrado, para que rC2/rComp/rBF (y sus helpers)
+// funcionen sin cambios. regionsByMonth trae una unica fila 'Nacional' -> natRow
+// devuelve el total nacional del universo filtrado.
+function synthNatView(family){
+  const base = MKT_MAP[family] && MKT_MAP[family].molecule && MKT_MAP[family].molecule.all;
+  const axis = base ? MONTHS.filter(m => base.regionsByMonth && base.regionsByMonth[m]) : MONTHS.slice();
+  const prods = filteredProducts(family);
+  const monthly = [], regionsByMonth = {}, productsByMonth = {};
+  axis.forEach(m => {
+    let total = 0, sie = 0;
+    const pr = [];
+    prods.forEach(p => {
+      const u = Number(p.u[m] || 0);
+      if (u > 0) { total += u; if (p.sie) sie += u; pr.push({ product:p.p, units:u, isSie:!!p.sie }); }
+    });
+    const share = total > 0 ? +(sie / total * 100).toFixed(1) : 0;
+    monthly.push({ month:m, total:Math.round(total), sie:Math.round(sie), share });
+    regionsByMonth[m] = [{ name:'Nacional', total:Math.round(total), sie:Math.round(sie), share }];
+    pr.forEach(x => { x.share = total > 0 ? +(x.units / total * 100).toFixed(1) : 0; });
+    pr.sort((a,b) => b.units - a.units);
+    // total/sie ya se sumaron sobre TODOS los productos filtrados; la lista visible
+    // se acota a top-20/mes para que la tabla y el chart no se vuelvan gigantes.
+    productsByMonth[m] = pr.slice(0, 20);
+  });
+  return { family, latestMonth: axis[axis.length - 1] || '', monthly, regionsByMonth, productsByMonth, _synth:true };
+}
+// Vista nacional para los paneles de competidores: bucket normal si no hay filtro,
+// o la vista sintetizada filtrada si hay. Los paneles regionales siguen usando marketObj().
+function natViewObj(){ return filterActive() ? synthNatView(cur) : marketObj(); }
+// Poda selecciones de filtro que no existen en el market actual (al cambiar de mercado).
+function pruneFilters(){
+  if (!familyHasDetail(cur)) { filForma.clear(); filMol.clear(); filCond = 'all'; return; }
+  const forms = new Set(familyFormas(cur));
+  const mols = new Set(familyMolecules(cur));
+  filForma = new Set([...filForma].filter(f => forms.has(f)));
+  filMol = new Set([...filMol].filter(m => mols.has(m)));
 }
 function marketMonths(mk){ return MONTHS.filter(m => mk?.regionsByMonth?.[m]); }
 function latestMonth(mk){ return mk?.latestMonth || marketMonths(mk).slice(-1)[0] || MONTHS.slice(-1)[0] || ''; }
@@ -155,8 +218,9 @@ function competitorRows(mk){
 function allProductRows(mk){ return productRows(mk, latestMonth(mk)); }
 function ensureSelection(){
   const mk = marketObj();
+  const nv = natViewObj();
   const regionNames = regionRows(mk, latestMonth(mk)).map(row => row.name);
-  const productNames = competitorRows(mk).map(row => row.product);
+  const productNames = competitorRows(nv).map(row => row.product);
   selRegs = selRegs.filter(reg => regionNames.includes(reg));
   if (selB && !productNames.includes(selB)) selB = null;
 }
@@ -168,6 +232,9 @@ function syncUrl(){
   url.searchParams.set('segment', seg);
   if (selB) url.searchParams.set('product', selB); else url.searchParams.delete('product');
   if (selRegs.length) url.searchParams.set('regions', selRegs.join('|')); else url.searchParams.delete('regions');
+  if (filForma.size) url.searchParams.set('forma', [...filForma].join('|')); else url.searchParams.delete('forma');
+  if (filMol.size) url.searchParams.set('mol', [...filMol].join('|')); else url.searchParams.delete('mol');
+  if (filCond !== 'all') url.searchParams.set('cond', filCond); else url.searchParams.delete('cond');
   history.replaceState({}, '', url);
 }
 function lineColor(index){ return BC[index % BC.length]; }
@@ -257,17 +324,26 @@ function lineOptions(legendFont){
 }
 
 function rKPI(mk){
-  const ar = activeReg();
-  const latest = latestMonth(mk);
-  const first = marketMonths(mk)[0];
-  const latestRow = ar === '__NAC__' ? natRow(mk, latest) : regionRow(mk, ar, latest);
-  const firstRow = ar === '__NAC__' ? natRow(mk, first) : regionRow(mk, ar, first);
+  // Con filtro activo, las tarjetas nacionales reflejan el mercado filtrado
+  // (vista nacional sintetizada). El filtro es nacional, asi que se ignora la
+  // seleccion de region para las KPI y la tarjeta 4 pasa a "peso del filtro".
+  const useFilt = filterActive();
+  const kmk = useFilt ? natViewObj() : mk;
+  const ar = useFilt ? '__NAC__' : activeReg();
+  const latest = latestMonth(kmk);
+  const first = marketMonths(kmk)[0];
+  const latestRow = ar === '__NAC__' ? natRow(kmk, latest) : regionRow(kmk, ar, latest);
+  const firstRow = ar === '__NAC__' ? natRow(kmk, first) : regionRow(kmk, ar, first);
   const latestMs = Number(ar === '__NAC__' ? latestRow.ms : latestRow.share || 0);
   const firstMs = Number(ar === '__NAC__' ? firstRow.ms : firstRow.share || 0);
   const diff = +(latestMs - firstMs).toFixed(1);
-  const label = activeLabel();
+  const label = useFilt ? 'Nacional' : activeLabel();
   let k4 = '';
-  if (ar === '__NAC__') {
+  if (useFilt) {
+    const full = natRow(mk, latest).total;
+    const peso = full > 0 ? +(latestRow.total / full * 100).toFixed(1) : 0;
+    k4 = `<div class="kc c4"><div class="kh">PESO DEL FILTRO</div><div class="kv purple">${peso}%</div><div class="kd">${fmt(latestRow.total)} de ${fmt(full)} u.<br>del mercado ${cur}</div></div>`;
+  } else if (ar === '__NAC__') {
     const rows = regionRows(mk, latest);
     const above = rows.filter(row => Number(row.share || 0) > latestMs).length;
     k4 = `<div class="kc c4"><div class="kh">REGIONES SOBRE PROMEDIO</div><div class="kv purple">${above}<span style="font-size:15px;color:var(--t4)">/${rows.length}</span></div><div class="kd">MS% > ${fms(latestMs)} nacional</div></div>`;
@@ -278,7 +354,7 @@ function rKPI(mk){
   }
   document.getElementById('kr').innerHTML = `
     <div class="kc c1"><div class="kh">MS% · ${label.toUpperCase()}</div><div class="kv red">${fms(latestMs)}</div><div class="kd">${cur}<br>${fmt(latestRow.total)} u. mercado</div></div>
-    <div class="kc c2"><div class="kh">UNIDADES SIE · ${monthLabel(latest).toUpperCase()}</div><div class="kv blue">${fk(latestRow.sie)}</div><div class="kd">${mk.family}<br>de ${fk(latestRow.total)} u.</div></div>
+    <div class="kc c2"><div class="kh">UNIDADES SIE · ${monthLabel(latest).toUpperCase()}</div><div class="kv blue">${fk(latestRow.sie)}</div><div class="kd">${kmk.family}<br>de ${fk(latestRow.total)} u.</div></div>
     <div class="kc c3"><div class="kh">MS% ÚLTIMO CORTE · ${label.toUpperCase()}</div><div class="kv green">${fms(latestMs)}</div><div class="kd">${monthLabel(latest)} · <span style="color:${diff >= 0 ? 'var(--green)' : 'var(--red)'}">${diff >= 0 ? '+' : ''}${diff}pp</span> vs ${monthLabel(first)}</div></div>${k4}`;
 }
 
@@ -874,21 +950,79 @@ function refreshSegChipsAvailability(){
   }
 }
 
+// ---- UI de filtros de competidores ----
+function filtChip(label, active, onClick, title){
+  const c = document.createElement('div');
+  c.className = 'mc' + (active ? ' a' : '');
+  c.textContent = label;
+  if (title) c.title = title;
+  c.onclick = onClick;
+  return c;
+}
+function buildFilterBars(){
+  const wrap = document.getElementById('filtGroups');
+  const has = familyHasDetail(cur);
+  if (wrap) wrap.style.display = has ? 'flex' : 'none';
+  if (!has) return;
+  const fb = document.getElementById('formaBar');
+  if (fb){
+    fb.innerHTML = '';
+    fb.appendChild(filtChip('Todas', filForma.size === 0, () => { filForma.clear(); render(); }));
+    familyFormas(cur).forEach(f => fb.appendChild(
+      filtChip(f, filForma.has(f), () => { filForma.has(f) ? filForma.delete(f) : filForma.add(f); render(); })));
+  }
+  const cb = document.getElementById('condBar');
+  if (cb){
+    cb.innerHTML = '';
+    [['all','Todas'],['etico','Bajo receta · ético'],['popular','Venta libre · popular']].forEach(([k,l]) =>
+      cb.appendChild(filtChip(l, filCond === k, () => { filCond = k; render(); })));
+  }
+  const mb = document.getElementById('molBar');
+  if (mb){
+    mb.innerHTML = '';
+    mb.appendChild(filtChip('Todas', filMol.size === 0, () => { filMol.clear(); render(); }));
+    familyMolecules(cur).forEach(m => mb.appendChild(
+      filtChip(m, filMol.has(m), () => { filMol.has(m) ? filMol.delete(m) : filMol.add(m); render(); })));
+  }
+}
+function updFilterNote(){
+  const el = document.getElementById('filtNote');
+  if (!el) return;
+  if (!filterActive()){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  const parts = [];
+  if (filCond !== 'all') parts.push(filCond === 'etico' ? 'bajo receta (ético)' : 'venta libre (popular)');
+  if (filForma.size) parts.push('forma: ' + [...filForma].join(', '));
+  if (filMol.size) parts.push('molécula: ' + [...filMol].join(', '));
+  const nv = natViewObj();
+  const latest = latestMonth(nv);
+  const nat = natRow(nv, latest);
+  const n = filteredProducts(cur).length;
+  el.style.display = 'block';
+  el.innerHTML = `<b>Filtro activo</b> · ${parts.join(' · ')} — ${n} producto${n === 1 ? '' : 's'} · mercado ${fmt(nat.total)} u. (${monthLabel(latest)}). ` +
+    `<span style="opacity:.75">Aplica a los paneles de competidores (02 · MS% Mensual y 04 · tabla); el mapa y las tablas por región muestran el mercado completo.</span> ` +
+    `<a href="#" onclick="clrFilters();return false;" style="color:var(--sie);font-weight:700">Limpiar filtros</a>`;
+}
+function clrFilters(){ filForma.clear(); filMol.clear(); filCond = 'all'; render(); }
+
 function render(){
   const mk = marketObj();
   if (!mk) return;
+  pruneFilters();
   ensureSelection();
   syncUrl();
   refreshSegChipsAvailability();
+  const nv = natViewObj();
   renderHero(mk);
   rKPI(mk);
-  rBF(mk);
+  rBF(nv);
   rC1(mk);
-  rC2(mk);
+  rC2(nv);
   rC3(mk);
-  rComp(mk);
+  rComp(nv);
   rTbl(mk);
   rMapa(mk);
+  buildFilterBars();
+  updFilterNote();
   buildRegList();
   updBtnText();
   updTags();
